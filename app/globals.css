@@ -65,3 +65,32 @@ body {
     width: 0px;
     height: 100%;
 }
+
+/* OTP Input */
+
+.custom-otp .ant-input {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 50% !important;
+  text-align: center !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  border: 1.5px solid #d9d9d9 !important;
+  margin: 0 10px !important;
+}
+
+/* Focus state */
+.custom-otp .ant-input:focus {
+  border-color: #0F3057 !important;
+  box-shadow: none !important;
+}
+
+/* Space between circles */
+.custom-otp .ant-input-group > .ant-input {
+  margin-right: 12px !important;
+}
+
+/* Remove last margin */
+.custom-otp .ant-input-group > .ant-input:last-child {
+  margin-right: 0 !important;
+}

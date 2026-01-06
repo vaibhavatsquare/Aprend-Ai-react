@@ -1,34 +1,36 @@
 "use client";
+import { useRedirect } from "@/src/hooks/router.hooks";
 import { Button, Input } from "antd";
 import { OTPProps } from "antd/es/input/OTP";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { GoArrowLeft } from "react-icons/go";
 
-interface LoginFormData {
+interface SignUpFormData {
   email: string;
   password: string;
 }
 
-const Login = () => {
+const SignUp = () => {
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginFormData>();
+  } = useForm<SignUpFormData>();
 
   const [isOtpSent, setIsOtpSent] = useState(false);
 
-  const handleLogin = async (data: LoginFormData) => {
-    setIsOtpSent(true);
-  };
+  const handleSignUp = async (data: SignUpFormData) => {};
 
   const handleOtp = async () => {
     setIsOtpSent(false);
   };
 
-  const handleResendOtp = async () => {};
+  const handleResendOtp = async () => {
+    setIsOtpSent(true);
+  };
 
   const onChange: OTPProps["onChange"] = (text) => {
     console.log("onChange:", text);
@@ -51,10 +53,11 @@ const Login = () => {
           alt="Login background"
           width={800}
           height={600}
-          className="object-contain w-auto h-full"
+          className="object-contain w-auto max-h-screen"
         />
       </div>
-      <form className="flex-1 h-full bg-white rounded-tl-4xl rounded-bl-4xl flex items-center justify-center">
+      <form className="relative flex-1 h-screen bg-white rounded-tl-4xl rounded-bl-4xl flex items-center justify-center">
+        <GoArrowLeft className="absolute top-5 left-5 cursor-pointer text-xl" onClick={() => useRedirect("/login")}/>
         {isOtpSent ? (
           <div className="w-[90%] sm:w-[80%] md:w-[60%] xl:w-[40%] h-full overflow-y-auto scrollbar-hide py-20 flex flex-col justify-center gap-10">
             <div className="flex flex-col gap-1 text-primary">
@@ -97,10 +100,12 @@ const Login = () => {
             </div>
           </div>
         ) : (
-          <div className="w-[90%] sm:w-[80%] md:w-[60%] xl:w-[50%] h-full overflow-y-auto scrollbar-hide py-10 flex flex-col justify-center gap-8">
+          <div className="w-[90%] sm:w-[80%] md:w-[60%] xl:w-[50%] h-full overflow-y-auto scrollbar-hide py-20 flex flex-col justify-center gap-8">
             <div className="flex flex-col gap-1 text-primary">
-              <h1 className="text-2xl font-bold">Welcome Back</h1>
-              <p className="text-sm">Log in to continue your learning</p>
+              <h1 className="text-2xl font-bold">Let's get started</h1>
+              <p className="text-sm">
+                Start your learning journey in just a few steps
+              </p>
             </div>
 
             <div className="flex flex-col gap-4">
@@ -148,22 +153,19 @@ const Login = () => {
                     />
                   )}
                 />
-                <div className="w-full flex gap-2 justify-between items-center">
+                {errors.password && (
                   <p className="text-red-500 text-xs">
-                    {errors?.password?.message || ""}
+                    {errors.password.message}
                   </p>
-                  <Link href="/forgot-password" className="text-primary text-sm">
-                    Forgot Password?
-                  </Link>
-                </div>
+                )}
               </div>
 
               <div className="flex justify-center">
                 <Button
-                  onClick={handleSubmit(handleLogin)}
+                  onClick={handleSubmit(handleSignUp)}
                   className="mt-6 w-[90%] h-[40px]! bg-primary! text-white! border-none! py-2 px-4 rounded-xl! hover:bg-primary/90! transition-all"
                 >
-                  Login
+                  Sign Up
                 </Button>
               </div>
 
@@ -197,9 +199,9 @@ const Login = () => {
               </div>
 
               <p className="mt-8 text-center text-sm text-gray-600">
-                Don't have an account?{" "}
-                <Link href="/signup" className="text-primary hover:underline">
-                  Sign up
+                Already have an account?{" "}
+                <Link href="/login" className="text-primary hover:underline">
+                  Sign In
                 </Link>
               </p>
             </div>
@@ -210,4 +212,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default SignUp;

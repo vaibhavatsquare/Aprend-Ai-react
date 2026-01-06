@@ -1,4 +1,4 @@
-export const authPathNames = ["/", "/login", "/forgot-password"];
+export const authPathNames = ["/", "/login", "/signUp", "/forgot-password"];
 
 export const protectedPathNames = [
     "/home",
