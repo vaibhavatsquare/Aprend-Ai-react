@@ -14,16 +14,10 @@ import Step5 from "./quizeSteps/step5";
 import { useSearchParams } from "next/navigation";
 
 const PlacementQuize = () => {
-
-    const searchParams = useSearchParams();
-  const [currentStep, setCurrentStep] = useState<number>(0);
-
-  useEffect(() => {
-    const step = searchParams.get("step")
-    if (step) {
-      setCurrentStep(parseInt(step) || 1)
-    }
-  }, [])
+  const searchParams = useSearchParams();
+  const [currentStep, setCurrentStep] = useState(
+    searchParams.get("step") ? parseInt(searchParams.get("step")!) : 1
+  );
 
   const renderStep = () => {
     switch (currentStep) {
@@ -46,7 +40,7 @@ const PlacementQuize = () => {
     <div className="w-full h-full flex justify-center items-center">
       <div className="flex flex-col gap-6 items-center">
         <div className="w-[250px] flex flex-col items-center gap-2">
-            <p className="text-xs text-primary font-medium">{currentStep}/5</p>
+          <p className="text-xs text-primary font-medium">{currentStep}/5</p>
           <Progress
             percent={currentStep * 20}
             size="small"
