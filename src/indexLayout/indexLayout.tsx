@@ -19,7 +19,9 @@ const IndexLayout = ({ children }: { children: React.ReactNode }) => {
     setRouterInstance(router);
   }, [router]);
 
-  const isAuthPath = authPathNames.includes(pathname);
+  const isAuthPath = authPathNames.some(
+    (path) => pathname === path || pathname.startsWith(`${path}/`)
+  );
 
   const isProtectedPath = protectedPathNames.some(
     (path) => pathname === path || pathname.startsWith(`${path}/`)

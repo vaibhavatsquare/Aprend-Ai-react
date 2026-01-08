@@ -24,11 +24,11 @@ export default function RootLayout({
       <body
         className={`${roboto.className} antialiased`}
       >
-        <IndexLayout>
-          <SidebarContextProvider>
+        <SidebarContextProvider>
+          <IndexLayout>
             {children}
-          </SidebarContextProvider>
-        </IndexLayout>
+          </IndexLayout>
+        </SidebarContextProvider>
       </body>
     </html>
   );

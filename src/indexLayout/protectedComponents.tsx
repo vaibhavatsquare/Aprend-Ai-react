@@ -4,17 +4,18 @@ import Sidebar from "@/src/components/sidebar/sidebar";
 import Navbar from "@/src/components/navbar/navbar";
 import { useSidebarContext } from "@/src/context/sidebar.context";
 import withAuth from "../hoc/withAuth";
+import { usePathname } from "next/navigation";
 
 const ProtectedComponents = ({ children }: { children: React.ReactNode }) => {
   const { isCollapsed } = useSidebarContext();
-  const [height, setHeight] = useState("100vh");
+  const pathname = usePathname();
 
-  useEffect(() => {
-    const h = window.innerHeight || "100vh";
-    setHeight(`${h}px`);
-  }, []);
+  if (pathname.startsWith("/onboarding")) {
+    return <div className="w-screen h-screen">{children}</div>;
+  }
+
   return (
-    <div className="w-[100vw] flex" style={{ height }}>
+    <div className="w-screen h-screen flex">
       <Sidebar />
       <div
         className={`${

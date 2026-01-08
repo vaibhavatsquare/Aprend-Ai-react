@@ -15,13 +15,13 @@ export const SidebarContextProvider = ({ children }) => {
     }, []);
 
   return (
-    <SidebarContext.Provider
+    <SidebarContext
       value={{
         isCollapsed, setIsCollapsed, isTabChangeLoading, setIsTabChangeLoading
       }}
     >
       {children}
-    </SidebarContext.Provider>
+    </SidebarContext>
   );
 };
 
