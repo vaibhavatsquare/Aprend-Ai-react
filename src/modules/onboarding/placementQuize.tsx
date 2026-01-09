@@ -12,6 +12,7 @@ import Step3 from "./quizeSteps/step3";
 import Step4 from "./quizeSteps/step4";
 import Step5 from "./quizeSteps/step5";
 import { useSearchParams } from "next/navigation";
+import Final from "./quizeSteps/final";
 
 const PlacementQuize = () => {
   const searchParams = useSearchParams();
@@ -32,13 +33,14 @@ const PlacementQuize = () => {
       case 5:
         return <Step5 {...{ setCurrentStep }} />;
       default:
-        return <></>;
+        return <Final />;
     }
   };
 
   return (
     <div className="w-full h-full flex justify-center items-center">
       <div className="flex flex-col gap-6 items-center">
+        {currentStep !== 6 &&
         <div className="w-[250px] flex flex-col items-center gap-2">
           <p className="text-xs text-primary font-medium">{currentStep}/5</p>
           <Progress
@@ -48,7 +50,7 @@ const PlacementQuize = () => {
             strokeColor="#0F3057"
             strokeWidth={3}
           />
-        </div>
+        </div>}
         {renderStep()}
       </div>
     </div>

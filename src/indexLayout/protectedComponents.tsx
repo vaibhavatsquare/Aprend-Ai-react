@@ -24,7 +24,7 @@ const ProtectedComponents = ({ children }: { children: React.ReactNode }) => {
       >
         <Navbar />
         <div
-          className={`w-full h-[calc(100%-60px)] overflow-y-auto bg-gray-100`}
+          className={`w-full h-[calc(100%-80px)] overflow-y-auto bg-white`}
         >
           {children}
         </div>

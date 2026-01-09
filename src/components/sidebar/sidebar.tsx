@@ -8,6 +8,10 @@ import { useSidebarContext } from "@/src/context/sidebar.context";
 import { UserOutlined } from "@ant-design/icons";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import Image from "next/image";
+import { GoHomeFill } from "react-icons/go";
+import { TbCards } from "react-icons/tb";
+import NotesIcon from "../icons/notesIcon";
+import UserIcon from "../icons/userIcon";
 
 const poppins = Poppins({
   weight: ["300", "400", "500", "600", "700"],
@@ -19,8 +23,26 @@ const menuItems = [
   {
     key: "home",
     label: "Home",
-    icon: UserOutlined,
+    icon: GoHomeFill,
     href: "/home",
+  },
+  {
+    key: "flashcards",
+    label: "Flashcards",
+    icon: TbCards,
+    href: "/flashcards",
+  },
+  {
+    key: "notes",
+    label: "Notes",
+    icon: NotesIcon,
+    href: "/notes",
+  },
+  {
+    key: "profile",
+    label: "Profile",
+    icon: UserIcon,
+    href: "/profile",
   },
 ];
 
@@ -50,26 +72,22 @@ const Sidebar = () => {
 
   return (
     <div
-      className={`relative h-full bg-white border-r border-[#e0e0e0] shadow-xl lg:shadow-none
+      className={`relative h-full bg-white shadow-xl lg:shadow-none
       ${poppins.className} flex flex-col transition-all duration-500
       ${isCollapsed ? "w-[60px]" : "w-[230px]"}
     `}
+    style={{
+      boxShadow: "0px 0px 10px 0px #0000001A inset",
+    }}
     >
       {/* Logo */}
-      <Link href="/home" className={`flex justify-center items-center mt-4`}>
-        <Image
-          src="" // Add your logo path here and adjust size as needed
-          alt="Logo"
-          width={150}
-          height={150}
-          className={`${
-            isCollapsed ? "w-[30px]" : "w-[120px]"
-          } h-[30px] border`}
-        />
+      <Link href="/home" className={`flex flex-col items-center`}>
+        <Image src="/images/appLogo.svg" alt="Loading" width={90} height={90} />
+        <p className="text-primary font-bold">MESTRE.IA</p>
       </Link>
 
       {/* Menu */}
-      <div className="flex flex-col gap-1 mt-10 px-1.5 overflow-y-auto scrollbar-mini pb-20">
+      <div className="flex flex-col gap-1 mt-10 overflow-y-auto scrollbar-mini pb-20">
         {menuItems.map((item) => {
           const isActive = selectedItem === item.key;
           const Icon = item.icon;
@@ -82,26 +100,26 @@ const Sidebar = () => {
               <Link
                 href={item.href}
                 onClick={() => handleNavigation(item.key)}
-                className={`flex items-center cursor-pointer rounded-md
+                className={`flex items-center cursor-pointer
                   border border-transparent hover:border-white
                   transition-all duration-300
-                  ${
-                    isCollapsed ? "justify-center px-0 py-2" : "gap-2 px-3 py-2"
-                  }
-                  ${isActive ? "bg-[#006aff]" : ""}
+                  gap-2 pl-8 h-[50px] relative
+                  ${isActive ? "bg-primary" : ""}
                 `}
               >
+                <Image src="/images/sidebar/curv.svg" alt="Loading" width={12} height={50} className="absolute left-0" />
+
                 <Icon
-                  className={`${isActive ? "text-white" : "text-[#006aff]"}`}
+                  className={`${isActive ? "text-white" : "text-[#555555]"} text-xl`}
                 />
 
                 {!isCollapsed && (
                   <span
                     className={`${
                       isActive
-                        ? "text-white font-semibold"
-                        : "text-[#006aff] font-medium"
-                    } text-[12px] truncate`}
+                        ? "text-white"
+                        : "text-[#555555]"
+                    } text-[12px] truncate font-medium`}
                   >
                     {item.label}
                   </span>
@@ -110,22 +128,6 @@ const Sidebar = () => {
             </Tooltip>
           );
         })}
-      </div>
-
-      {/* Toggle Button */}
-      <div className="absolute bottom-0 flex justify-center items-center p-1.5 w-full cursor-pointer">
-        <button
-          onClick={toggleSidebar}
-          className="w-full h-full flex justify-center items-center py-2 bg-[#006aff] rounded-md"
-        >
-          <Tooltip title="Toggle Sidebar" placement="right">
-            {isCollapsed ? (
-              <FaChevronRight className="text-[#ffffff]" />
-            ) : (
-              <FaChevronLeft className="text-[#ffffff]" />
-            )}
-          </Tooltip>
-        </button>
       </div>
     </div>
   );

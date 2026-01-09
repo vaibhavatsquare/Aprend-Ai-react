@@ -12,8 +12,9 @@ const Step5 = ({
 }) => {
   const [selectedLearningTime, setSelectedLearningTime] = useState<string>("");
 
-  const handleContinue = () => {
-    // setCurrentStep(5);
+  const handleFinish = () => {
+    setCurrentStep(6);
+    setSearchParam("step", 6);
   };
 
   return (
@@ -62,10 +63,10 @@ const Step5 = ({
           Back
         </Button>
         <Button
-          onClick={handleContinue}
+          onClick={handleFinish}
           className="w-[180px] h-10! rounded-xl! text-white! bg-primary! mt-4"
         >
-          Continue
+          Finish
         </Button>
       </div>
     </div>
