@@ -27,7 +27,7 @@ const Final = () => {
             height={48}
           />
           <div className="flex flex-col">
-            <p className="text-[#555555]">Subject</p>
+            <p className="text-secondary">Subject</p>
             <p className="text-primary">English and Mathematics</p>
           </div>
         </div>
@@ -39,7 +39,7 @@ const Final = () => {
             height={48}
           />
           <div className="flex flex-col">
-            <p className="text-[#555555]">Goal</p>
+            <p className="text-secondary">Goal</p>
             <p className="text-primary">Learn a new topic from scratch</p>
           </div>
         </div>
@@ -51,7 +51,7 @@ const Final = () => {
             height={48}
           />
           <div className="flex flex-col">
-            <p className="text-[#555555]">Learning Style</p>
+            <p className="text-secondary">Learning Style</p>
             <p className="text-primary">Auditory + Reading/Writing</p>
           </div>
         </div>

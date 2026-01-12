@@ -182,7 +182,7 @@ const Login = () => {
                     height={28}
                     className="w-[28px] h-[28px]"
                   />
-                  <p className="text-[#555555]">Google</p>
+                  <p className="text-secondary">Google</p>
                 </div>
                 <div className="w-[150px] border-gray-300 flex gap-2 items-center justify-center cursor-pointer">
                   <Image
@@ -192,7 +192,7 @@ const Login = () => {
                     height={28}
                     className="w-[28px] h-[28px]"
                   />
-                  <p className="text-[#555555]">Apple</p>
+                  <p className="text-secondary">Apple</p>
                 </div>
               </div>
 

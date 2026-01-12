@@ -110,7 +110,7 @@ const Sidebar = () => {
                 <Image src="/images/sidebar/curv.svg" alt="Loading" width={12} height={50} className="absolute left-0" />
 
                 <Icon
-                  className={`${isActive ? "text-white" : "text-[#555555]"} text-xl`}
+                  className={`${isActive ? "text-white" : "text-secondary"} text-xl`}
                 />
 
                 {!isCollapsed && (
@@ -118,7 +118,7 @@ const Sidebar = () => {
                     className={`${
                       isActive
                         ? "text-white"
-                        : "text-[#555555]"
+                        : "text-secondary"
                     } text-[12px] truncate font-medium`}
                   >
                     {item.label}
