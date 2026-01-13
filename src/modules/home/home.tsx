@@ -1,4 +1,6 @@
+"use client"
 import IconSparkel from "@/src/components/icons/iconSparkel";
+import { useRedirect } from "@/src/hooks/router.hooks";
 import Image from "next/image";
 import React from "react";
 import { AiOutlineFire } from "react-icons/ai";
@@ -9,7 +11,7 @@ import { LuChevronRight } from "react-icons/lu";
 
 const Home = () => {
   return (
-    <div className="px-4 grid grid-cols-3 gap-4">
+    <div className="px-4 grid grid-cols-3 gap-2">
       <div className="h-[calc(100vh-80px)] p-2 overflow-y-auto scrollbar col-span-2 flex flex-col gap-4">
         <div className="relative w-full flex items-start justify-between gap-4 rounded-lg px-4 py-6 bg-linear-to-r from-[#F97316] via-[#ED482F] to-[#EF4444]">
           <h1 className="text-2xl text-white">
@@ -47,7 +49,7 @@ const Home = () => {
           </div>
 
           <div className="flex flex-col gap-3">
-            {Array.from({ length: 6 }).map((_, index) => (
+            {Array.from({ length: 4 }).map((_, index) => (
               <div
                 key={index}
                 className="p-3 border border-gray-200 rounded-lg flex gap-2 items-center justify-between cursor-pointer"
@@ -75,8 +77,8 @@ const Home = () => {
       </div>
 
       {/* Right part */}
-      <div className="flex flex-col gap-4">
-        <div className="relative h-[126px] border-2 border-[#3A86FF] flex flex-col justify-end gap-4 bg-primary rounded-xl p-4">
+      <div className="flex flex-col gap-4 h-[calc(100vh-80px)] p-2 overflow-y-auto scrollbar">
+        <div className="relative h-[126px] border-2 border-[#3A86FF] flex flex-col justify-end gap-4 bg-primary rounded-xl p-4 cursor-pointer" onClick={() => useRedirect("/home/ai-tutor")}>
           <IconSparkel />
           <h2 className="text-white text-sm tracking-wider">
             YOUR <span className="font-medium">AI TUTOR</span> IS READY TO HELP
@@ -91,9 +93,22 @@ const Home = () => {
         </div>
 
         <div className="relative flex flex-col gap-3 justify-end p-4 rounded-xl h-[166px] bg-[#BDFF43]">
-          <IoArrowForwardSharp className="-rotate-45 absolute top-2 ring-2" />
-          <h2 className="text-xl font-medium">Upload Notes</h2>
-          <p>Upload images to create new <br />study sets.</p>
+          <IoArrowForwardSharp className="text-xl -rotate-45 absolute top-4 right-4 cursor-pointer" />
+          <h2 className="text-lg font-medium">Upload Notes</h2>
+          <p>
+            Upload images to create new <br />
+            study sets.
+          </p>
+        </div>
+
+        <div className="flex gap-2 items-center justify-between p-4 rounded-xl border border-[#DADADA]">
+          <p className="text-sm font-medium">Question Bank</p>
+          <IoArrowForwardSharp className="text-lg -rotate-45 cursor-pointer" />
+        </div>
+
+        <div className="flex gap-2 items-center justify-between p-4 rounded-xl border border-[#DADADA]">
+          <p className="text-sm font-medium">Weak Spot Tracker</p>
+          <IoArrowForwardSharp className="text-lg -rotate-45 cursor-pointer" />
         </div>
       </div>
     </div>
