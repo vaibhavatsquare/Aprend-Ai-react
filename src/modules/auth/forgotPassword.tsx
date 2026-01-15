@@ -1,12 +1,13 @@
 "use client";
 import { useRedirect } from "@/src/hooks/router.hooks";
-import { Button, Input } from "antd";
+import { Button, Input, message } from "antd";
 import { OTPProps } from "antd/es/input/OTP";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { GoArrowLeft } from "react-icons/go";
+import { forgotPasswordWithFirebase } from "@/src/services/auth/auth.service";
 
 interface ForgotPasswordFormData {
   email?: string;
@@ -25,9 +26,18 @@ const ForgotPassword = () => {
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [isResetOpen, setIsResetOpen] = useState(false);
 
+  // const handleForgotPassword = async (data: ForgotPasswordFormData) => {
+  //   setIsOtpSent(true);
+  // };
+
   const handleForgotPassword = async (data: ForgotPasswordFormData) => {
-    setIsOtpSent(true);
-  };
+  try {
+    await forgotPasswordWithFirebase(data.email!);
+    message.success("Password reset link sent to email");
+  } catch (error: any) {
+    message.error(error?.message || "Failed to send reset email");
+  }
+};
 
   const handleOtp = async () => {
     setIsResetOpen(true);

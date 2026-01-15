@@ -1,12 +1,15 @@
 "use client";
 import { useRedirect } from "@/src/hooks/router.hooks";
-import { Button, Input } from "antd";
+import { Button, Input, message } from "antd";
 import { OTPProps } from "antd/es/input/OTP";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { GoArrowLeft } from "react-icons/go";
+import { signUpWithFirebase, signInWithGoogle } from "@/src/services/auth/auth.service";
+import { useAuth } from "@/src/context/auth.context";
 
 interface SignUpFormData {
   email: string;
@@ -20,9 +23,45 @@ const SignUp = () => {
     formState: { errors },
   } = useForm<SignUpFormData>();
 
+  const router = useRouter();
   const [isOtpSent, setIsOtpSent] = useState(false);
+  const { currentUser, loading } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSignUp = async (data: SignUpFormData) => {};
+  useEffect(() => {
+    if (!loading && currentUser) {
+      useRedirect("/home");
+    }
+  }, [currentUser, loading]);
+
+  const handleSignUp = async (data: SignUpFormData) => {
+    try {
+      await signUpWithFirebase(data.email, data.password);
+      message.success("Account created successfully");
+      useRedirect("/home");
+    } catch (error: any) {
+      message.error(error?.message || "Signup failed");
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    if (isLoading) return;
+
+    try {
+      setIsLoading(true);
+
+      const result = await signInWithGoogle();
+
+      if (!result) return; // user cancelled popup
+
+      message.success("Signed in with Google");
+      router.replace("/home");
+    } catch (error: any) {
+      message.error(error.message || "Google sign-in failed");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleOtp = async () => {
     setIsOtpSent(false);
@@ -57,7 +96,7 @@ const SignUp = () => {
         />
       </div>
       <form className="relative flex-1 h-screen bg-white rounded-tl-4xl rounded-bl-4xl flex items-center justify-center">
-        <GoArrowLeft className="absolute top-5 left-5 cursor-pointer text-xl" onClick={() => useRedirect("/login")}/>
+        <GoArrowLeft className="absolute top-5 left-5 cursor-pointer text-xl" onClick={() => useRedirect("/login")} />
         {isOtpSent ? (
           <div className="w-[90%] sm:w-[80%] md:w-[60%] xl:w-[40%] h-full overflow-y-auto scrollbar-hide py-20 flex flex-col justify-center gap-10">
             <div className="flex flex-col gap-1 text-primary">
@@ -176,7 +215,10 @@ const SignUp = () => {
               </div>
 
               <div className="flex justify-center">
-                <div className="w-[150px] border-r border-gray-300 flex gap-2 items-center justify-center cursor-pointer">
+                <div
+                  onClick={handleGoogleSignIn}
+                  className="w-[150px] border-r border-gray-300 flex gap-2 items-center justify-center cursor-pointer"
+                >
                   <Image
                     src="/images/auth/googleLogo.svg"
                     alt="Google login"

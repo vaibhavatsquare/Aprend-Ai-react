@@ -1,10 +1,16 @@
 "use client";
-import { Button, Input } from "antd";
+import { Button, Input, message } from "antd";
 import { OTPProps } from "antd/es/input/OTP";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
+import {
+  signInWithFirebase,
+  signInWithGoogle
+} from '@/src/services/auth/auth.service';
+import { useAuth } from "@/src/context/auth.context";
 
 interface LoginFormData {
   email: string;
@@ -12,23 +18,60 @@ interface LoginFormData {
 }
 
 const Login = () => {
+  const router = useRouter();
+  const { currentUser, loading } = useAuth();
+  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
   const {
     control,
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormData>();
 
-  const [isOtpSent, setIsOtpSent] = useState(false);
+  useEffect(() => {
+    if (!loading && currentUser) {
+      router.replace("/home");
+    }
+  }, [currentUser, loading, router]);
+
+  const handleGoogleSignIn = async () => {
+    if (isLoading) return;
+
+    try {
+      setIsLoading(true);
+
+      const result = await signInWithGoogle();
+
+      if (!result) return; // user cancelled popup
+
+      message.success("Signed in with Google");
+      router.replace("/home");
+    } catch (error: any) {
+      message.error(error.message || "Google sign-in failed");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleLogin = async (data: LoginFormData) => {
-    setIsOtpSent(true);
+    try {
+      setIsLoading(true);
+      await signInWithFirebase(data.email, data.password);
+      message.success("Login successful");
+      router.push("/home");
+    } catch (error: any) {
+      message.error(error?.message || "Login failed");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleOtp = async () => {
     setIsOtpSent(false);
   };
 
-  const handleResendOtp = async () => {};
+  const handleResendOtp = async () => { };
 
   const onChange: OTPProps["onChange"] = (text) => {
     console.log("onChange:", text);
@@ -42,6 +85,8 @@ const Login = () => {
     onChange,
     onInput,
   };
+
+  if (currentUser) return null;
 
   return (
     <div className="w-full h-full bg-primary flex">
@@ -174,7 +219,10 @@ const Login = () => {
               </div>
 
               <div className="flex justify-center">
-                <div className="w-[150px] border-r border-gray-300 flex gap-2 items-center justify-center cursor-pointer">
+                <div
+                  onClick={handleGoogleSignIn}
+                  className="w-[150px] border-r border-gray-300 flex gap-2 items-center justify-center cursor-pointer"
+                >
                   <Image
                     src="/images/auth/googleLogo.svg"
                     alt="Google login"

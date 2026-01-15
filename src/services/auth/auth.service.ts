@@ -1,25 +1,101 @@
-import { sendPasswordResetEmail, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import {
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+  signOut,
+  GoogleAuthProvider,
+  signInWithPopup,
+  User,
+  onAuthStateChanged,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  UserCredential,
+  getIdToken
+} from "firebase/auth";
 import { auth } from "../../configs/firebase.config";
 
+const googleProvider = new GoogleAuthProvider();
+
+/* EMAIL + PASSWORD LOGIN */
 export const signInWithFirebase = async (
-    email: string,
-    password: string
-): Promise<any> => {
-    const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-    );
-    const idToken = await userCredential.user.getIdToken();
-    return { userCredential, idToken };
+  email: string,
+  password: string
+): Promise<{ user: User; idToken: string }> => {
+  const userCredential = await signInWithEmailAndPassword(
+    auth,
+    email,
+    password
+  );
+
+  const user = userCredential.user;
+  const idToken = await getIdToken(user, true);
+
+  return { user, idToken };
 };
 
+/* SIGN UP */
+export const signUpWithFirebase = async (
+  email: string,
+  password: string,
+  displayName?: string
+): Promise<User> => {
+  const userCredential = await createUserWithEmailAndPassword(
+    auth,
+    email,
+    password
+  );
+
+  if (displayName && auth.currentUser) {
+    await updateProfile(auth.currentUser, { displayName });
+  }
+
+  return userCredential.user;
+};
+
+/* GOOGLE SIGN IN */
+export const signInWithGoogle = async (): Promise<{
+  user: User;
+  idToken: string;
+} | null> => {
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    const user = result.user;
+    const idToken = await getIdToken(user, true);
+
+    return { user, idToken };
+  } catch (error: any) {
+    // ✅ USER closed popup or multiple popup triggered
+    if (error?.code === "auth/cancelled-popup-request") {
+      return null; // silently ignore
+    }
+
+    // ✅ Popup blocked by browser
+    if (error?.code === "auth/popup-blocked") {
+      throw new Error("Popup was blocked. Please allow popups and try again.");
+    }
+
+    // ❌ Real error
+    throw error;
+  }
+};
+
+/* LOGOUT */
+export const signOutUser = async (): Promise<void> => {
+  await signOut(auth);
+};
+
+/* FORGOT PASSWORD (EMAIL LINK) */
 export const forgotPasswordWithFirebase = async (
-    email: string
-): Promise<any> => {
-    await sendPasswordResetEmail(auth, email);
+  email: string
+): Promise<void> => {
+  await sendPasswordResetEmail(auth, email, {
+    url: `${window.location.origin}/login`,
+  });
 };
 
-export const signOutUser = async () => {
-    await signOut(auth);
-};
+/* AUTH STATE LISTENER */
+export const onAuthStateChangedListener = (
+  callback: (user: User | null) => void
+) => onAuthStateChanged(auth, callback);
+
+/* CURRENT USER */
+export const getCurrentUser = (): User | null => auth.currentUser;

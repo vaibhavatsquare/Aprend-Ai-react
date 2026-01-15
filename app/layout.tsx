@@ -3,6 +3,7 @@ import { Roboto } from "next/font/google";
 import "./globals.css";
 import { SidebarContextProvider } from "@/src/context/sidebar.context";
 import IndexLayout from "@/src/indexLayout/indexLayout";
+import { AuthProvider } from "@/src/context/auth.context";
 
 const roboto = Roboto({
   weight: ["100", "300", "400", "500", "700"],
@@ -24,11 +25,13 @@ export default function RootLayout({
       <body
         className={`${roboto.className} antialiased`}
       >
-        <SidebarContextProvider>
-          <IndexLayout>
-            {children}
-          </IndexLayout>
-        </SidebarContextProvider>
+        <AuthProvider>
+          <SidebarContextProvider>
+            <IndexLayout>
+              {children}
+            </IndexLayout>
+          </SidebarContextProvider>
+        </AuthProvider>
       </body>
     </html>
   );
