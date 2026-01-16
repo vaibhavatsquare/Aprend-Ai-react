@@ -10,7 +10,7 @@ import {
   signInWithFirebase,
   signInWithGoogle
 } from '@/src/services/auth/auth.service';
-import { useAuth } from "@/src/context/auth.context";
+import { setCookie } from "@/src/services/coockies/coockie.service";
 
 interface LoginFormData {
   email: string;
@@ -19,21 +19,15 @@ interface LoginFormData {
 
 const Login = () => {
   const router = useRouter();
-  const { currentUser, loading } = useAuth();
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [loader, setLoader] = useState()
 
   const {
     control,
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormData>();
-
-  useEffect(() => {
-    if (!loading && currentUser) {
-      router.replace("/home");
-    }
-  }, [currentUser, loading, router]);
 
   const handleGoogleSignIn = async () => {
     if (isLoading) return;
@@ -42,8 +36,10 @@ const Login = () => {
       setIsLoading(true);
 
       const result = await signInWithGoogle();
+      if (!result) return;
 
-      if (!result) return; // user cancelled popup
+      const { user, idToken } = result;
+      setCookie("idToken", idToken, 7);
 
       message.success("Signed in with Google");
       router.replace("/home");
@@ -57,7 +53,13 @@ const Login = () => {
   const handleLogin = async (data: LoginFormData) => {
     try {
       setIsLoading(true);
-      await signInWithFirebase(data.email, data.password);
+      const { user, idToken } = await signInWithFirebase(
+        data.email,
+        data.password
+      );
+
+      setCookie("idToken", idToken, 7);
+
       message.success("Login successful");
       router.push("/home");
     } catch (error: any) {
@@ -85,8 +87,6 @@ const Login = () => {
     onChange,
     onInput,
   };
-
-  if (currentUser) return null;
 
   return (
     <div className="w-full h-full bg-primary flex">

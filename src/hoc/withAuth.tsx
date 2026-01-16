@@ -16,22 +16,22 @@ const withAuth = <P extends object>(
 
     const checkAuthState = () => {
       const idToken = getCookie("idToken");
-      // waitForAuthState().then((user) => {
-      //   if (!user || !idToken) {
-      //     removeCookie("idToken");
-      //     localStorage.clear();
-      //     router.replace("/login"); // Replace with your public login route
-      //   } else {
-      //     setLoading(false);
-      //   }
-      // });
+      waitForAuthState().then((user) => {
+        if (!user || !idToken) {
+          removeCookie("idToken");
+          localStorage.clear();
+          router.replace("/login"); // Replace with your public login route
+        } else {
+          setLoading(false);
+        }
+      });
     };
 
     useEffect(() => {
       checkAuthState();
     }, [router]);
 
-    if (!loading) return <FullScreenLoader />;
+    if (loading) return <FullScreenLoader />;
     return <WrappedComponent {...props} />;
   };
 

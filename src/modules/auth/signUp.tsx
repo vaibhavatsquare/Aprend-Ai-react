@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { GoArrowLeft } from "react-icons/go";
 import { signUpWithFirebase, signInWithGoogle } from "@/src/services/auth/auth.service";
-import { useAuth } from "@/src/context/auth.context";
+import { setCookie } from "@/src/services/coockies/coockie.service";
 
 interface SignUpFormData {
   email: string;
@@ -25,18 +25,19 @@ const SignUp = () => {
 
   const router = useRouter();
   const [isOtpSent, setIsOtpSent] = useState(false);
-  const { currentUser, loading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    if (!loading && currentUser) {
-      useRedirect("/home");
-    }
-  }, [currentUser, loading]);
 
   const handleSignUp = async (data: SignUpFormData) => {
     try {
-      await signUpWithFirebase(data.email, data.password);
+
+      const user = await signUpWithFirebase(
+        data.email,
+        data.password
+      );
+
+      const idToken = await user.getIdToken(true);
+      setCookie("idToken", idToken, 7);
+
       message.success("Account created successfully");
       useRedirect("/home");
     } catch (error: any) {
@@ -51,8 +52,10 @@ const SignUp = () => {
       setIsLoading(true);
 
       const result = await signInWithGoogle();
+      if (!result) return;
 
-      if (!result) return; // user cancelled popup
+      const { user, idToken } = result;
+      setCookie("idToken", idToken, 7);
 
       message.success("Signed in with Google");
       router.replace("/home");
