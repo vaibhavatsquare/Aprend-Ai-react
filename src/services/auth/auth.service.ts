@@ -12,6 +12,7 @@ import {
   getIdToken
 } from "firebase/auth";
 import { auth } from "../../configs/firebase.config";
+import { setCookie } from "@/src/services/coockies/coockie.service";
 
 const googleProvider = new GoogleAuthProvider();
 
@@ -81,6 +82,7 @@ export const signInWithGoogle = async (): Promise<{
 /* LOGOUT */
 export const signOutUser = async (): Promise<void> => {
   await signOut(auth);
+  setCookie("idToken", "");
 };
 
 /* FORGOT PASSWORD (EMAIL LINK) */

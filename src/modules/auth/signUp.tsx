@@ -5,7 +5,6 @@ import { OTPProps } from "antd/es/input/OTP";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { GoArrowLeft } from "react-icons/go";
 import { signUpWithFirebase, signInWithGoogle } from "@/src/services/auth/auth.service";
@@ -23,7 +22,6 @@ const SignUp = () => {
     formState: { errors },
   } = useForm<SignUpFormData>();
 
-  const router = useRouter();
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -58,7 +56,7 @@ const SignUp = () => {
       setCookie("idToken", idToken, 7);
 
       message.success("Signed in with Google");
-      router.replace("/home");
+      useRedirect("/home");
     } catch (error: any) {
       message.error(error.message || "Google sign-in failed");
     } finally {

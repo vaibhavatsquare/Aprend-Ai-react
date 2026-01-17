@@ -3,7 +3,6 @@ import { Button, Input, message } from "antd";
 import { OTPProps } from "antd/es/input/OTP";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
@@ -11,6 +10,7 @@ import {
   signInWithGoogle
 } from '@/src/services/auth/auth.service';
 import { setCookie } from "@/src/services/coockies/coockie.service";
+import { useRedirect } from "@/src/hooks/router.hooks";
 
 interface LoginFormData {
   email: string;
@@ -18,7 +18,6 @@ interface LoginFormData {
 }
 
 const Login = () => {
-  const router = useRouter();
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [loader, setLoader] = useState()
@@ -42,7 +41,7 @@ const Login = () => {
       setCookie("idToken", idToken, 7);
 
       message.success("Signed in with Google");
-      router.replace("/home");
+      useRedirect("/home");
     } catch (error: any) {
       message.error(error.message || "Google sign-in failed");
     } finally {
@@ -61,7 +60,7 @@ const Login = () => {
       setCookie("idToken", idToken, 7);
 
       message.success("Login successful");
-      router.push("/home");
+      useRedirect("/home");
     } catch (error: any) {
       message.error(error?.message || "Login failed");
     } finally {
