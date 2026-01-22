@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { GoArrowLeft } from "react-icons/go";
-import { forgotPasswordWithFirebase } from "@/src/services/auth/auth.service";
+import { forgotPasswordWithFirebase } from "@/src/services/auth/auth.firebase.service";
 
 interface ForgotPasswordFormData {
   email?: string;

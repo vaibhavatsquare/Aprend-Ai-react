@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { GoArrowLeft } from "react-icons/go";
-import { signUpWithFirebase, signInWithGoogle } from "@/src/services/auth/auth.service";
+import { signUpWithFirebase, signInWithGoogle } from "@/src/services/auth/auth.firebase.service";
 import { setCookie } from "@/src/services/coockies/coockie.service";
 
 interface SignUpFormData {
@@ -37,7 +37,7 @@ const SignUp = () => {
       setCookie("idToken", idToken, 7);
 
       message.success("Account created successfully");
-      useRedirect("/home");
+      useRedirect("/home", true);
     } catch (error: any) {
       message.error(error?.message || "Signup failed");
     }
@@ -56,7 +56,7 @@ const SignUp = () => {
       setCookie("idToken", idToken, 7);
 
       message.success("Signed in with Google");
-      useRedirect("/home");
+      useRedirect("/home", true);
     } catch (error: any) {
       message.error(error.message || "Google sign-in failed");
     } finally {

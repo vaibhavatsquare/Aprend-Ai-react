@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Modal } from "antd";
-import { signOutUser } from "@/src/services/auth/auth.service";
+import { signOutUser } from "@/src/services/auth/auth.firebase.service";
 import { useRedirect } from "@/src/hooks/router.hooks";
 import { removeCookie } from "@/src/services/coockies/coockie.service";
 
