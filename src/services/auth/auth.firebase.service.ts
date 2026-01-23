@@ -8,11 +8,12 @@ import {
   onAuthStateChanged,
   createUserWithEmailAndPassword,
   updateProfile,
-  UserCredential,
-  getIdToken
+  getIdToken,
 } from "firebase/auth";
+import { getMessaging, getToken } from "firebase/messaging";
 import { auth } from "../../configs/firebase.config";
 import { setCookie } from "@/src/services/coockies/coockie.service";
+import { logoutUser } from "@/src/services/api/auth.api";
 
 const googleProvider = new GoogleAuthProvider();
 
@@ -81,7 +82,14 @@ export const signInWithGoogle = async (): Promise<{
 
 /* LOGOUT */
 export const signOutUser = async (): Promise<void> => {
+  
+  const sessionId = localStorage.getItem("sessionId");
+  if (!sessionId) return;
+  await logoutUser();
   await signOut(auth);
+  console.log("🟣 logout");
+  localStorage.clear();
+  document.cookie = "idToken=; max-age=0";
   setCookie("idToken", "");
 };
 
@@ -92,6 +100,16 @@ export const forgotPasswordWithFirebase = async (
   await sendPasswordResetEmail(auth, email, {
     url: `${window.location.origin}/login`,
   });
+};
+
+/* FCM */
+export const getFCMToken = async () => {
+  const messaging = getMessaging();
+  const token = await getToken(messaging, {
+    vapidKey: process.env.FB_VAPID_KEY,
+  });
+  console.log("🟣 111 Token:", token);
+  return token;
 };
 
 /* AUTH STATE LISTENER */

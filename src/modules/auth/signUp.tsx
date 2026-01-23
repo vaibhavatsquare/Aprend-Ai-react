@@ -9,6 +9,7 @@ import { Controller, useForm } from "react-hook-form";
 import { GoArrowLeft } from "react-icons/go";
 import { signUpWithFirebase, signInWithGoogle } from "@/src/services/auth/auth.firebase.service";
 import { setCookie } from "@/src/services/coockies/coockie.service";
+import { authenticateWithAPI } from "@/src/services/api/auth.api";
 
 interface SignUpFormData {
   email: string;
@@ -35,7 +36,8 @@ const SignUp = () => {
 
       const idToken = await user.getIdToken(true);
       setCookie("idToken", idToken, 7);
-
+      console.log("🟢 idToken:", idToken);
+      await authenticateWithAPI();
       message.success("Account created successfully");
       useRedirect("/home", true);
     } catch (error: any) {
@@ -54,7 +56,7 @@ const SignUp = () => {
 
       const { user, idToken } = result;
       setCookie("idToken", idToken, 7);
-
+      await authenticateWithAPI();
       message.success("Signed in with Google");
       useRedirect("/home", true);
     } catch (error: any) {

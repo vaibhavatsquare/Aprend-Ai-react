@@ -11,6 +11,7 @@ import {
 } from "@/src/services/auth/auth.firebase.service";
 import { setCookie } from "@/src/services/coockies/coockie.service";
 import { useRedirect } from "@/src/hooks/router.hooks";
+import { authenticateWithAPI } from "@/src/services/api/auth.api";
 
 interface LoginFormData {
   email: string;
@@ -38,8 +39,9 @@ const Login = () => {
       if (!result) return;
 
       const { user, idToken } = result;
-      setCookie("idToken", idToken, 7);
 
+      setCookie("idToken", idToken, 7);
+      await authenticateWithAPI();
       message.success("Signed in with Google");
       useRedirect("/home", true);
     } catch (error: any) {
@@ -58,7 +60,8 @@ const Login = () => {
       );
 
       setCookie("idToken", idToken, 7);
-
+      console.log("🟢 idToken:", idToken);
+      await authenticateWithAPI();
       message.success("Login successful");
       useRedirect("/home", true);
     } catch (error: any) {

@@ -8,6 +8,7 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { GoArrowLeft } from "react-icons/go";
 import { forgotPasswordWithFirebase } from "@/src/services/auth/auth.firebase.service";
+import { authenticateWithAPI } from "@/src/services/api/auth.api";
 
 interface ForgotPasswordFormData {
   email?: string;
