@@ -4,12 +4,13 @@ import { Button, Input, message } from "antd";
 import { OTPProps } from "antd/es/input/OTP";
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { GoArrowLeft } from "react-icons/go";
 import { signUpWithFirebase, signInWithGoogle } from "@/src/services/auth/auth.firebase.service";
 import { setCookie } from "@/src/services/coockies/coockie.service";
 import { authenticateWithAPI } from "@/src/services/api/auth.api";
+import { getFCMToken } from "@/src/configs/firebase.config";
 
 interface SignUpFormData {
   email: string;
@@ -26,6 +27,58 @@ const SignUp = () => {
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const [fcmToken, setFcmToken] = useState("");
+  const isInitialized = useRef(false);
+
+   useEffect(() => {
+    const registerServiceWorkerAndGetToken = async () => {
+      try {
+        if (Notification.permission !== "granted") {
+          const permission = await Notification.requestPermission();
+          if (permission !== "granted") {
+            localStorage.setItem("notificationToken", "");
+            return;
+          }
+        }
+
+        // 🔥 Unregister existing service workers to prevent duplicates
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        if (registrations.length > 0) {
+          // console.warn("Multiple Service Workers found. Unregistering all...", registrations);
+          await Promise.all(registrations.map((reg) => reg.unregister()));
+          // console.log("Old Service Workers unregistered.");
+        }
+
+        // ✅ Register the service worker properly
+        const registration = await navigator.serviceWorker.register(
+          "/firebase-messaging-sw.js"
+        );
+        // console.log("New Service Worker registered:", registration);
+
+        // ✅ Ensure the registration is ready
+        await navigator.serviceWorker.ready;
+
+        // ✅ Get the FCM token
+        const token = await getFCMToken(registration);
+
+        if (token) {
+          // console.log("FCM Token retrieved:", token);
+          localStorage.setItem("notificationToken", token);
+          setFcmToken(token);
+        } else {
+          console.error("No FCM Token available.");
+        }
+      } catch (error) {
+        console.error("Error during Service Worker or FCM setup:", error);
+      }
+    };
+
+    if (!isInitialized.current && "serviceWorker" in navigator) {
+      isInitialized.current = true; // Mark as initialized
+      registerServiceWorkerAndGetToken();
+    }
+  }, []);
+
   const handleSignUp = async (data: SignUpFormData) => {
     try {
 
@@ -37,7 +90,7 @@ const SignUp = () => {
       const idToken = await user.getIdToken(true);
       setCookie("idToken", idToken, 7);
       console.log("🟢 idToken:", idToken);
-      await authenticateWithAPI();
+      await authenticateWithAPI(fcmToken);
       message.success("Account created successfully");
       useRedirect("/home", true);
     } catch (error: any) {
@@ -56,7 +109,7 @@ const SignUp = () => {
 
       const { user, idToken } = result;
       setCookie("idToken", idToken, 7);
-      await authenticateWithAPI();
+      await authenticateWithAPI(fcmToken);
       message.success("Signed in with Google");
       useRedirect("/home", true);
     } catch (error: any) {

@@ -25,8 +25,8 @@ export const backendDeleteUser = async () => {
   });
 };
 
-export const authenticateWithAPI = async () => {
-  const res = await backendLogin("111");
+export const authenticateWithAPI = async (fcmToken: any) => {
+  const res = await backendLogin(fcmToken);
 
   localStorage.setItem("sessionId", res.userSessions.id);
   localStorage.setItem("userId", res.user.id);

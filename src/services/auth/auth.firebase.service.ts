@@ -102,16 +102,6 @@ export const forgotPasswordWithFirebase = async (
   });
 };
 
-/* FCM */
-export const getFCMToken = async () => {
-  const messaging = getMessaging();
-  const token = await getToken(messaging, {
-    vapidKey: process.env.FB_VAPID_KEY,
-  });
-  console.log("🟣 111 Token:", token);
-  return token;
-};
-
 /* AUTH STATE LISTENER */
 export const onAuthStateChangedListener = (
   callback: (user: User | null) => void

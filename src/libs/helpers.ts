@@ -16,8 +16,10 @@ export const waitForAuthState = (): Promise<User | null> => {
     if (!authReadyPromise) {
         authReadyPromise = new Promise((resolve) => {
             const auth = getAuth(app);
-            onAuthStateChanged(auth, (user) => {
+            const unsubscribe = onAuthStateChanged(auth, (user) => {
                 resolve(user); // Firebase has finished restoring the session
+                unsubscribe();
+                authReadyPromise = null; // Allow fresh checks on subsequent calls
             });
         });
     }
