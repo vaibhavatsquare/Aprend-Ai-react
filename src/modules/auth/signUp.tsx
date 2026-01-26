@@ -9,7 +9,7 @@ import { Controller, useForm } from "react-hook-form";
 import { GoArrowLeft } from "react-icons/go";
 import { signUpWithFirebase, signInWithGoogle } from "@/src/services/auth/auth.firebase.service";
 import { setCookie } from "@/src/services/coockies/coockie.service";
-import { authenticateWithAPI } from "@/src/services/api/auth.api";
+import { authenticateWithAPI, resendOtp, sendOtp, verifyOtp } from "@/src/services/api/auth.api";
 import { getFCMToken } from "@/src/configs/firebase.config";
 
 interface SignUpFormData {
@@ -26,11 +26,34 @@ const SignUp = () => {
 
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [otpValue, setOtpValue] = useState("");
+  const [userEmail, setUserEmail] = useState("");
+  const [resendTimer, setResendTimer] = useState(30);
+  const [canResend, setCanResend] = useState(false);
 
   const [fcmToken, setFcmToken] = useState("");
   const isInitialized = useRef(false);
 
-   useEffect(() => {
+  useEffect(() => {
+    let interval: any;
+
+    if (isOtpSent && !canResend) {
+      interval = setInterval(() => {
+        setResendTimer((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            setCanResend(true);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+
+    return () => clearInterval(interval);
+  }, [isOtpSent, canResend]);
+
+  useEffect(() => {
     const registerServiceWorkerAndGetToken = async () => {
       try {
         if (Notification.permission !== "granted") {
@@ -81,20 +104,24 @@ const SignUp = () => {
 
   const handleSignUp = async (data: SignUpFormData) => {
     try {
+      setIsLoading(true);
 
-      const user = await signUpWithFirebase(
-        data.email,
-        data.password
-      );
-
+      const user = await signUpWithFirebase(data.email, data.password);
       const idToken = await user.getIdToken(true);
       setCookie("idToken", idToken, 7);
-      console.log("🟢 idToken:", idToken);
+
       await authenticateWithAPI(fcmToken);
-      message.success("Account created successfully");
-      useRedirect("/home", true);
+      await sendOtp();
+
+      setUserEmail(data.email);
+      setIsOtpSent(true);
+      startResendTimer();
+
+      message.success("OTP sent to your email");
     } catch (error: any) {
       message.error(error?.message || "Signup failed");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -120,14 +147,46 @@ const SignUp = () => {
   };
 
   const handleOtp = async () => {
-    setIsOtpSent(false);
+    try {
+      if (otpValue.length < 4) {
+        return message.warning("Enter valid OTP");
+      }
+
+      setIsLoading(true);
+      const res = await verifyOtp(otpValue, userEmail);
+
+      localStorage.setItem("resetToken", res.token);
+      message.success("OTP verified");
+      useRedirect("/home", true);
+    } catch (err: any) {
+      message.error(err.message || "Invalid OTP");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const startResendTimer = () => {
+    setResendTimer(30);
+    setCanResend(false);
   };
 
   const handleResendOtp = async () => {
-    setIsOtpSent(true);
+    if (!canResend) return;
+
+    try {
+      setIsLoading(true);
+      await resendOtp();
+      message.success("OTP resent");
+      startResendTimer();
+    } catch {
+      message.error("Failed to resend OTP");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const onChange: OTPProps["onChange"] = (text) => {
+    setOtpValue(text);
     console.log("onChange:", text);
   };
 
@@ -158,7 +217,8 @@ const SignUp = () => {
             <div className="flex flex-col gap-1 text-primary">
               <h1 className="text-2xl font-bold">Enter OTP</h1>
               <p className="text-sm">
-                A magic code sent to your email mattwitting@yahoo.com
+                A magic code sent to your email{" "}
+                <span className="font-medium">{userEmail}</span>
               </p>
             </div>
 
@@ -176,6 +236,8 @@ const SignUp = () => {
             <div className="flex flex-col gap-4">
               <div className="flex justify-center">
                 <Button
+                  loading={isLoading}
+                  disabled={isLoading}
                   onClick={handleOtp}
                   className="mt-6 w-full h-[40px]! bg-primary! text-white! border-none! py-2 px-4 rounded-xl! hover:bg-primary/90! transition-all"
                 >
@@ -185,12 +247,18 @@ const SignUp = () => {
 
               <div className="mt-8 text-center text-sm text-gray-600 flex flex-col gap-2 justify-center">
                 Didn't you receive any code?{" "}
-                <span
-                  className="text-primary hover:underline cursor-pointer"
-                  onClick={handleResendOtp}
-                >
-                  Resend
-                </span>
+                {canResend ? (
+                  <span
+                    className="text-primary hover:underline cursor-pointer"
+                    onClick={handleResendOtp}
+                  >
+                    Resend
+                  </span>
+                ) : (
+                  <span className="text-gray-400">
+                    Resend in {resendTimer}s
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -257,6 +325,8 @@ const SignUp = () => {
 
               <div className="flex justify-center">
                 <Button
+                  loading={isLoading}
+                  disabled={isLoading}
                   onClick={handleSubmit(handleSignUp)}
                   className="mt-6 w-[90%] h-[40px]! bg-primary! text-white! border-none! py-2 px-4 rounded-xl! hover:bg-primary/90! transition-all"
                 >

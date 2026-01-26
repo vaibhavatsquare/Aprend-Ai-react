@@ -48,3 +48,39 @@ export const logoutUser = async (): Promise<void> => {
     throw err;
   }
 };
+
+/* SEND OTP */
+export const sendOtp = async () => {
+  return await fetch({
+    url: "/auth/otp/send",
+    method: "POST",
+  });
+};
+
+/* RESEND OTP */
+export const resendOtp = async () => {
+  return await fetch({
+    url: "/auth/otp/resend",
+    method: "POST",
+  });
+};
+
+/* VERIFY OTP */
+export const verifyOtp = async (otp: string, email: string) => {
+  return await fetch<{
+    token: string; // reset/set-password token
+  }>({
+    url: "/auth/otp/verify",
+    method: "POST",
+    data: { otp, email },
+  });
+};
+
+/* SET PASSWORD */
+export const setPassword = async (password: string, token: string) => {
+  return await fetch({
+    url: "/auth/set-password",
+    method: "POST",
+    data: { password, token },
+  });
+};
