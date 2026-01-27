@@ -3,12 +3,12 @@ import { useRedirect } from "@/src/hooks/router.hooks";
 import { Button, Input, message } from "antd";
 import { OTPProps } from "antd/es/input/OTP";
 import Image from "next/image";
-import Link from "next/link";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { GoArrowLeft } from "react-icons/go";
-import { forgotPasswordWithFirebase } from "@/src/services/auth/auth.firebase.service";
-import { authenticateWithAPI } from "@/src/services/api/auth.api";
+import { sendOtp, verifyOtp, setPassword } from "@/src/services/api/auth.api";
+import { auth } from "@/src/configs/firebase.config";
+import { signInWithEmailAndPassword, updatePassword } from "firebase/auth";
 
 interface ForgotPasswordFormData {
   email?: string;
@@ -26,43 +26,65 @@ const ForgotPassword = () => {
 
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [isResetOpen, setIsResetOpen] = useState(false);
+  const [emailValue, setEmailValue] = useState("");
+  const [otp, setOtp] = useState("");
 
-  // const handleForgotPassword = async (data: ForgotPasswordFormData) => {
-  //   setIsOtpSent(true);
-  // };
-
+  // 1) SEND OTP (BE)
   const handleForgotPassword = async (data: ForgotPasswordFormData) => {
-  try {
-    await forgotPasswordWithFirebase(data.email!);
-    message.success("Password reset link sent to email");
-  } catch (error: any) {
-    message.error(error?.message || "Failed to send reset email");
-  }
-};
-
-  const handleOtp = async () => {
-    setIsResetOpen(true);
+    try {
+      await sendOtp(data.email!);
+      setEmailValue(data.email!);
+      setIsOtpSent(true);
+      message.success("Verification code sent");
+    } catch {
+      message.error("Failed to send OTP");
+    }
   };
 
+  // RESEND
   const handleResendOtp = async () => {
-    setIsOtpSent(true);
+    try {
+      await sendOtp(emailValue);
+      message.success("OTP resent");
+    } catch {
+      message.error("Failed to resend OTP");
+    }
   };
 
-  const onChange: OTPProps["onChange"] = (text) => {
-    console.log("onChange:", text);
-  };
-
-  const onInput: OTPProps["onInput"] = (value) => {
-    console.log("onInput:", value);
+  // 2) VERIFY OTP (BE)
+  const handleOtp = async () => {
+    try {
+      await verifyOtp(emailValue, otp);
+      setIsResetOpen(true);
+      message.success("OTP verified");
+    } catch {
+      message.error("Invalid OTP");
+    }
   };
 
   const sharedProps: OTPProps = {
-    onChange,
-    onInput,
+    onChange: (v) => setOtp(v),
   };
 
+  // 3) RESET PASSWORD (Firebase → BE)
   const handleResetPassword = async (data: ForgotPasswordFormData) => {
-    setIsResetOpen(true);
+    try {
+      const userCred = await signInWithEmailAndPassword(
+        auth,
+        emailValue,
+        data.password!
+      );
+
+      await updatePassword(userCred.user, data.password!);
+
+      const token = await userCred.user.getIdToken();
+      await setPassword(data.password!, token);
+
+      message.success("Password updated successfully");
+      useRedirect("/login");
+    } catch {
+      message.error("Failed to reset password");
+    }
   };
 
   return (
@@ -76,46 +98,45 @@ const ForgotPassword = () => {
           className="object-contain w-auto h-full"
         />
       </div>
+
       <form className="relative flex-1 h-full bg-white rounded-tl-4xl rounded-bl-4xl flex items-center justify-center">
         <GoArrowLeft
           className="absolute top-5 left-5 cursor-pointer text-xl"
           onClick={() => useRedirect("/login")}
         />
+
         {isOtpSent ? (
           !isResetOpen ? (
+            /* OTP SCREEN */
             <div className="w-[90%] sm:w-[80%] md:w-[60%] xl:w-[40%] h-full overflow-y-auto scrollbar-hide py-20 flex flex-col justify-center gap-10">
               <div className="flex flex-col gap-1 text-primary">
                 <h1 className="text-2xl font-bold">Enter OTP</h1>
                 <p className="text-sm">
-                  A magic code sent to your email mattwitting@yahoo.com
+                  A magic code sent to your email {emailValue}
                 </p>
               </div>
 
               <div className="w-full flex justify-center">
-                <span>
-                  <Input.OTP
-                    length={4}
-                    formatter={(str) => str.toUpperCase()}
-                    className="custom-otp"
-                    {...sharedProps}
-                  />
-                </span>
+                <Input.OTP
+                  length={4}
+                  formatter={(str) => str.toUpperCase()}
+                  className="custom-otp"
+                  {...sharedProps}
+                />
               </div>
 
               <div className="flex flex-col gap-4">
-                <div className="flex justify-center">
-                  <Button
-                    onClick={handleOtp}
-                    className="mt-6 w-full h-[40px]! bg-primary! text-white! border-none! py-2 px-4 rounded-xl! hover:bg-primary/90! transition-all"
-                  >
-                    Continue
-                  </Button>
-                </div>
+                <Button
+                  onClick={handleOtp}
+                  className="mt-6 w-full h-[40px]! bg-primary! text-white! border-none! rounded-xl!"
+                >
+                  Verify Code
+                </Button>
 
-                <div className="mt-8 text-center text-sm text-gray-600 flex flex-col gap-2 justify-center">
-                  Didn't you receive any code?{" "}
+                <div className="mt-8 text-center text-sm text-gray-600">
+                  Didn’t receive?{" "}
                   <span
-                    className="text-primary hover:underline cursor-pointer"
+                    className="text-primary cursor-pointer"
                     onClick={handleResendOtp}
                   >
                     Resend
@@ -124,126 +145,61 @@ const ForgotPassword = () => {
               </div>
             </div>
           ) : (
+            /* RESET PASSWORD SCREEN */
             <div className="w-[90%] sm:w-[80%] md:w-[60%] xl:w-[40%] h-full overflow-y-auto scrollbar-hide py-20 flex flex-col justify-center gap-10">
-              <div className="flex flex-col gap-1 text-primary">
-                <h1 className="text-2xl font-bold">Reset Password</h1>
-                <p className="text-sm">
-                  Enter your email address and we'll send you a link to reset your password.
-                </p>
-              </div>
+              <h1 className="text-2xl font-bold text-primary">
+                Create New Password
+              </h1>
 
-              <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-2">
-                  <label htmlFor="email" className="font-medium">
-                    Password
-                  </label>
-                  <Controller
-                    name="password"
-                    control={control}
-                    rules={{
-                      required: "Password is required",
-                    }}
-                    render={({ field }) => (
-                      <Input.Password
-                        {...field}
-                        placeholder="Enter your password"
-                        className="bg-[#F5F5F5]! border-none! h-[40px] rounded-xl! px-3 py-2 focus:border-none! focus:outline-none! shadow-none!"
-                      />
-                    )}
-                  />
-                  {errors.password && (
-                    <p className="text-red-500 text-xs">
-                      {errors.password.message}
-                    </p>
-                  )}
-                </div>
-                <div className="flex flex-col gap-2">
-                  <label htmlFor="email" className="font-medium">
-                    Confirm Password
-                  </label>
-                  <Controller
-                    name="confirmPassword"
-                    control={control}
-                    rules={{
-                      required: "Confirm Password is required",
-                      validate: (value) =>
-                        value === watch("password") || "Passwords do not match",
-                    }}
-                    render={({ field }) => (
-                      <Input.Password
-                        {...field}
-                        placeholder="Enter your password"
-                        className="bg-[#F5F5F5]! border-none! h-[40px] rounded-xl! px-3 py-2 focus:border-none! focus:outline-none! shadow-none!"
-                      />
-                    )}
-                  />
-                  {errors.confirmPassword && (
-                    <p className="text-red-500 text-xs">
-                      {errors.confirmPassword.message}
-                    </p>
-                  )}
-                </div>
-              </div>
+              <Controller
+                name="password"
+                control={control}
+                rules={{ required: "Password is required" }}
+                render={({ field }) => (
+                  <Input.Password {...field} placeholder="Password" />
+                )}
+              />
 
-              <div className="flex flex-col gap-4">
-                <div className="flex justify-center">
-                  <Button
-                    onClick={handleSubmit(handleResetPassword)}
-                    className="mt-6 w-full h-[40px]! bg-primary! text-white! border-none! py-2 px-4 rounded-xl! hover:bg-primary/90! transition-all"
-                  >
-                    Create New Password
-                  </Button>
-                </div>
-              </div>
+              <Controller
+                name="confirmPassword"
+                control={control}
+                rules={{
+                  validate: (v) =>
+                    v === watch("password") || "Passwords do not match",
+                }}
+                render={({ field }) => (
+                  <Input.Password {...field} placeholder="Confirm Password" />
+                )}
+              />
+
+              <Button
+                onClick={handleSubmit(handleResetPassword)}
+                className="mt-6 w-full h-[40px]! bg-primary! text-white! border-none! rounded-xl!"
+              >
+                Create New Password
+              </Button>
             </div>
           )
         ) : (
+          /* EMAIL SCREEN */
           <div className="w-[90%] sm:w-[80%] md:w-[60%] xl:w-[50%] h-full overflow-y-auto scrollbar-hide py-20 flex flex-col justify-center gap-8">
-            <div className="flex flex-col gap-1 text-primary">
-              <h1 className="text-2xl font-bold">Forgot Password</h1>
-              <p className="text-sm">
-                No worries! Just enter your email, and we'll help you reset your
-                password.
-              </p>
-            </div>
+            <h1 className="text-2xl font-bold text-primary">
+              Forgot Password
+            </h1>
 
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-2">
-                <label htmlFor="email" className="font-medium">
-                  Email Address
-                </label>
-                <Controller
-                  name="email"
-                  control={control}
-                  rules={{
-                    required: "Email is required",
-                    pattern: {
-                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: "Invalid email address",
-                    },
-                  }}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      placeholder="Enter your email address"
-                      className="bg-[#F5F5F5]! border-none! h-[40px] rounded-xl! px-3 py-2 focus:border-none! focus:outline-none! shadow-none!"
-                    />
-                  )}
-                />
-                {errors.email && (
-                  <p className="text-red-500 text-xs">{errors.email.message}</p>
-                )}
-              </div>
+            <Controller
+              name="email"
+              control={control}
+              rules={{ required: "Email is required" }}
+              render={({ field }) => <Input {...field} placeholder="Email" />}
+            />
 
-              <div className="flex justify-center">
-                <Button
-                  onClick={handleSubmit(handleForgotPassword)}
-                  className="mt-6 w-[90%] h-[40px]! bg-primary! text-white! border-none! py-2 px-4 rounded-xl! hover:bg-primary/90! transition-all"
-                >
-                  Send Verification Code
-                </Button>
-              </div>
-            </div>
+            <Button
+              onClick={handleSubmit(handleForgotPassword)}
+              className="mt-6 w-full h-[40px]! bg-primary! text-white! border-none! rounded-xl!"
+            >
+              Send Verification Code
+            </Button>
           </div>
         )}
       </form>

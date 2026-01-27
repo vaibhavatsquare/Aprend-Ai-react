@@ -50,7 +50,7 @@ export const logoutUser = async (): Promise<void> => {
 };
 
 /* SEND OTP */
-export const sendOtp = async () => {
+export const sendOtp = async (email: string = "") => {
   return await fetch({
     url: "/auth/otp/send",
     method: "POST",
