@@ -13,6 +13,7 @@ import { setCookie } from "@/src/services/coockies/coockie.service";
 import { useRedirect } from "@/src/hooks/router.hooks";
 import { authenticateWithAPI } from "@/src/services/api/auth.api";
 import { getFCMToken } from "@/src/configs/firebase.config";
+import { handlePostLoginRedirect } from "@/src/utils/redirect";
 
 interface LoginFormData {
   email: string;
@@ -96,7 +97,8 @@ const Login = () => {
       setCookie("idToken", idToken, 7);
       await authenticateWithAPI(fcmToken);
       message.success("Signed in with Google");
-      useRedirect("/home", true);
+      const res = await authenticateWithAPI(fcmToken);
+      handlePostLoginRedirect(res.user);
     } catch (error: any) {
       message.error(error.message || "Google sign-in failed");
     } finally {
@@ -114,9 +116,9 @@ const Login = () => {
 
       setCookie("idToken", idToken, 7);
       console.log("🟢 idToken:", idToken);
-      await authenticateWithAPI(fcmToken);
+      const res = await authenticateWithAPI(fcmToken);
       message.success("Login successful");
-      useRedirect("/home", true);
+      handlePostLoginRedirect(res.user);
     } catch (error: any) {
       message.error(error?.message || "Login failed");
     } finally {

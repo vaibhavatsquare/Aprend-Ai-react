@@ -12,10 +12,14 @@ export const backendLogin = async (notificationToken?: string) => {
 };
 
 export const backendLogout = async (sessionId: string) => {
-  return await fetch({
-    url: `/auth/${sessionId}`,
-    method: "PUT",
-  });
+  try {
+    return await fetch({
+      url: `/auth/${sessionId}`,
+      method: "PUT",
+    });
+  } catch {
+    return null; 
+  }
 };
 
 export const backendDeleteUser = async () => {
@@ -35,18 +39,17 @@ export const authenticateWithAPI = async (fcmToken: any) => {
 };
 
 export const logoutUser = async (): Promise<void> => {
+  const sessionId = localStorage.getItem("sessionId");
+  if (!sessionId) return;
+
   try {
-    const sessionId = localStorage.getItem("sessionId");
-    if (!sessionId) return;
-
     await backendLogout(sessionId);
-
-    localStorage.clear();
-    console.log("✅ Logged out");
-  } catch (err) {
-    console.error("❌ Logout failed:", err);
-    throw err;
+  } catch (e) {
+    console.warn("Session already closed");
   }
+
+  localStorage.removeItem("sessionId");
+  localStorage.removeItem("userId");
 };
 
 /* SEND OTP */
@@ -54,6 +57,7 @@ export const sendOtp = async (email: string = "") => {
   return await fetch({
     url: "/auth/otp/send",
     method: "POST",
+    data: { email },
   });
 };
 

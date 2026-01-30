@@ -19,7 +19,7 @@ export const languages = [
 export const educationLevels = [
     {
         label: "Elementary School",
-        value: "ELEMENTARY_SCHOOL"
+        value: "ELEMENTARY"
     },
     {
         label: "High School",
@@ -27,7 +27,7 @@ export const educationLevels = [
     },
     {
         label: "Pre-Vestibular",
-        value: "PRE_VESTIBULAR"
+        value: "PRE_UNIVERSITY"
     },
     {
         label: "University",
@@ -35,7 +35,7 @@ export const educationLevels = [
     },
     {
         label: "Competitive Exam",
-        value: "COMPETITIVE_EXAM"
+        value: "COMPETITIVE_EXAMS"
     },
 ];
 

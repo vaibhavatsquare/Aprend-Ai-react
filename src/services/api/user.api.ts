@@ -9,3 +9,14 @@ export const getProfile = async (userId?: string) => {
     method: "GET",
   });
 };
+
+export const saveOnboardingProfile = async (data: {
+  user_language: string;
+  user_EducationLevel: string;
+}) => {
+  return await fetch({
+    url: "/onboarding/profile",
+    method: "POST",
+    data,
+  });
+};
