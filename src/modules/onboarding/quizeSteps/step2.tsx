@@ -1,18 +1,22 @@
 "use client";
-import { useState } from "react";
-import { Button, Input } from "antd";
+import { Button } from "antd";
 import { FaArrowLeft } from "react-icons/fa";
 import { step2Options } from "@/src/libs/constants/onboarding.constants";
 import { setSearchParam } from "@/src/hooks/router.hooks";
 
 const Step2 = ({
   setCurrentStep,
+  quiz,
+  setQuiz,
 }: {
   setCurrentStep: (step: number) => void;
+  quiz: any;
+  setQuiz: (fn: any) => void;
 }) => {
-  const [selectedLearningGoals, setSelectedLearningGoals] = useState<string>(
-    ""
-  );
+
+  const handleSelect = (val: string) => {
+    setQuiz((p: any) => ({ ...p, learningGoal: val }));
+  };
 
   const handleContinue = () => {
     setSearchParam("step", 3);
@@ -31,21 +35,21 @@ const Step2 = ({
           <div
             key={level.value}
             className={`w-full h-11 px-3 border rounded-xl flex justify-between items-center gap-3 cursor-pointer transition-all ${
-              selectedLearningGoals === level.value
+              quiz.learningGoal === level.value
                 ? "border-primary"
                 : "border-[#DADADA] hover:border-gray-400"
             }`}
-            onClick={() => setSelectedLearningGoals(level.value)}
+            onClick={() => handleSelect(level.value)}
           >
             <p className="text-sm">{level.label}</p>
             <div
               className={`w-4 h-4 flex justify-center items-center border-2 rounded-full transition-all ${
-                selectedLearningGoals === level.value
+                quiz.learningGoal === level.value
                   ? "border-primary"
                   : "border-[#DADADA] hover:border-primary"
               }`}
             >
-              {selectedLearningGoals === level.value && (
+              {quiz.learningGoal === level.value && (
                 <div className="w-2 h-2 bg-primary rounded-full" />
               )}
             </div>
@@ -56,15 +60,17 @@ const Step2 = ({
       <div className="w-[300px] flex gap-3 items-center mt-6">
         <Button
           onClick={() => {
-            setCurrentStep(1)
-            setSearchParam("step", 1)
+            setCurrentStep(1);
+            setSearchParam("step", 1);
           }}
           className="flex-1 h-10! rounded-xl! border border-[#DADADA]! text-primary! bg-white! mt-4"
           icon={<FaArrowLeft />}
         >
           Back
         </Button>
+
         <Button
+          disabled={!quiz.learningGoal}
           onClick={handleContinue}
           className="w-[180px] h-10! rounded-xl! text-white! bg-primary! mt-4"
         >

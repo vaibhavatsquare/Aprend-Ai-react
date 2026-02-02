@@ -1,25 +1,31 @@
 "use client";
-import Image from "next/image";
-import {
-  educationLevels,
-  languages,
-  step1Options,
-} from "@/src/libs/constants/onboarding.constants";
-import { useState } from "react";
+import { step1Options } from "@/src/libs/constants/onboarding.constants";
 import { Button, Input } from "antd";
 import { FaArrowLeft } from "react-icons/fa";
 import { setSearchParam, useBack } from "@/src/hooks/router.hooks";
 
 const Step1 = ({
   setCurrentStep,
+  quiz,
+  setQuiz,
 }: {
   setCurrentStep: (step: number) => void;
+  quiz: any;
+  setQuiz: (fn: any) => void;
 }) => {
-  const [selectedLearnings, setSelectedLearnings] = useState<string[]>([]);
 
   const handleContinue = () => {
     setSearchParam("step", 2);
     setCurrentStep(2);
+  };
+
+  const toggle = (val: string) => {
+    setQuiz((p: any) => ({
+      ...p,
+      subjects: p.subjects.includes(val)
+        ? p.subjects.filter((v: string) => v !== val)
+        : [...p.subjects, val],
+    }));
   };
 
   return (
@@ -34,32 +40,27 @@ const Step1 = ({
           <div
             key={level.value}
             className={`w-full h-11 px-3 border rounded-xl flex justify-between items-center gap-3 cursor-pointer transition-all ${
-              selectedLearnings.includes(level.value)
+              quiz.subjects.includes(level.value)
                 ? "border-primary"
                 : "border-[#DADADA] hover:border-gray-400"
             }`}
-            onClick={() =>
-              setSelectedLearnings((prev) =>
-                prev.includes(level.value)
-                  ? prev.filter((item) => item !== level.value)
-                  : [...prev, level.value]
-              )
-            }
+            onClick={() => toggle(level.value)}
           >
             <p className="text-sm">{level.label}</p>
             <div
               className={`w-4 h-4 flex justify-center items-center border-2 rounded-full transition-all ${
-                selectedLearnings.includes(level.value)
+                quiz.subjects.includes(level.value)
                   ? "border-primary"
                   : "border-[#DADADA] hover:border-primary"
               }`}
             >
-              {selectedLearnings.includes(level.value) && (
+              {quiz.subjects.includes(level.value) && (
                 <div className="w-2 h-2 bg-primary rounded-full" />
               )}
             </div>
           </div>
         ))}
+
         <div className="w-full h-11">
           <Input
             placeholder="Write your subject here"
@@ -76,7 +77,9 @@ const Step1 = ({
         >
           Back
         </Button>
+
         <Button
+          disabled={quiz.subjects.length === 0}
           onClick={handleContinue}
           className="w-[180px] h-10! rounded-xl! text-white! bg-primary! mt-4"
         >

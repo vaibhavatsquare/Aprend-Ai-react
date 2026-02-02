@@ -1,9 +1,14 @@
 import { useRedirect } from "@/src/hooks/router.hooks";
+import {
+  goalLabels,
+  styleLabels,
+  subjectLabels,
+} from "@/src/libs/constants/onboarding.constants";
 import { Button } from "antd";
 import Image from "next/image";
 import React from "react";
 
-const Final = () => {
+const Final = ({ quiz }: { quiz: any }) => {
   return (
     <div className="flex flex-col gap-10 items-center">
       <div className="flex flex-col gap-6 items-center">
@@ -28,7 +33,9 @@ const Final = () => {
           />
           <div className="flex flex-col">
             <p className="text-secondary">Subject</p>
-            <p className="text-primary">English and Mathematics</p>
+            <p className="text-primary">
+               {quiz.subjects.map((s: string) => subjectLabels[s]).join(", ")}
+            </p>
           </div>
         </div>
         <div className="flex gap-3 items-center">
@@ -40,7 +47,9 @@ const Final = () => {
           />
           <div className="flex flex-col">
             <p className="text-secondary">Goal</p>
-            <p className="text-primary">Learn a new topic from scratch</p>
+            <p className="text-primary">
+              {goalLabels[quiz.learningGoal]}
+            </p>
           </div>
         </div>
         <div className="flex gap-3 items-center">
@@ -52,18 +61,20 @@ const Final = () => {
           />
           <div className="flex flex-col">
             <p className="text-secondary">Learning Style</p>
-            <p className="text-primary">Auditory + Reading/Writing</p>
+            <p className="text-primary">
+               {quiz.learningStyles.map((s: string) => styleLabels[s]).join(" + ")}
+            </p>
           </div>
         </div>
       </div>
 
       <Button
-          onClick={() => useRedirect("/home")}
-          className="h-10! px-16! rounded-xl! text-white! bg-primary! mt-4"
-        >
-          Start Your Learning Journey
-        </Button>
-    </div>
+        onClick={() => useRedirect("/home")}
+        className="h-10! px-16! rounded-xl! text-white! bg-primary! mt-4"
+      >
+        Start Your Learning Journey
+      </Button>
+    </div >
   );
 };
 

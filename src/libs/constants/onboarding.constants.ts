@@ -79,31 +79,43 @@ export const step1Options = [
 ]
 
 export const step2Options = [
-    {
-        value: "EXAM_PREPARATION",
-        label: "Prepare for an exam or test"
-    },
-    {
-        value: "REVISION",
-        label: "Revise / refresh previous knowledge"
-    },
-    {
-        value: "GRADES_IMPROVEMENT",
-        label: "Improve grades / performance in school"
-    },
-    {
-        value: "STUDY_CONSISTENCY",
-        label: "Improve study consistency or habits"
-    },
-    {
-        value: "NEW_TOPIC",
-        label: "Learn a new topic from scratch"
-    },
-    {
-        value: "LONG_TERM_MASTERY",
-        label: "Build long-term mastery or fluency"
-    },
-]
+    { value: "PREPARE_FOR_EXAM", label: "Prepare for an exam or test" },
+    { value: "REVISE_PREVIOUS_KNOWLEDGE", label: "Revise / refresh previous knowledge" },
+    { value: "IMPROVE_GRADES", label: "Improve grades / performance in school" },
+    { value: "IMPROVE_STUDY_HABITS", label: "Improve study consistency or habits" },
+    { value: "LEARN_FROM_SCRATCH", label: "Learn a new topic from scratch" },
+    { value: "BUILD_LONG_TERM_MASTERY", label: "Build long-term mastery or fluency" },
+];
+
+export const goalLabels: Record<string, string> = {
+  PREPARE_FOR_EXAM: "Prepare for Exam",
+  IMPROVE_GRADES: "Improve Grades",
+  LEARN_FROM_SCRATCH: "Learn From Scratch",
+  BUILD_LONG_TERM_MASTERY: "Build Long-term Mastery",
+  REVISE_PREVIOUS_KNOWLEDGE: "Revise Previous Knowledge",
+  IMPROVE_STUDY_HABITS: "Improve Study Habits",
+};
+
+export const styleLabels: Record<string, string> = {
+  VISUAL: "Visual",
+  AI_GUIDED: "AI Guided",
+  AUDITORY: "Auditory",
+  READING_WRITING: "Reading/Writing",
+  KINESTHETIC: "Kinesthetic",
+};
+
+export const subjectLabels: Record<string, string> = {
+  ENGLISH: "English",
+  MATHEMATICS: "Mathematics",
+  COMPUTER_SCIENCE: "Computer Science",
+  BUSINESS_ECONOMICS: "Business & Economics",
+  SCIENCE: "Science",
+  LANGUAGES: "Languages",
+  HISTORY: "History",
+  OTHER: "Other",
+  GEOGRAPHY: "Geography",
+};
+
 
 export const Step3Options = [
     {
@@ -129,23 +141,11 @@ export const Step3Options = [
 ]
 
 export const Step4Options = [
-    {
-        value: "LESS_THAN_15_MINUTES",
-        label: "<15 minutes"
-    },
-    {
-        value: "BETWEEN_15_AND_30_MINUTES",
-        label: "15–30 minutes"
-    },
-    {
-        value: "BETWEEN_30_AND_60_MINUTES",
-        label: "30–60 minutes"
-    },
-    {
-        value: "MORE_THAN_60_MINUTES",
-        label: "1 hour"
-    },
-]
+    { value: "LESS_THAN_15_MIN", label: "<15 minutes" },
+    { value: "MIN_15_TO_30", label: "15–30 minutes" },
+    { value: "MIN_30_TO_60", label: "30–60 minutes" },
+    { value: "ONE_HOUR", label: "1 hour" },
+];
 
 export const Step5Options = [
     {

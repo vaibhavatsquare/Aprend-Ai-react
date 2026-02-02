@@ -1,20 +1,32 @@
 "use client";
-import { useState } from "react";
-import { Button, Input } from "antd";
+import { Button } from "antd";
 import { FaArrowLeft } from "react-icons/fa";
 import { Step5Options } from "@/src/libs/constants/onboarding.constants";
-import { setSearchParam } from "@/src/hooks/router.hooks";
+import { setSearchParam, useRedirect } from "@/src/hooks/router.hooks";
+import { savePlacementQuiz } from "@/src/services/api/user.api";
 
 const Step5 = ({
   setCurrentStep,
+  quiz,
+  setQuiz,
 }: {
   setCurrentStep: (step: number) => void;
+  quiz: any;
+  setQuiz: (fn: any) => void;
 }) => {
-  const [selectedLearningTime, setSelectedLearningTime] = useState<string>("");
 
-  const handleFinish = () => {
-    setCurrentStep(6);
-    setSearchParam("step", 6);
+  const handleSelect = (val: string) => {
+    setQuiz((p: any) => ({ ...p, preferredTime: val }));
+  };
+
+  const handleFinish = async () => {
+    try {
+      await savePlacementQuiz(quiz);
+      setCurrentStep(6);
+      setSearchParam("step", 6);
+    } catch (e: any) {
+      console.error("Failed to save placement quiz", e);
+    }
   };
 
   return (
@@ -29,21 +41,21 @@ const Step5 = ({
           <div
             key={level.value}
             className={`w-full h-11 px-3 border rounded-xl flex justify-between items-center gap-3 cursor-pointer transition-all ${
-              selectedLearningTime === level.value
+              quiz.preferredTime === level.value
                 ? "border-primary"
                 : "border-[#DADADA] hover:border-gray-400"
             }`}
-            onClick={() => setSelectedLearningTime(level.value)}
+            onClick={() => handleSelect(level.value)}
           >
             <p className="text-sm">{level.label}</p>
             <div
               className={`w-4 h-4 flex justify-center items-center border-2 rounded-full transition-all ${
-                selectedLearningTime === level.value
+                quiz.preferredTime === level.value
                   ? "border-primary"
                   : "border-[#DADADA] hover:border-primary"
               }`}
             >
-              {selectedLearningTime === level.value && (
+              {quiz.preferredTime === level.value && (
                 <div className="w-2 h-2 bg-primary rounded-full" />
               )}
             </div>
@@ -62,7 +74,9 @@ const Step5 = ({
         >
           Back
         </Button>
+
         <Button
+          disabled={!quiz.preferredTime}
           onClick={handleFinish}
           className="w-[180px] h-10! rounded-xl! text-white! bg-primary! mt-4"
         >
