@@ -1,11 +1,20 @@
 import { fetch } from "@/src/libs/helpers";
 
-export const saveOnboardingProfile = async (data: {
+export const saveLanguage = async (data: {
   user_language: string;
+}) => {
+  return await fetch({
+    url: "/onboarding/Language",
+    method: "POST",
+    data,
+  });
+};
+
+export const saveEducationlevel = async (data: {
   user_EducationLevel: string;
 }) => {
   return await fetch({
-    url: "/onboarding/profile",
+    url: "/onboarding/educationlevel",
     method: "POST",
     data,
   });

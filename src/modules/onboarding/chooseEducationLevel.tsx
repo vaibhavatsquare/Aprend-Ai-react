@@ -4,22 +4,18 @@ import { educationLevels } from "@/src/libs/constants/onboarding.constants";
 import { useState } from "react";
 import { Button, message } from "antd";
 import { useRedirect } from "@/src/hooks/router.hooks";
-import { useLanguageStore } from "@/src/store/language.store";
-import { saveOnboardingProfile } from "@/src/services/api/user.api";
+import { saveEducationlevel } from "@/src/services/api/user.api";
 
 const ChooseEducationLevel = () => {
   const [selectedEducationLevel, setSelectedEducationLevel] =
     useState<string | null>(null);
 
-  const language = useLanguageStore((s) => s.language);
-
   const handleContinue = async () => {
     if (!selectedEducationLevel) return;
 
     try {
-      await saveOnboardingProfile({
-        user_language: language,
-        user_EducationLevel: selectedEducationLevel,
+      await saveEducationlevel({
+        user_EducationLevel: selectedEducationLevel
       });
 
       useRedirect("/onboarding/placement-quize");

@@ -12,10 +12,10 @@ export const handlePostLoginRedirect = (user: any) => {
     return;
   }
 
-  if (!user.isPlacementDone) {
+  if (!user.isPlacementQuizDone) {
     useRedirect("/onboarding/placement-quize", true);
     return;
   }
-  
+
   useRedirect("/home", true);
 };

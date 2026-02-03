@@ -5,16 +5,23 @@ import { useState } from "react";
 import { Button, message } from "antd";
 import { useRedirect } from "@/src/hooks/router.hooks";
 import { useLanguageStore } from "@/src/store/language.store";
-import { saveOnboardingProfile } from "@/src/services/api/user.api";
+import { saveLanguage } from "@/src/services/api/user.api";
 
 const ChooseLanguage = () => {
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
   const setLanguage = useLanguageStore((s) => s.setLanguage);
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (!selectedLanguage) return;
-    setLanguage(selectedLanguage); 
-    useRedirect("/onboarding/choose-education-level");
+    setLanguage(selectedLanguage);
+    try {
+      await saveLanguage({
+        user_language: selectedLanguage
+      });
+      useRedirect("/onboarding/choose-education-level");
+    } catch {
+      message.error("Failed to save language");
+    }
   };
 
   return (
@@ -26,11 +33,10 @@ const ChooseLanguage = () => {
           {languages.map((language: any) => (
             <div
               key={language.value}
-              className={`w-[280px] h-10 border rounded-xl flex justify-center items-center gap-3 cursor-pointer transition-all ${
-                selectedLanguage === language.value
+              className={`w-[280px] h-10 border rounded-xl flex justify-center items-center gap-3 cursor-pointer transition-all ${selectedLanguage === language.value
                   ? "border-primary"
                   : "border-[#DADADA] hover:border-gray-400"
-              }`}
+                }`}
               onClick={() => setSelectedLanguage(language.value)}
             >
               <Image src={language.flag} alt="" width={24} height={24} />
