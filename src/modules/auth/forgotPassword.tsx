@@ -6,9 +6,9 @@ import Image from "next/image";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { GoArrowLeft } from "react-icons/go";
-import { sendOtp, verifyOtp, setPassword } from "@/src/services/api/auth.api";
-import { auth } from "@/src/configs/firebase.config";
-import { signInWithEmailAndPassword, updatePassword } from "firebase/auth";
+import { sendOtp, verifyOtp, resendOtp, changePassword } from "@/src/services/api/auth.api";
+import { encryptAES } from "@/src/utils/crypto";
+import MiniLoader from "@/src/components/loaders/MiniLoader";
 
 interface ForgotPasswordFormData {
   email?: string;
@@ -28,37 +28,52 @@ const ForgotPassword = () => {
   const [isResetOpen, setIsResetOpen] = useState(false);
   const [emailValue, setEmailValue] = useState("");
   const [otp, setOtp] = useState("");
+  const [verificationId, setVerificationId] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(false);
 
   // 1) SEND OTP (BE)
   const handleForgotPassword = async (data: ForgotPasswordFormData) => {
     try {
-      await sendOtp(data.email!);
+      setIsLoading(true);
+      await sendOtp(data.email!, true)
       setEmailValue(data.email!);
       setIsOtpSent(true);
       message.success("Verification code sent");
     } catch {
       message.error("Failed to send OTP");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   // RESEND
   const handleResendOtp = async () => {
     try {
-      await sendOtp(emailValue);
+      setIsLoading(true);
+      await resendOtp(emailValue);
       message.success("OTP resent");
     } catch {
       message.error("Failed to resend OTP");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   // 2) VERIFY OTP (BE)
   const handleOtp = async () => {
     try {
-      await verifyOtp(emailValue, otp);
+      setIsLoading(true);
+      const res = await verifyOtp(emailValue, otp);
+
+      // SAVE verification id from backend
+      setVerificationId(res.data.id);
+
       setIsResetOpen(true);
       message.success("OTP verified");
     } catch {
       message.error("Invalid OTP");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -69,26 +84,27 @@ const ForgotPassword = () => {
   // 3) RESET PASSWORD (Firebase → BE)
   const handleResetPassword = async (data: ForgotPasswordFormData) => {
     try {
-      const userCred = await signInWithEmailAndPassword(
-        auth,
-        emailValue,
-        data.password!
-      );
-
-      await updatePassword(userCred.user, data.password!);
-
-      const token = await userCred.user.getIdToken();
-      await setPassword(data.password!, token);
+      setIsLoading(true);
+      const encrypted = encryptAES(data.password!);
+      await changePassword({
+        email: emailValue,
+        password: encrypted,
+        confirmPassword: encrypted,
+        verificationId: verificationId,
+      });
 
       message.success("Password updated successfully");
       useRedirect("/login");
     } catch {
       message.error("Failed to reset password");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="w-full h-full bg-primary flex">
+      {isLoading && <MiniLoader />}
       <div className="h-full flex justify-end">
         <Image
           src="/images/auth/loginImg.svg"

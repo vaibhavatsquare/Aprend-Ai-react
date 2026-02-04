@@ -14,6 +14,10 @@ const nextConfig: NextConfig = {
     FB_MESSAGING_SENDER_ID: process.env.FB_MESSAGING_SENDER_ID,
     FB_APP_ID: process.env.FB_APP_ID,
     FB_VAPID_KEY: process.env.FB_VAPID_KEY,
+
+    //Encryption
+    AES_KEY_BASE64: process.env.AES_KEY_BASE64,
+    AES_IV_BASE64: process.env.AES_IV_BASE64,
   }
 };
 

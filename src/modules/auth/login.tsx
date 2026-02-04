@@ -14,6 +14,7 @@ import { useRedirect } from "@/src/hooks/router.hooks";
 import { authenticateWithAPI } from "@/src/services/api/auth.api";
 import { getFCMToken } from "@/src/configs/firebase.config";
 import { handlePostLoginRedirect } from "@/src/utils/redirect";
+import MiniLoader from "@/src/components/loaders/MiniLoader";
 
 interface LoginFormData {
   email: string;
@@ -23,7 +24,6 @@ interface LoginFormData {
 const Login = () => {
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [loader, setLoader] = useState()
 
   const [fcmToken, setFcmToken] = useState("");
   const isInitialized = useRef(false);
@@ -150,6 +150,7 @@ const Login = () => {
 
   return (
     <div className="w-full h-full bg-primary flex">
+      {isLoading && <MiniLoader />}
       <div className="h-full flex justify-end">
         <Image
           src="/images/auth/loginImg.svg"

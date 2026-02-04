@@ -2,7 +2,8 @@
 import { step1Options } from "@/src/libs/constants/onboarding.constants";
 import { Button, Input } from "antd";
 import { FaArrowLeft } from "react-icons/fa";
-import { setSearchParam, useBack } from "@/src/hooks/router.hooks";
+import { canGoBack, setSearchParam, useBack } from "@/src/hooks/router.hooks";
+import { useEffect, useState } from "react";
 
 const Step1 = ({
   setCurrentStep,
@@ -13,6 +14,12 @@ const Step1 = ({
   quiz: any;
   setQuiz: (fn: any) => void;
 }) => {
+  
+  const [showBack, setShowBack] = useState(false);
+
+  useEffect(() => {
+    setShowBack(canGoBack());
+  }, []);
 
   const handleContinue = () => {
     setSearchParam("step", 2);
@@ -39,20 +46,18 @@ const Step1 = ({
         {step1Options.map((level: any) => (
           <div
             key={level.value}
-            className={`w-full h-11 px-3 border rounded-xl flex justify-between items-center gap-3 cursor-pointer transition-all ${
-              quiz.subjects.includes(level.value)
-                ? "border-primary"
-                : "border-[#DADADA] hover:border-gray-400"
-            }`}
+            className={`w-full h-11 px-3 border rounded-xl flex justify-between items-center gap-3 cursor-pointer transition-all ${quiz.subjects.includes(level.value)
+              ? "border-primary"
+              : "border-[#DADADA] hover:border-gray-400"
+              }`}
             onClick={() => toggle(level.value)}
           >
             <p className="text-sm">{level.label}</p>
             <div
-              className={`w-4 h-4 flex justify-center items-center border-2 rounded-full transition-all ${
-                quiz.subjects.includes(level.value)
-                  ? "border-primary"
-                  : "border-[#DADADA] hover:border-primary"
-              }`}
+              className={`w-4 h-4 flex justify-center items-center border-2 rounded-full transition-all ${quiz.subjects.includes(level.value)
+                ? "border-primary"
+                : "border-[#DADADA] hover:border-primary"
+                }`}
             >
               {quiz.subjects.includes(level.value) && (
                 <div className="w-2 h-2 bg-primary rounded-full" />
@@ -70,14 +75,15 @@ const Step1 = ({
       </div>
 
       <div className="w-[300px] flex gap-3 items-center mt-6">
-        <Button
-          onClick={useBack}
-          className="flex-1 h-10! rounded-xl! border border-[#DADADA]! text-primary! bg-white! mt-4"
-          icon={<FaArrowLeft />}
-        >
-          Back
-        </Button>
-
+        {showBack && (
+          <Button
+            onClick={useBack}
+            className="flex-1 h-10! rounded-xl! border border-[#DADADA]! text-primary! bg-white! mt-4"
+            icon={<FaArrowLeft />}
+          >
+            Back
+          </Button>
+        )}
         <Button
           disabled={quiz.subjects.length === 0}
           onClick={handleContinue}

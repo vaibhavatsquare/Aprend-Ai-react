@@ -11,6 +11,7 @@ import { signUpWithFirebase, signInWithGoogle } from "@/src/services/auth/auth.f
 import { setCookie } from "@/src/services/coockies/coockie.service";
 import { authenticateWithAPI, resendOtp, sendOtp, verifyOtp } from "@/src/services/api/auth.api";
 import { getFCMToken } from "@/src/configs/firebase.config";
+import MiniLoader from "@/src/components/loaders/MiniLoader";
 
 interface SignUpFormData {
   email: string;
@@ -111,9 +112,8 @@ const SignUp = () => {
       setCookie("idToken", idToken, 7);
 
       await authenticateWithAPI(fcmToken);
-      await sendOtp();
-
       setUserEmail(data.email);
+      await sendOtp(data.email, false)
       setIsOtpSent(true);
       startResendTimer();
 
@@ -153,9 +153,8 @@ const SignUp = () => {
       }
 
       setIsLoading(true);
-      const res = await verifyOtp(otpValue, userEmail);
+      const res = await verifyOtp(userEmail, otpValue);
 
-      localStorage.setItem("resetToken", res.token);
       message.success("OTP verified");
       useRedirect("/home", true);
     } catch (err: any) {
@@ -175,7 +174,7 @@ const SignUp = () => {
 
     try {
       setIsLoading(true);
-      await resendOtp();
+       await resendOtp(userEmail)
       message.success("OTP resent");
       startResendTimer();
     } catch {
@@ -201,6 +200,7 @@ const SignUp = () => {
 
   return (
     <div className="w-full h-full bg-primary flex">
+      {isLoading && <MiniLoader />}
       <div className="h-full flex justify-end">
         <Image
           src="/images/auth/loginImg.svg"

@@ -27,7 +27,7 @@ export const educationLevels = [
     },
     {
         label: "Pre-Vestibular",
-        value: "PRE_UNIVERSITY"
+        value: "PRE_VESTIBULAR"
     },
     {
         label: "University",

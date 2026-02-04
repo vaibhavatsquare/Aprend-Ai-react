@@ -1,5 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 /**
  * Global variable to hold router instance,
@@ -17,6 +18,13 @@ export const setRouterInstance = (router: ReturnType<typeof useRouter>) => {
   routerInstance = router;
 };
 
+let lastNavigationWasReplace = false;
+
+export const canGoBack = () => {
+  if (lastNavigationWasReplace) return false;
+  return window.history.length > 1;
+};
+
 /**
  * Utility function to redirect the user to a specific URL.
  * Falls back to window.location if router is not yet initialized.
@@ -25,6 +33,8 @@ export const setRouterInstance = (router: ReturnType<typeof useRouter>) => {
  * @param replace - Whether to replace history instead of pushing a new entry
  */
 export const useRedirect = (path: string, replace: boolean = false) => {
+  lastNavigationWasReplace = replace;
+  
   if (routerInstance) {
     replace ? routerInstance.replace(path) : routerInstance.push(path);
   } else {
