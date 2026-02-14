@@ -4,6 +4,7 @@ import { User } from "firebase/auth";
 import { app } from "../configs/firebase.config";
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 import { setCookie } from "../services/coockies/coockie.service";
+import { UserDetail } from "@/src/libs/types";
 
 // Axios instance
 let axiosInstance: AxiosInstance | null = null;
@@ -109,3 +110,38 @@ const fetch = async <T>(config: AxiosRequestConfig): Promise<T> => {
 };
 
 export { API, fetch };
+
+export const getCurrentWeek = () => {
+  const today = new Date();
+  const day = today.getDay(); // 0 = Sunday
+  const diff = today.getDate() - day + (day === 0 ? -6 : 1);
+
+  const monday = new Date(today.setDate(diff));
+
+  return Array.from({ length: 7 }).map((_, i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    return d;
+  });
+};
+
+export const getStoredUser = (): UserDetail | null => {
+  if (typeof window === "undefined") return null;
+
+  const user = localStorage.getItem("user");
+  if (!user) return null;
+
+  try {
+    return JSON.parse(user) as UserDetail;
+  } catch {
+    return null;
+  }
+};
+
+export const getGreeting = () => {
+  const hour = new Date().getHours();
+
+  if (hour < 12) return "Good Morning";
+  if (hour < 17) return "Good Afternoon";
+  return "Good Evening";
+};

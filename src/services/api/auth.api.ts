@@ -1,14 +1,15 @@
 import { fetch } from "@/src/libs/helpers";
+import { UserDetail, UserSession } from "@/src/libs/types";
 
 export const backendLogin = async (notificationToken?: string) => {
-    return await fetch<{
-        user: { id: string };
-        userSessions: { id: string };
-    }>({
-        url: "/auth",
-        method: "POST",
-        data: { notificationToken },
-    });
+  return await fetch<{
+    user: UserDetail;
+    userSessions: UserSession;
+  }>({
+    url: "/auth",
+    method: "POST",
+    data: { notificationToken },
+  });
 };
 
 export const backendLogout = async (sessionId: string) => {
@@ -35,6 +36,7 @@ export const authenticateWithAPI = async (fcmToken: any) => {
     localStorage.setItem("sessionId", res.userSessions.id);
     localStorage.setItem("userId", res.user.id);
 
+    localStorage.setItem("user", JSON.stringify(res.user));
     return res;
 };
 
@@ -50,6 +52,7 @@ export const logoutUser = async (): Promise<void> => {
 
     localStorage.removeItem("sessionId");
     localStorage.removeItem("userId");
+    localStorage.removeItem("user");
 };
 
 /* SEND OTP */

@@ -1,72 +1,174 @@
-"use client"
+"use client";
+
 import IconSparkel from "@/src/components/icons/iconSparkel";
 import { useRedirect } from "@/src/hooks/router.hooks";
+import { getCurrentWeek, getGreeting, getStoredUser } from "@/src/libs/helpers";
+import { getDashboard } from "@/src/services/api/dashboard.api";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { AiOutlineFire } from "react-icons/ai";
-import { FaArrowRight } from "react-icons/fa";
 import { GoDotFill } from "react-icons/go";
 import { IoArrowForwardSharp } from "react-icons/io5";
 import { LuChevronRight } from "react-icons/lu";
 
+const formatTaskType = (type: string) => {
+  if (type === "FLASHCARD") return "Flashcards";
+  if (type === "PRACTICE_QUESTION") return "Practice Questions";
+  if (type === "CONCEPT_EXPLANATION") return "Concept Explanation";
+  return type;
+};
+
 const Home = () => {
+  const [dashboard, setDashboard] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [selectedDate, setSelectedDate] = useState<string>("");
+  const week = useMemo(() => getCurrentWeek(), []);
+  const todayIso = new Date().toISOString().split("T")[0];
+  const isToday = selectedDate === todayIso;
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await getDashboard();
+        setDashboard(res);
+        setSelectedDate(new Date().toISOString().split("T")[0]);
+      } catch (err) {
+        console.error("Dashboard error", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    load();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="px-4 grid grid-cols-3 gap-2">
+        <div className="h-[calc(100vh-80px)] p-2 col-span-2">
+          <div className="h-[120px] bg-gray-200 rounded-lg animate-pulse" />
+        </div>
+      </div>
+    );
+  }
+
+  const streak = dashboard?.currentStreak ?? 0;
+
+  const streakTitle =
+    streak === 0
+      ? "Start your learning journey today 🚀"
+      : `You've studied ${streak} days in a row!`;
+
+  const streakSub =
+    streak === 0
+      ? "Consistency builds mastery. Let's begin!"
+      : "Keep it up 💪";
+
+  const tasksForDate =
+    dashboard?.tasks?.filter(
+      (t: any) => t.scheduledDate.split("T")[0] === selectedDate
+    ) || [];
+
+  const completedCount = tasksForDate.filter(
+    (t: any) => t.status === "COMPLETED"
+  ).length;
+
+  const progress =
+    tasksForDate.length > 0
+      ? Math.round((completedCount / tasksForDate.length) * 100)
+      : 0;
+
   return (
     <div className="px-4 grid grid-cols-3 gap-2">
       <div className="h-[calc(100vh-80px)] p-2 overflow-y-auto scrollbar col-span-2 flex flex-col gap-4">
+
+        {/* SAME STREAK DESIGN */}
         <div className="relative w-full flex items-start justify-between gap-4 rounded-lg px-4 py-6 bg-linear-to-r from-[#F97316] via-[#ED482F] to-[#EF4444]">
-          <h1 className="text-2xl text-white">
-            You've studied 3 days in a row! <br />
-            Keep it up 💪
+          <h1 className="text-xl text-white">
+            {streakTitle}
+            <br />
+            {streakSub}
           </h1>
           <AiOutlineFire className="text-white text-4xl" />
-          <div className="absolute -bottom-3 right-5 flex gap-2 items-center text-[#FFFFFF80] font-medium">
-            <h2 className="text-5xl">3</h2>
-            <p className="text-xl">days</p>
-          </div>
-        </div>
-
-        <div className="flex gap-2 items-center">
-          {Array.from({ length: 7 }).map((_, index) => (
-            <div
-              key={index}
-              className="p-2 border border-gray-200 rounded-lg flex flex-col items-center justify-center"
-              style={{
-                boxShadow: "0px 0px 1px 0px #00000040",
-              }}
-            >
-              <p className="text-sm text-secondary">MON</p>
-              <p className="text-sm font-medium">{21 + index}</p>
+          {streak > 0 && (
+            <div className="absolute -bottom-3 right-5 flex gap-2 items-center text-[#FFFFFF80] font-medium">
+              <h2 className="text-5xl">{streak}</h2>
+              <p className="text-xl">days</p>
             </div>
-          ))}
+          )}
         </div>
 
+        {/* SAME WEEK DESIGN */}
+        <div className="flex gap-2 items-center">
+          {week.map((date, index) => {
+            const iso = date.toISOString().split("T")[0];
+            const isSelected = iso === selectedDate;
+
+            return (
+              <div
+                key={index}
+                onClick={() => setSelectedDate(iso)}
+                className={`w-[56px] h-[66px] rounded-lg flex flex-col items-center justify-center cursor-pointer transition-all border
+          ${isSelected
+                    ? "bg-[#1E3A5F] text-white border-[#1E3A5F]"
+                    : "bg-white text-black border-[#E5E5E5]"
+                  }`}
+                style={{
+                  boxShadow: "0px 2px 6px rgba(0,0,0,0.06)",
+                }}
+              >
+                <p
+                  className={`text-[16px] font-regular ${isSelected ? "text-white" : "text-secondary"
+                    }`}
+                >
+                  {date
+                    .toLocaleDateString("en-US", { weekday: "short" })
+                    .toUpperCase()}
+                </p>
+
+                <p className="text-[16px] font-medium">
+                  {date.getDate()}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* TASK SECTION SAME */}
         <div className="flex flex-col gap-6">
           <div className="flex gap-2 items-center justify-between">
-            <h2 className="text-xl font-semibold">Today's Task</h2>
+            <h2 className="text-xl font-semibold">{isToday ? "Today's Task" : ""}</h2>
             <p className="text-secondary">
-              Progress: <span className="text-black font-medium">60%</span>
+              Progress: <span className="text-black font-medium">{progress}%</span>
             </p>
           </div>
 
           <div className="flex flex-col gap-3">
-            {Array.from({ length: 4 }).map((_, index) => (
+            {tasksForDate.length === 0 && (
+              <div className="p-3 border border-gray-200 rounded-lg text-secondary">
+                No tasks scheduled
+              </div>
+            )}
+
+            {tasksForDate.map((task: any) => (
               <div
-                key={index}
-                className="p-3 border border-gray-200 rounded-lg flex gap-2 items-center justify-between cursor-pointer"
+                key={task.id}
+                className="p-2 border border-gray-200 rounded-[14px] flex gap-1 items-center justify-between cursor-pointer"
                 style={{
                   boxShadow: "0px 0px 1px 0px #00000040",
                 }}
               >
-                <div className="flex flex-col gap-2">
-                  <h3>
-                    Math practice - Algebra
-                    <p className="text-sm text-secondary flex gap-2 items-center">
-                      Flashcards <GoDotFill className="text-primary" />
-                      <span className="text-primary font-semibold">
-                        Completed
-                      </span>
-                    </p>
+                <div className="flex flex-col">
+                  <h3 className="font-medium text-[17px]">
+                    {task.task.topic} - {task.task.subtopic}
                   </h3>
+                  <p className="text-[15px] text-secondary flex gap-2 items-center font-normal">
+                    {formatTaskType(task.task.taskType)}
+                    <GoDotFill className="text-primary" />
+                    <span className="text-primary font-normal">
+                      {task.status === "COMPLETED" ? "Completed" : "Pending"}
+                    </span>
+                  </p>
                 </div>
 
                 <LuChevronRight className="text-2xl text-secondary" />
@@ -76,9 +178,12 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Right part */}
+      {/* RIGHT SIDE UNTOUCHED */}
       <div className="flex flex-col gap-4 h-[calc(100vh-80px)] p-2 overflow-y-auto scrollbar">
-        <div className="relative h-[126px] border-2 border-[#3A86FF] flex flex-col justify-end gap-4 bg-primary rounded-xl p-4 cursor-pointer" onClick={() => useRedirect("/home/ai-tutor")}>
+        <div
+          className="relative h-[126px] border-2 border-[#3A86FF] flex flex-col justify-end gap-4 bg-primary rounded-xl p-4 cursor-pointer"
+          onClick={() => useRedirect("/home/ai-tutor")}
+        >
           <IconSparkel />
           <h2 className="text-white text-sm tracking-wider">
             YOUR <span className="font-medium">AI TUTOR</span> IS READY TO HELP
