@@ -14,6 +14,8 @@ import { IoClose } from "react-icons/io5";
 import { FaPause, FaPlay } from "react-icons/fa";
 import NotesIcon from "@/src/components/icons/notesIcon";
 import { TbCards } from "react-icons/tb";
+import { sendAiMessage } from "@/src/services/api/aiTutor.api";
+import ReactMarkdown from "react-markdown";
 
 const AudioWaveform = dynamic(
   () => import("@/src/components/AudioWaveform/AudioWaveform"),
@@ -27,6 +29,21 @@ const AudioPlayer = dynamic(
 
 const AiTutor = () => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [conversationId, setConversationId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [userName, setUserName] = useState<string | null>(null);
+  const bottomRef = useRef<HTMLDivElement | null>(null);
+  const scrollToBottom = () => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const parsed = JSON.parse(storedUser);
+      setUserName(parsed?.name || null);
+    }
+  }, []);
 
   const {
     recordingState,
@@ -59,6 +76,10 @@ const AiTutor = () => {
   const [message, setMessage] = useState("");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, loading]);
+
   const handleImage = (e: any) => {
     const file = (e.target as HTMLInputElement).files?.[0];
     if (file) {
@@ -78,18 +99,50 @@ const AiTutor = () => {
     }
   };
 
-  const handleSendMessage = () => {
-    if (message.trim() !== "" || selectedImage) {
+  const handleSendMessage = async () => {
+    if (!message.trim() && !selectedImage) return;
+
+    const userMessage = {
+      role: "user",
+      message: message.trim() || null,
+      image: selectedImage || null,
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    setMessage("");
+    setSelectedImage(null);
+
+    try {
+      setLoading(true);
+
+      const res = await sendAiMessage({
+        message: userMessage.message || "",
+        imageUrl: userMessage.image || "",
+        conversationId,
+      });
+
+      // Save conversationId if first message
+      if (!conversationId) {
+        setConversationId(res.conversationId);
+      }
+
       setMessages((prev) => [
         ...prev,
         {
-          role: "user",
-          message: message.trim() !== "" ? message : null,
-          image: selectedImage || null,
+          role: "tutor",
+          message: res.reply,
         },
       ]);
-      setMessage("");
-      setSelectedImage(null);
+    } catch (e) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "tutor",
+          message: "Something went wrong. Please try again.",
+        },
+      ]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -115,6 +168,18 @@ const AiTutor = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [recordingState, handleSendAudio]);
 
+  const streak = Number(localStorage.getItem("streak")) || 0;
+
+  const streakTitle =
+    streak === 0
+      ? "Start your learning journey today 🚀"
+      : `You've studied ${streak} days in a row!`;
+
+  const streakSub =
+    streak === 0
+      ? "Consistency builds mastery. Let's begin!"
+      : "Keep it up 💪";
+
   return (
     <div className="px-4 grid grid-cols-3 gap-2">
       {/* Header  */}
@@ -135,7 +200,7 @@ const AiTutor = () => {
         <div className="px-4 relative flex-1 flex flex-col gap-2 overflow-y-auto scrollbar">
           {messages.length === 0 && (
             <h1 className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-4xl font-semibold bg-linear-to-r from-primary via-[#6D8199] to-primary bg-clip-text text-transparent">
-              Hello, lucas!
+              Hello{userName ? `, ${userName}!` : ""}
             </h1>
           )}
 
@@ -172,11 +237,30 @@ const AiTutor = () => {
                       <div className="w-12 h-12 p-2 rounded-full bg-primary flex justify-center items-center">
                         <IconSparkel color="#ffffff" />
                       </div>
-                      <p>{msg.message}</p>
+                      <div className="prose prose-sm max-w-none text-secondary">
+                        <ReactMarkdown>{msg.message}</ReactMarkdown>
+                      </div>
                     </div>
                   </div>
                 )
               )}
+
+            {loading && (
+              <div className="flex justify-start">
+                <div className="max-w-[80%] p-3 flex gap-2">
+                  <div className="w-12 h-12 p-2 rounded-full bg-primary flex justify-center items-center">
+                    <IconSparkel color="#ffffff" />
+                  </div>
+                  <div className="flex items-center h-12">
+                    <p className="text-secondary leading-none">
+                      AI is typing...
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+             <div ref={bottomRef} />
           </div>
         </div>
 
@@ -331,14 +415,17 @@ const AiTutor = () => {
       <div className="flex flex-col gap-4 h-[calc(100vh-84px)] mt-1 px-2 overflow-y-auto scrollbar">
         <div className="relative w-full flex items-start justify-between gap-4 rounded-lg px-4 py-6 bg-linear-to-r from-[#F97316] via-[#ED482F] to-[#EF4444]">
           <h1 className="text-base text-white">
-            You've studied 3 days in a row! <br />
-            Keep it up 💪
+            {streakTitle}
+            <br />
+            {streakSub}
           </h1>
           <AiOutlineFire className="text-white text-4xl" />
-          <div className="absolute -bottom-3 right-5 flex gap-2 items-center text-[#FFFFFF80] font-medium">
-            <h2 className="text-5xl">3</h2>
-            <p className="text-xl">days</p>
-          </div>
+          {streak > 0 && (
+            <div className="absolute -bottom-3 right-5 flex gap-2 items-center text-[#FFFFFF80] font-medium">
+              <h2 className="text-5xl">{streak}</h2>
+              <p className="text-xl">days</p>
+            </div>
+          )}
         </div>
 
         <div className="flex gap-2 items-center justify-between p-4 rounded-xl border border-[#DADADA]">

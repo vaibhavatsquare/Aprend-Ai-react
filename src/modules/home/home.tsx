@@ -53,7 +53,7 @@ const Home = () => {
   }
 
   const streak = dashboard?.currentStreak ?? 0;
-
+  localStorage.setItem("streak", streak);
   const streakTitle =
     streak === 0
       ? "Start your learning journey today 🚀"
