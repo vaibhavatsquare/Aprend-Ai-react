@@ -36,6 +36,57 @@ const AiTutor = () => {
   const scrollToBottom = () => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+  const recognitionRef = useRef<any>(null);
+  const [isConverting, setIsConverting] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const adjustTextareaHeight = () => {
+    const el = textareaRef.current;
+    if (!el) return;
+
+    el.style.height = "auto";
+    el.style.height = el.scrollHeight + "px";
+  };
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const SpeechRecognition =
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      console.warn("Speech recognition not supported");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "en-US";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.onstart = () => {
+      setIsRecording(true);
+      setIsConverting(false);
+    };
+
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      setMessage(transcript);
+    };
+
+    recognition.onend = () => {
+      setIsRecording(false);
+      setIsConverting(false);
+    };
+
+    recognition.onerror = () => {
+      setIsRecording(false);
+      setIsConverting(false);
+    };
+    recognitionRef.current = recognition;
+  }, []);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -79,6 +130,10 @@ const AiTutor = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages, loading]);
+
+  useEffect(() => {
+    adjustTextareaHeight();
+  }, [message]);
 
   const handleImage = (e: any) => {
     const file = (e.target as HTMLInputElement).files?.[0];
@@ -260,7 +315,7 @@ const AiTutor = () => {
               </div>
             )}
 
-             <div ref={bottomRef} />
+            <div ref={bottomRef} />
           </div>
         </div>
 
@@ -329,22 +384,39 @@ const AiTutor = () => {
                       className="hidden"
                     />
                   </div>
-                  <Input
-                    className="border-none! shadow-none! flex-1"
+                  {isRecording && (
+                    <div className="flex items-center gap-2 text-sm text-red-500 px-1">
+                      <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                      Listening...
+                    </div>
+                  )}
+                  <textarea
+                    ref={textareaRef}
+                    className="flex-1 resize-none outline-none transition-all duration-150"
                     placeholder="Ask Your AI Tutor"
                     value={message}
+                    rows={1}
                     onChange={(e) => setMessage(e.target.value)}
-                    onPressEnter={handleSendMessage}
                   />
                 </>
               )}
               {recordingState === "idle" ? (
                 <div
-                  className="w-8 h-8 rounded-full flex justify-center items-center cursor-pointer"
+                  className={`w-8 h-8 rounded-full flex justify-center items-center cursor-pointer transition-all duration-200 ${isRecording ? "bg-red-500 scale-110 animate-pulse" : ""
+                    }`}
                   style={{
                     boxShadow: "0px 0px 4px 0px #00000040",
                   }}
-                  onClick={startRecording}
+                  onClick={() => {
+                    if (!recognitionRef.current) return;
+
+                    if (!isRecording) {
+                      recognitionRef.current.start();
+                    } else {
+                      setIsConverting(true);
+                      recognitionRef.current.stop();
+                    }
+                  }}
                 >
                   <Image
                     src="/images/home/mic.svg"
@@ -353,28 +425,13 @@ const AiTutor = () => {
                     height={20}
                   />
                 </div>
-              ) : recordingState === "recording" ? (
+              ) : isRecording ? (
                 <div className="flex-1 flex items-center gap-2">
-                  <div
-                    className="w-8 h-8 rounded-full flex justify-center items-center cursor-pointer hover:bg-gray-100 transition-colors"
-                    onClick={cancelRecording}
-                  >
-                    <IoClose className="text-lg text-gray-600" />
-                  </div>
                   <div className="flex-1 flex justify-center items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                    <span className="text-sm text-gray-600 min-w-[40px]">
-                      {formatTime(recordingTime)}
+                    <span className="text-sm text-gray-600">
+                      Listening...
                     </span>
-                  </div>
-                  <div
-                    className="w-8 h-8 rounded-full flex justify-center items-center cursor-pointer bg-gray-100 hover:bg-gray-200 transition-colors"
-                    style={{
-                      boxShadow: "0px 0px 4px 0px #00000040",
-                    }}
-                    onClick={stopRecording}
-                  >
-                    <FaPause className="text-sm" />
                   </div>
                 </div>
               ) : (
@@ -389,22 +446,25 @@ const AiTutor = () => {
                 </div>
               )}
               <div
-                className="w-8 h-8 rounded-full flex justify-center items-center cursor-pointer"
+                className={`w-8 h-8 rounded-full flex justify-center items-center transition-all ${loading || isConverting || isRecording
+                  ? "opacity-50 pointer-events-none"
+                  : "cursor-pointer"
+                  }`}
                 style={{
                   boxShadow: "0px 0px 4px 0px #00000040",
                 }}
-                onClick={
-                  recordingState === "stopped"
-                    ? handleSendAudio
-                    : handleSendMessage
-                }
+                onClick={handleSendMessage}
               >
-                <Image
-                  src="/images/home/shareIcon.svg"
-                  alt="Share"
-                  width={20}
-                  height={20}
-                />
+                {loading || isConverting ? (
+                  <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Image
+                    src="/images/home/shareIcon.svg"
+                    alt="Share"
+                    width={20}
+                    height={20}
+                  />
+                )}
               </div>
             </div>
           </div>
