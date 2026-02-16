@@ -16,6 +16,7 @@ import NotesIcon from "@/src/components/icons/notesIcon";
 import { TbCards } from "react-icons/tb";
 import { sendAiMessage } from "@/src/services/api/aiTutor.api";
 import ReactMarkdown from "react-markdown";
+import { deleteFile, uploadImage } from "@/src/services/api/upload.api";
 
 const AudioWaveform = dynamic(
   () => import("@/src/components/AudioWaveform/AudioWaveform"),
@@ -40,6 +41,8 @@ const AiTutor = () => {
   const [isConverting, setIsConverting] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const adjustTextareaHeight = () => {
     const el = textareaRef.current;
@@ -135,23 +138,46 @@ const AiTutor = () => {
     adjustTextareaHeight();
   }, [message]);
 
-  const handleImage = (e: any) => {
+  const handleImage = async (e: any) => {
     const file = (e.target as HTMLInputElement).files?.[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setSelectedImage(imageUrl);
+    if (!file) return;
+
+    try {
+      setIsUploading(true);
+
+      const outPutUrl = await uploadImage(file);
+
+      setUploadedImageUrl(outPutUrl);  // real S3 public URL
+
+      // Local preview
+      const previewUrl = URL.createObjectURL(file);
+      setSelectedImage(previewUrl);
+
+    } catch (err) {
+      console.error("Upload failed", err);
+    } finally {
+      setIsUploading(false);
     }
-    // Reset input value to allow selecting the same file again
+
     if (inputRef.current) {
       inputRef.current.value = "";
     }
   };
 
-  const handleRemoveImage = () => {
-    if (selectedImage) {
-      URL.revokeObjectURL(selectedImage);
-      setSelectedImage(null);
+  const handleRemoveImage = async () => {
+    if (!uploadedImageUrl) return;
+
+    try {
+      const fileName = uploadedImageUrl.split("/").pop(); // extract file name
+console.log(fileName)
+      if (fileName) {
+        await deleteFile(fileName);
+      }
+    } catch (err) {
+      console.warn("Delete failed");
     }
+    setUploadedImageUrl(null);
+    setSelectedImage(null);
   };
 
   const handleSendMessage = async () => {
@@ -160,7 +186,7 @@ const AiTutor = () => {
     const userMessage = {
       role: "user",
       message: message.trim() || null,
-      image: selectedImage || null,
+      image: uploadedImageUrl || null,
     };
 
     setMessages((prev) => [...prev, userMessage]);
@@ -172,7 +198,7 @@ const AiTutor = () => {
 
       const res = await sendAiMessage({
         message: userMessage.message || "",
-        imageUrl: userMessage.image || "",
+        imageUrl: uploadedImageUrl || "",
         conversationId,
       });
 
@@ -341,34 +367,41 @@ const AiTutor = () => {
           >
             {/* Image Preview */}
             {selectedImage && (
-              <div className="relative w-fit">
-                <AntImage
-                  src={selectedImage}
-                  alt="Preview"
-                  width={80}
-                  height={80}
-                  className="w-20 h-20 object-cover rounded-lg"
-                  preview={{
-                    toolbarRender: () => null,
-                  }}
-                />
-                <div
-                  className="absolute -top-2 -right-2 w-5 h-5 bg-secondary rounded-full flex justify-center items-center cursor-pointer"
-                  onClick={handleRemoveImage}
-                >
-                  <IoClose className="text-white text-sm" />
-                </div>
-              </div>
-            )}
+  <div className="relative w-fit overflow-visible">
+    <AntImage
+      src={selectedImage}
+      alt="Preview"
+      width={80}
+      height={80}
+      className="w-20 h-20 object-cover rounded-lg"
+      preview={{
+        actionsRender: () => [],
+      }}
+    />
+
+    <div
+      className="absolute -top-2 -right-2 z-10 w-6 h-6 bg-secondary rounded-full flex justify-center items-center cursor-pointer pointer-events-auto"
+      onClick={handleRemoveImage}
+    >
+      <IoClose className="text-white text-xs" />
+    </div>
+  </div>
+)}
+
             <div className="flex gap-2 items-center">
               {recordingState === "idle" && (
                 <>
                   <div
-                    className="w-8 h-8 rounded-full flex justify-center items-center cursor-pointer"
+                    className={`w-8 h-8 rounded-full flex justify-center items-center transition-all ${uploadedImageUrl ? "opacity-50 pointer-events-none" : "cursor-pointer"
+                      }`}
                     style={{
                       boxShadow: "0px 0px 4px 0px #00000040",
                     }}
-                    onClick={() => inputRef.current?.click()}
+                    onClick={() => {
+                      if (!uploadedImageUrl) {
+                        inputRef.current?.click();
+                      }
+                    }}
                   >
                     <Image
                       src="/images/home/camera.svg"
@@ -381,6 +414,7 @@ const AiTutor = () => {
                       onChange={handleImage}
                       type="file"
                       accept="image/*"
+                      disabled={!!uploadedImageUrl}
                       className="hidden"
                     />
                   </div>
@@ -446,7 +480,7 @@ const AiTutor = () => {
                 </div>
               )}
               <div
-                className={`w-8 h-8 rounded-full flex justify-center items-center transition-all ${loading || isConverting || isRecording
+                className={`w-8 h-8 rounded-full flex justify-center items-center transition-all ${loading || isConverting || isRecording || isUploading
                   ? "opacity-50 pointer-events-none"
                   : "cursor-pointer"
                   }`}
@@ -455,7 +489,7 @@ const AiTutor = () => {
                 }}
                 onClick={handleSendMessage}
               >
-                {loading || isConverting ? (
+                {loading || isConverting || isUploading ? (
                   <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                 ) : (
                   <Image
