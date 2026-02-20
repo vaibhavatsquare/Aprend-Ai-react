@@ -206,9 +206,12 @@ const Home = () => {
           </p>
         </div>
 
-        <div className="flex gap-2 items-center justify-between p-4 rounded-xl border border-[#DADADA]">
+        <div
+          className="flex gap-2 items-center justify-between p-4 rounded-xl border border-[#DADADA] cursor-pointer hover:bg-gray-50 transition-colors"
+          onClick={() => useRedirect("/home/questions")}
+        >
           <p className="text-sm font-medium">Question Bank</p>
-          <IoArrowForwardSharp className="text-lg -rotate-45 cursor-pointer" />
+          <IoArrowForwardSharp className="text-lg -rotate-45" />
         </div>
 
         <div className="flex gap-2 items-center justify-between p-4 rounded-xl border border-[#DADADA]">
