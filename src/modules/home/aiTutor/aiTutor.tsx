@@ -4,19 +4,20 @@ import IconSparkel from "@/src/components/icons/iconSparkel";
 import { useBack } from "@/src/hooks/router.hooks";
 import { useAudioRecorder } from "@/src/hooks/useAudioRecorder";
 import dynamic from "next/dynamic";
-import { Input, Image as AntImage } from "antd";
+import { Image as AntImage, message as antMessage } from "antd";
 import Image from "next/image";
 import { useRef, useState, useEffect, useCallback } from "react";
 import { AiOutlineFire } from "react-icons/ai";
 import { GoArrowLeft } from "react-icons/go";
 import { IoArrowForwardSharp } from "react-icons/io5";
 import { IoClose } from "react-icons/io5";
-import { FaPause, FaPlay } from "react-icons/fa";
 import NotesIcon from "@/src/components/icons/notesIcon";
 import { TbCards } from "react-icons/tb";
 import { sendAiMessage } from "@/src/services/api/aiTutor.api";
 import ReactMarkdown from "react-markdown";
 import { deleteFile, uploadImage } from "@/src/services/api/upload.api";
+import { createNote } from "@/src/services/api/notes.api";
+import { generateFlashcards } from "@/src/services/api/flashcards.api";
 
 const AudioWaveform = dynamic(
   () => import("@/src/components/AudioWaveform/AudioWaveform"),
@@ -43,6 +44,8 @@ const AiTutor = () => {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isSavingNote, setIsSavingNote] = useState(false);
+  const [isGeneratingFlashcard, setIsGeneratingFlashcard] = useState(false);
 
   const adjustTextareaHeight = () => {
     const el = textareaRef.current;
@@ -103,30 +106,11 @@ const AiTutor = () => {
     recordingState,
     recordingTime,
     audioUrl,
-    startRecording,
-    stopRecording,
     cancelRecording,
     resetRecording,
   } = useAudioRecorder();
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
-  };
-
-  const [messages, setMessages] = useState<any[]>([
-    // {
-    //   role: "user",
-    //   message: "Hey! Can you help me revise the human heart anatomy?",
-    // },
-    // {
-    //   role: "tutor",
-    //   message:
-    //     "Of course! ❤️ The human heart has four chambers — two atria (upper chambers) and two ventricles (lower chambers).",
-    // },
-  ]);
-
+  const [messages, setMessages] = useState<any[]>([]);
   const [message, setMessage] = useState("");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
@@ -169,7 +153,7 @@ const AiTutor = () => {
 
     try {
       const fileName = uploadedImageUrl.split("/").pop(); // extract file name
-console.log(fileName)
+      console.log(fileName)
       if (fileName) {
         await deleteFile(fileName);
       }
@@ -224,6 +208,8 @@ console.log(fileName)
       ]);
     } finally {
       setLoading(false);
+      setUploadedImageUrl(null);
+      setSelectedImage(null);
     }
   };
 
@@ -248,6 +234,43 @@ console.log(fileName)
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [recordingState, handleSendAudio]);
+
+  const handleGenerateNote = async () => {
+    if (!conversationId) return;
+
+    try {
+      setIsSavingNote(true);
+
+      await createNote(conversationId);
+
+      // Optional: show success toast
+      console.log("Note saved successfully");
+
+    } catch (err) {
+      console.error("Failed to save note", err);
+    } finally {
+      setIsSavingNote(false);
+      antMessage.success("Note generated...");
+    }
+  };
+
+  const handleGenerateFlashcard = async () => {
+    if (!conversationId) return;
+
+    try {
+      setIsGeneratingFlashcard(true);
+
+      const res = await generateFlashcards(conversationId);
+
+      console.log("Flashcards generated:", res);
+
+    } catch (err) {
+      console.error("Flashcard generation failed", err);
+    } finally {
+      setIsGeneratingFlashcard(false);
+      antMessage.success("Flashcard generated...");
+    }
+  };
 
   const streak = Number(localStorage.getItem("streak")) || 0;
 
@@ -302,7 +325,7 @@ console.log(fileName)
                             alt="Uploaded"
                             className="max-w-[200px] rounded-lg"
                             preview={{
-                              toolbarRender: () => null,
+                              actionsRender: () => [],
                             }}
                           />
                         )}
@@ -349,14 +372,42 @@ console.log(fileName)
         <div className="flex flex-col gap-4">
           {messages.length > 0 && (
             <div className="px-4 grid grid-cols-2 gap-3">
-              <div className="w-full flex gap-2 items-center justify-between rounded-full px-4 py-2.5 border border-[#DADADA] cursor-pointer">
-                <p className="text-sm text-secondary">Save to Notes</p>
-                <NotesIcon />
+              <div
+                className={`w-full flex gap-2 items-center justify-between rounded-full px-4 py-2.5 border border-[#DADADA] transition-all
+    ${!conversationId || isSavingNote ? "opacity-50 pointer-events-none" : "cursor-pointer"}
+  `}
+                onClick={handleGenerateNote}
+              >
+                <p className="text-sm text-secondary">
+                  {isSavingNote ? "Saving..." : "Save to Notes"}
+                </p>
+
+                {isSavingNote ? (
+                  <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <NotesIcon />
+                )}
               </div>
-              <div className="w-full flex gap-2 items-center justify-between rounded-full px-4 py-2.5 border border-[#DADADA] cursor-pointer">
-                <p className="text-sm text-secondary">Generate Flashcards</p>
-                <TbCards className="text-secondary text-xl" />
+              <div
+                className={`w-full flex gap-2 items-center justify-between rounded-full px-4 py-2.5 border border-[#DADADA] transition-all
+    ${!conversationId || isGeneratingFlashcard
+                    ? "opacity-50 pointer-events-none"
+                    : "cursor-pointer"
+                  }
+  `}
+                onClick={handleGenerateFlashcard}
+              >
+                <p className="text-sm text-secondary">
+                  {isGeneratingFlashcard ? "Generating..." : "Generate Flashcards"}
+                </p>
+
+                {isGeneratingFlashcard ? (
+                  <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <TbCards className="text-secondary text-xl" />
+                )}
               </div>
+
             </div>
           )}
           <div
@@ -367,26 +418,26 @@ console.log(fileName)
           >
             {/* Image Preview */}
             {selectedImage && (
-  <div className="relative w-fit overflow-visible">
-    <AntImage
-      src={selectedImage}
-      alt="Preview"
-      width={80}
-      height={80}
-      className="w-20 h-20 object-cover rounded-lg"
-      preview={{
-        actionsRender: () => [],
-      }}
-    />
+              <div className="relative w-fit overflow-visible">
+                <AntImage
+                  src={selectedImage}
+                  alt="Preview"
+                  width={80}
+                  height={80}
+                  className="w-20 h-20 object-cover rounded-lg"
+                  preview={{
+                    actionsRender: () => [],
+                  }}
+                />
 
-    <div
-      className="absolute -top-2 -right-2 z-10 w-6 h-6 bg-secondary rounded-full flex justify-center items-center cursor-pointer pointer-events-auto"
-      onClick={handleRemoveImage}
-    >
-      <IoClose className="text-white text-xs" />
-    </div>
-  </div>
-)}
+                <div
+                  className="absolute -top-2 -right-2 z-10 w-6 h-6 bg-secondary rounded-full flex justify-center items-center cursor-pointer pointer-events-auto"
+                  onClick={handleRemoveImage}
+                >
+                  <IoClose className="text-white text-xs" />
+                </div>
+              </div>
+            )}
 
             <div className="flex gap-2 items-center">
               {recordingState === "idle" && (
