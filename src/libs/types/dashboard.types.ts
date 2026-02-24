@@ -1,6 +1,9 @@
 export type Question = {
-  id: string;
-  questionText: string;
+    id: string;
+    questionText: string;
+    options: Option[];
+    correctOptionId: string;
+    stepByStepExplanation: string;
 };
 
 export type TaskDetail = {
@@ -28,3 +31,9 @@ export type DashboardResponse = {
   count: number;
   tasks: UserTask[];
 };
+
+export type Option = {
+    id: string;
+    text: string;
+};
+

@@ -84,7 +84,7 @@ const ChooseSubjects = ({ onBack }: { onBack?: () => void }) => {
           <div
             className="absolute top-6 text-[16px] text-[#121212] -translate-x-1/2"
             style={{
-              left: `${(value / 40) * 100}%`,
+              left: `calc(${(value - 0.5) / 40 * 100}%)`,
             }}
           >
             {value}

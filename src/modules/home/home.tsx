@@ -10,6 +10,7 @@ import { AiOutlineFire } from "react-icons/ai";
 import { GoDotFill } from "react-icons/go";
 import { IoArrowForwardSharp } from "react-icons/io5";
 import { LuChevronRight } from "react-icons/lu";
+import QuestionsBank from "./questions/questionsBank";
 
 const formatTaskType = (type: string) => {
   if (type === "FLASHCARD") return "Flashcards";
@@ -25,6 +26,7 @@ const Home = () => {
   const week = useMemo(() => getCurrentWeek(), []);
   const todayIso = new Date().toISOString().split("T")[0];
   const isToday = selectedDate === todayIso;
+  const [activeTask, setActiveTask] = useState<any>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -43,14 +45,60 @@ const Home = () => {
   }, []);
 
   if (loading) {
-    return (
-      <div className="px-4 grid grid-cols-3 gap-2">
-        <div className="h-[calc(100vh-80px)] p-2 col-span-2">
-          <div className="h-[120px] bg-gray-200 rounded-lg animate-pulse" />
+  return (
+    <div className="px-4 grid grid-cols-3 gap-2 animate-pulse">
+      
+      {/* LEFT SIDE */}
+      <div className="h-[calc(100vh-80px)] p-2 col-span-2 flex flex-col gap-4">
+
+        {/* Streak Card */}
+        <div className="h-[120px] rounded-lg bg-gray-200" />
+
+        {/* Week Selector */}
+        <div className="flex gap-2">
+          {[1,2,3,4,5,6,7].map((i) => (
+            <div
+              key={i}
+              className="w-[56px] h-[66px] rounded-lg bg-gray-200"
+            />
+          ))}
+        </div>
+
+        {/* Task Header */}
+        <div className="flex justify-between items-center">
+          <div className="h-6 w-32 bg-gray-200 rounded" />
+          <div className="h-6 w-24 bg-gray-200 rounded" />
+        </div>
+
+        {/* Task List */}
+        <div className="flex flex-col gap-3">
+          {[1,2,3,4].map((i) => (
+            <div
+              key={i}
+              className="h-[72px] rounded-[14px] bg-gray-200"
+            />
+          ))}
         </div>
       </div>
-    );
-  }
+
+      {/* RIGHT SIDE */}
+      <div className="flex flex-col gap-4 h-[calc(100vh-80px)] p-2">
+        
+        {/* AI Tutor Card */}
+        <div className="h-[126px] rounded-xl bg-gray-200" />
+
+        {/* Upload Notes */}
+        <div className="h-[166px] rounded-xl bg-gray-200" />
+
+        {/* Question Bank */}
+        <div className="h-[60px] rounded-xl bg-gray-200" />
+
+        {/* Weak Spot */}
+        <div className="h-[60px] rounded-xl bg-gray-200" />
+      </div>
+    </div>
+  );
+}
 
   const streak = dashboard?.currentStreak ?? 0;
   localStorage.setItem("streak", streak);
@@ -77,6 +125,40 @@ const Home = () => {
     tasksForDate.length > 0
       ? Math.round((completedCount / tasksForDate.length) * 100)
       : 0;
+
+  if (activeTask) {
+    const type = activeTask.task.taskType;
+
+    if (type === "PRACTICE_QUESTION") {
+      return (
+        <QuestionsBank
+          taskId={activeTask.task.id}
+          initialQuestions={activeTask.task.questions}
+          onClose={() => setActiveTask(null)}
+        />
+      );
+    }
+
+    // if (type === "FLASHCARD") {
+    //   return (
+    //     <FlashCardScreen
+    //       taskId={activeTask.task.id}
+    //       initialData={activeTask.task}
+    //       onClose={() => setActiveTask(null)}
+    //     />
+    //   );
+    // }
+
+    // if (type === "CONCEPT_EXPLANATION") {
+    //   return (
+    //     <ConceptExplanationScreen
+    //       taskId={activeTask.task.id}
+    //       initialData={activeTask.task}
+    //       onClose={() => setActiveTask(null)}
+    //     />
+    //   );
+    // }
+  }
 
   return (
     <div className="px-4 grid grid-cols-3 gap-2">
@@ -153,10 +235,9 @@ const Home = () => {
             {tasksForDate.map((task: any) => (
               <div
                 key={task.id}
+                onClick={() => setActiveTask(task)}
                 className="p-2 border border-gray-200 rounded-[14px] flex gap-1 items-center justify-between cursor-pointer"
-                style={{
-                  boxShadow: "0px 0px 1px 0px #00000040",
-                }}
+                style={{ boxShadow: "0px 0px 1px 0px #00000040" }}
               >
                 <div className="flex flex-col">
                   <h3 className="font-medium text-[17px]">

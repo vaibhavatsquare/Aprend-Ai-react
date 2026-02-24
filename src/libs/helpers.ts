@@ -70,6 +70,7 @@ const fetch = async <T>(config: AxiosRequestConfig): Promise<T> => {
         if (user) {
             const idToken = await fetchIdToken();
             setCookie("idToken", idToken);
+            console.log("🟢 idToken:", idToken);
             config.headers = {
                 Authorization: `Bearer ${idToken}`,
             }

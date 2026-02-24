@@ -15,7 +15,7 @@ const Questions = () => {
     };
 
     const ChooseQuestionsBank = async () => {
-        useRedirect("/home/questions/questionsBank");
+        useRedirect("/home/questions-bank");
     };
 
     return (
@@ -86,7 +86,7 @@ const Questions = () => {
 
                                         {/* Button */}
                                         <button
-                                            onClick={() => ChooseQuestionsBank()}
+                                            onClick={() => ChooseQuestionsBank()} 
                                             className="w-full h-[50px] bg-primary rounded-[16px] flex items-center justify-center cursor-pointer"
                                         >
                                             {/* Text */}

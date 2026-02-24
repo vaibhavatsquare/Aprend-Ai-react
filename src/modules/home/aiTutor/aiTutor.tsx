@@ -18,6 +18,7 @@ import ReactMarkdown from "react-markdown";
 import { deleteFile, uploadImage } from "@/src/services/api/upload.api";
 import { createNote } from "@/src/services/api/notes.api";
 import { generateFlashcards } from "@/src/services/api/flashcards.api";
+import { getStoredUser } from "@/src/libs/helpers";
 
 const AudioWaveform = dynamic(
   () => import("@/src/components/AudioWaveform/AudioWaveform"),
@@ -95,11 +96,12 @@ const AiTutor = () => {
   }, []);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      const parsed = JSON.parse(storedUser);
-      setUserName(parsed?.name || null);
-    }
+    const user = getStoredUser();
+    if (user) {
+      setUserName(user?.name ||
+        user?.email?.split("@")[0] ||
+        "");
+    };
   }, []);
 
   const {
