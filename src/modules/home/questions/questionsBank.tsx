@@ -59,7 +59,7 @@ const QuestionsBank = ({
     return (
       <div className="px-4">
         <div
-          className="h-[calc(100vh-100px)] mt-1 mb-4 py-6 rounded-xl flex flex-col animate-[pulse_1.2s_ease-in-out_infinite]"
+          className="h-[calc(100vh-100px)] mt-1 mb-4 py-6 rounded-[32px] flex flex-col animate-[pulse_1.2s_ease-in-out_infinite]"
           style={{ boxShadow: "0px 0px 4px 0px #00000040" }}
         >
           <div className="px-6 flex items-center gap-4">
@@ -176,7 +176,7 @@ const QuestionsBank = ({
   return (
     <div className="px-4">
       <div
-        className="h-[calc(100vh-100px)] mt-1 mb-4 py-6 rounded-xl flex flex-col overflow-hidden"
+        className="h-[calc(100vh-100px)] mt-1 mb-4 py-6 rounded-[32px] flex flex-col overflow-hidden"
         style={{ boxShadow: "0px 0px 4px 0px #00000040" }}
       >
         {/* TOP BAR */}

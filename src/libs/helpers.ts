@@ -113,36 +113,60 @@ const fetch = async <T>(config: AxiosRequestConfig): Promise<T> => {
 export { API, fetch };
 
 export const getCurrentWeek = () => {
-  const today = new Date();
-  const day = today.getDay(); // 0 = Sunday
-  const diff = today.getDate() - day + (day === 0 ? -6 : 1);
+    const today = new Date();
+    const day = today.getDay(); // 0 = Sunday
+    const diff = today.getDate() - day + (day === 0 ? -6 : 1);
 
-  const monday = new Date(today.setDate(diff));
+    const monday = new Date(today.setDate(diff));
 
-  return Array.from({ length: 7 }).map((_, i) => {
-    const d = new Date(monday);
-    d.setDate(monday.getDate() + i);
-    return d;
-  });
+    return Array.from({ length: 7 }).map((_, i) => {
+        const d = new Date(monday);
+        d.setDate(monday.getDate() + i);
+        return d;
+    });
 };
 
 export const getStoredUser = (): UserDetail | null => {
-  if (typeof window === "undefined") return null;
+    if (typeof window === "undefined") return null;
 
-  const user = localStorage.getItem("user");
-  if (!user) return null;
+    const user = localStorage.getItem("user");
+    if (!user) return null;
 
-  try {
-    return JSON.parse(user) as UserDetail;
-  } catch {
-    return null;
-  }
+    try {
+        return JSON.parse(user) as UserDetail;
+    } catch {
+        return null;
+    }
 };
 
 export const getGreeting = () => {
-  const hour = new Date().getHours();
+    const hour = new Date().getHours();
 
-  if (hour < 12) return "Good Morning";
-  if (hour < 17) return "Good Afternoon";
-  return "Good Evening";
+    if (hour < 12) return "Good Morning";
+    if (hour < 17) return "Good Afternoon";
+    return "Good Evening";
+};
+
+export const lightenColor = (hex: string, percent: number) => {
+    const num = parseInt(hex.replace("#", ""), 16),
+        amt = Math.round(2.3 * percent),
+        R = (num >> 16) + amt,
+        G = ((num >> 8) & 0x00ff) + amt,
+        B = (num & 0x0000ff) + amt;
+
+    return (
+        "#" +
+        (
+            0x1000000 +
+            (R < 255 ? (R < 1 ? 0 : R) : 255) * 0x10000 +
+            (G < 255 ? (G < 1 ? 0 : G) : 255) * 0x100 +
+            (B < 255 ? (B < 1 ? 0 : B) : 255)
+        )
+            .toString(16)
+            .slice(1)
+    );
+};
+
+export const darkenColor = (hex: string, percent: number) => {
+    return lightenColor(hex, -percent);
 };

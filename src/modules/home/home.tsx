@@ -11,6 +11,7 @@ import { GoDotFill } from "react-icons/go";
 import { IoArrowForwardSharp } from "react-icons/io5";
 import { LuChevronRight } from "react-icons/lu";
 import QuestionsBank from "./questions/questionsBank";
+import Flashcards from "../flashcards/flashCards";
 
 const formatTaskType = (type: string) => {
   if (type === "FLASHCARD") return "Flashcards";
@@ -139,15 +140,15 @@ const Home = () => {
       );
     }
 
-    // if (type === "FLASHCARD") {
-    //   return (
-    //     <FlashCardScreen
-    //       taskId={activeTask.task.id}
-    //       initialData={activeTask.task}
-    //       onClose={() => setActiveTask(null)}
-    //     />
-    //   );
-    // }
+    if (type === "FLASHCARD") {
+      return (
+        <Flashcards
+          taskId={activeTask.task.id}
+          initialQuestions={activeTask.task.questions}
+          onClose={() => setActiveTask(null)}
+        />
+      );
+    }
 
     // if (type === "CONCEPT_EXPLANATION") {
     //   return (
