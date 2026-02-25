@@ -1,3 +1,3 @@
-import Flashcards from '@/src/modules/flashcards/flashCards'
+import SavedFlashCards from '@/src/modules/flashcards/savedFlashCards'
 
-export default Flashcards
+export default SavedFlashCards

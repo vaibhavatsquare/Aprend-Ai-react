@@ -8,13 +8,11 @@ import { useSidebarContext } from "@/src/context/sidebar.context";
 import { UserOutlined } from "@ant-design/icons";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import Image from "next/image";
-import { GoHomeFill } from "react-icons/go";
+import { GoHome } from "react-icons/go";
 import { TbCards } from "react-icons/tb";
 import NotesIcon from "../icons/notesIcon";
 import UserIcon from "../icons/userIcon";
-import { signOutUser } from "@/src/services/auth/auth.firebase.service";
 import { useRouter } from "next/navigation";
-import { message } from "antd";
 
 const poppins = Poppins({
   weight: ["300", "400", "500", "600", "700"],
@@ -26,7 +24,7 @@ const menuItems = [
   {
     key: "home",
     label: "Home",
-    icon: GoHomeFill,
+    icon: GoHome,
     href: "/home",
   },
   {
@@ -74,16 +72,6 @@ const Sidebar = () => {
   };
 
   const router = useRouter();
-
-const handleLogout = async () => {
-  try {
-    await signOutUser();
-    message.success("Logged out successfully");
-    router.replace("/login");
-  } catch {
-    message.error("Logout failed");
-  }
-};
 
   return (
     <div
@@ -144,9 +132,6 @@ const handleLogout = async () => {
           );
         })}
       </div>
-      <button onClick={handleLogout}>
-  Logout (Test)
-</button>
     </div>
   );
 };

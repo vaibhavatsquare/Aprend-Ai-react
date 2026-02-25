@@ -18,7 +18,7 @@ const UserIcon = ({ className }: { className?: string }) => {
         />
         <path
           d="M12 10C13.6569 10 15 8.65685 15 7C15 5.34315 13.6569 4 12 4C10.3431 4 9 5.34315 9 7C9 8.65685 10.3431 10 12 10Z"
-          stroke="#555555"
+           stroke={className?.includes("text-white") ? "#ffffff" : "#555555"}
           strokeWidth="2"
         />
       </svg>

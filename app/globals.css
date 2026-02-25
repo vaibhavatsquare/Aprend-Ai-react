@@ -96,3 +96,17 @@ body {
 .custom-otp .ant-input-group > .ant-input:last-child {
   margin-right: 0 !important;
 }
+
+.custom-switch {
+  width: 44px !important;
+  height: 26px !important;
+}
+
+.custom-switch .ant-switch-handle {
+  width: 20px !important;
+  height: 20px !important;
+}
+
+.custom-switch.ant-switch-checked {
+  background-color: #0F3057 !important;
+}
