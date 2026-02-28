@@ -4,7 +4,7 @@ import React from "react";
 import Image from "next/image";
 import { useRedirect } from "@/src/hooks/router.hooks";
 
-type CardType = "notes" | "flashcards";
+type CardType = "notes" | "flashcards" | "library";
 
 type Props = {
   type: CardType;
@@ -36,12 +36,15 @@ const SavedCard = ({
     }
   };
 
+  let mainIcon;
 
-const mainIcon =
-    type === "notes"
-      ? "/images/notes/saveNotes.svg"
-      : "/images/home/flashCards.svg";
-
+  if (type === "notes") {
+    mainIcon = "/images/notes/saveNotes.svg";
+  } else if (type === "flashcards") {
+    mainIcon = "/images/home/flashCards.svg";
+  } else {
+    mainIcon = "/images/home/savedLibrary.svg";
+  }
 
   return (
     <div
@@ -78,14 +81,17 @@ const mainIcon =
       <div className="flex items-center gap-3"
         onClick={(e) => e.stopPropagation()}
       >
-        <ActionButton
-          icon="/images/notes/rename.svg"
-          label="Rename"
-          onClick={() => {
-            const newTitle = prompt("Rename", item.title);
-            if (newTitle) onRename(item.id, newTitle);
-          }}
-        />
+
+        {type !== "library" &&
+          <ActionButton
+            icon="/images/notes/rename.svg"
+            label="Rename"
+            onClick={() => {
+              const newTitle = prompt("Rename", item.title);
+              if (newTitle) onRename(item.id, newTitle);
+            }}
+          />
+        }
 
         <ActionButton
           icon="/images/notes/unsave.svg"
@@ -93,11 +99,13 @@ const mainIcon =
           onClick={() => onRemove(item.id)}
         />
 
-        <ActionButton
-          icon="/images/notes/delete.svg"
-          label="Delete"
-          onClick={handleDeleteClick}
-        />
+        {type !== "library" &&
+          <ActionButton
+            icon="/images/notes/delete.svg"
+            label="Delete"
+            onClick={handleDeleteClick}
+          />
+        }
       </div>
 
     </div>

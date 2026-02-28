@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getStoredUser } from "@/src/libs/helpers";
-import { UserDetail } from "@/src/libs/types";
+import { UserDetail, UserLanguage } from "@/src/libs/types";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { FiEdit2 } from "react-icons/fi";
@@ -11,6 +11,10 @@ import { FaUserCircle } from "react-icons/fa";
 import { Switch, message } from "antd";
 import { signOutUser } from "@/src/services/auth/auth.firebase.service";
 import ConfirmModal from "./confirmModal";
+import SavedLibrary from "./savedLibrary";
+import SavedFlashCards from "../flashcards/savedFlashCards";
+import SavedNotes from "../notes/savedNotes";
+import LanguageSection from "./chooseLanguage";
 
 const UserProfile = () => {
     const [user, setUser] = useState<UserDetail | null>(null);
@@ -18,12 +22,14 @@ const UserProfile = () => {
     const [notifications, setNotifications] = useState(true);
     const [logoutOpen, setLogoutOpen] = useState(false);
     const [deleteOpen, setDeleteOpen] = useState(false);
+    const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
 
     const router = useRouter();
 
     useEffect(() => {
         const storedUser = getStoredUser();
         setUser(storedUser);
+        setSelectedLanguage(storedUser?.user_language || null);
     }, []);
 
     const educationLabel = (level?: string) => {
@@ -53,6 +59,33 @@ const UserProfile = () => {
         user?.name || user?.email?.split("@")[0] || "";
 
     const isSplit = selected !== null;
+
+    if (selected === "notes") {
+        return (
+            <SavedNotes
+                showBack={true}
+                onBack={() => setSelected(null)}
+            />
+        );
+    }
+
+    if (selected === "flashcards") {
+        return (
+            <SavedFlashCards
+                showBack={true}
+                onBack={() => setSelected(null)}
+            />
+        );
+    }
+
+    if (selected === "Summaries") {
+        return (
+            <SavedLibrary
+                showBack={true}
+                onBack={() => setSelected(null)}
+            />
+        );
+    }
 
     return (
         <div className="px-6 py-6 pt-1 h-[calc(100vh-80px)]">
@@ -145,6 +178,11 @@ const UserProfile = () => {
                                 />
 
                                 <ProfileItem
+                                    title="Saved Summaries"
+                                    onClick={() => setSelected("Summaries")}
+                                />
+
+                                <ProfileItem
                                     title="Achievements"
                                     onClick={() => setSelected("achievements")}
                                 />
@@ -200,7 +238,17 @@ const UserProfile = () => {
 
                         {/* LANGUAGE */}
                         {selected === "language" && (
-                            <LanguageSection />
+                            <LanguageSection
+                                currentLanguage={selectedLanguage}
+                                onClose={(lang) => {
+                                    setSelectedLanguage(lang);
+
+                                    // setUser((prev) =>
+                                    //     prev ? { ...prev, user_language: lang } : prev
+                                    // );
+                                    setSelected(null); // close split
+                                }}
+                            />
                         )}
 
                         {/* SUBSCRIPTION */}
@@ -292,41 +340,6 @@ const InputField = ({
         />
     </div>
 );
-
-const LanguageSection = () => {
-    const [selectedLang, setSelectedLang] = useState("English");
-
-    const languages = ["Portuguese", "Spanish", "English"];
-
-    return (
-        <div>
-            <h3 className="text-[20px] font-semibold mb-6">
-                Choose your language
-            </h3>
-
-            <div className="space-y-3">
-                {languages.map((lang) => (
-                    <div
-                        key={lang}
-                        onClick={() => setSelectedLang(lang)}
-                        className={`h-[45px] flex items-center justify-center rounded-[8px] cursor-pointer border ${selectedLang === lang
-                            ? "border-[#0F3057] bg-[#F7F7F8]"
-                            : "border-gray-200"
-                            }`}
-                    >
-                        {lang}
-                    </div>
-                ))}
-            </div>
-
-            <div className="flex justify-center mt-6">
-                <button className="px-6 py-2 bg-[#0F3057] text-white rounded-[8px]">
-                    Save to profile
-                </button>
-            </div>
-        </div>
-    );
-};
 
 const SubscriptionSection = () => (
     <div>

@@ -5,7 +5,7 @@ import SavedCard from "../../components/Cards/savedCards";
 import EmptyState from "@/src/components/Cards/emptyState";
 import { GoArrowLeft } from "react-icons/go";
 
-type cardItem = {
+type LibraryItem = {
     id: string;
     title: string;
     createdAt: string;
@@ -13,13 +13,13 @@ type cardItem = {
 
 const PAGE_LIMIT = 10;
 
-type SavedFlashCardsProps = {
+type SavedLibraryProps = {
     showBack?: boolean; // default false
     onBack?: () => void;
 };
 
-const SavedFlashCards = ({ showBack = false, onBack }: SavedFlashCardsProps) => {
-    const [flashCards, setFlashCards] = useState<cardItem[]>([]);
+const SavedLibrary = ({ showBack = false, onBack }: SavedLibraryProps) => {
+    const [library, setLibrary] = useState<LibraryItem[]>([]);
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
     const [initialLoading, setInitialLoading] = useState(true);
@@ -28,16 +28,16 @@ const SavedFlashCards = ({ showBack = false, onBack }: SavedFlashCardsProps) => 
     const observerRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
-        fetchFlashCards(page);
+        fetchLibrary(page);
     }, [page]);
 
-    const fetchFlashCards = async (pageNumber: number) => {
+    const fetchLibrary = async (pageNumber: number) => {
         try {
             setLoading(true);
 
             await new Promise((res) => setTimeout(res, 1000));
 
-            const dummy: cardItem[] = Array.from({ length: 10 }).map(
+            const dummy: LibraryItem[] = Array.from({ length: 10 }).map(
                 (_, i) => ({
                     id: `${pageNumber}-${i}`,
                     title:
@@ -50,7 +50,7 @@ const SavedFlashCards = ({ showBack = false, onBack }: SavedFlashCardsProps) => 
                 })
             );
 
-            setFlashCards((prev) => [...prev, ...dummy]);
+            setLibrary((prev) => [...prev, ...dummy]);
             setHasMore(pageNumber < 3);
         } finally {
             setLoading(false);
@@ -78,6 +78,7 @@ const SavedFlashCards = ({ showBack = false, onBack }: SavedFlashCardsProps) => 
         return () => observer.disconnect();
     }, [loading, hasMore]);
 
+
     return (
         <div className="px-4">
             <div
@@ -86,6 +87,7 @@ const SavedFlashCards = ({ showBack = false, onBack }: SavedFlashCardsProps) => 
                     boxShadow: "0px 0px 4px 0px #00000040",
                 }}
             >
+
                 {/* 🔹 FIXED HEADER */}
                 <div className="py-3 px-6 flex items-center relative">
 
@@ -95,8 +97,9 @@ const SavedFlashCards = ({ showBack = false, onBack }: SavedFlashCardsProps) => 
                             onClick={onBack}
                         />
                     )}
+
                     <h1 className="text-[28px] font-semibold text-primaryText w-full text-center">
-                        {!initialLoading && flashCards.length === 0 ? "" : " Saved Flashcards"}
+                        {!initialLoading && library.length === 0 ? "" : "Saved library"}
                     </h1>
                 </div>
 
@@ -106,31 +109,31 @@ const SavedFlashCards = ({ showBack = false, onBack }: SavedFlashCardsProps) => 
                         <div className="w-full">
                             <CardsShimmer count={5} />
                         </div>
-                    ) : flashCards.length === 0 ? (
+                    ) : library.length === 0 ? (
                         <div className="flex-1 flex items-center justify-center mt-30">
-                            <EmptyState type="flashcards" />
+                            <EmptyState type="library" />
                         </div>
                     ) : (
                         <div className="flex flex-col gap-4 py-3 w-full">
-                            {flashCards.map((flashCard) => (
+                            {library.map((item) => (
                                 <SavedCard
-                                    key={flashCard.id}
-                                    type="flashcards"
-                                    item={flashCard}
+                                    key={item.id}
+                                    type="library"
+                                    item={item}
                                     onRename={(id, title) =>
-                                        setFlashCards((prev) =>
+                                        setLibrary((prev) =>
                                             prev.map((n) =>
                                                 n.id === id ? { ...n, title } : n
                                             )
                                         )
                                     }
                                     onDelete={(id) =>
-                                        setFlashCards((prev) =>
+                                        setLibrary((prev) =>
                                             prev.filter((n) => n.id !== id)
                                         )
                                     }
                                     onRemove={(id) =>
-                                        setFlashCards((prev) =>
+                                        setLibrary((prev) =>
                                             prev.filter((n) => n.id !== id)
                                         )
                                     }
@@ -177,4 +180,4 @@ const CardsShimmer = ({ count = 3 }: { count?: number }) => {
     );
 };
 
-export default SavedFlashCards;
+export default SavedLibrary;

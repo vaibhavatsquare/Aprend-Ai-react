@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import SavedCard from "../../components/Cards/savedCards";
 import EmptyState from "@/src/components/Cards/emptyState";
+import { GoArrowLeft } from "react-icons/go";
 
 type NoteItem = {
     id: string;
@@ -12,7 +13,12 @@ type NoteItem = {
 
 const PAGE_LIMIT = 10;
 
-const SavedNotes = () => {
+type SavedNotesProps = {
+    showBack?: boolean; // default false
+    onBack?: () => void;
+};
+
+const SavedNotes = ({ showBack = false, onBack }: SavedNotesProps) => {
     const [notes, setNotes] = useState<NoteItem[]>([]);
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
@@ -81,8 +87,15 @@ const SavedNotes = () => {
                 }}
             >
                 {/* 🔹 FIXED HEADER */}
-                <div className="py-3 px-6">
-                    <h1 className="text-[28px] font-semibold text-primaryText text-center">
+                <div className="py-3 px-6 flex items-center relative">
+
+                    {showBack && (
+                        <GoArrowLeft
+                            className="text-xl absolute left-8 cursor-pointer"
+                            onClick={onBack}
+                        />
+                    )}
+                    <h1 className="text-[28px] font-semibold text-primaryText w-full text-center">
                         {!initialLoading && notes.length === 0 ? "" : "Saved Notes"}
                     </h1>
                 </div>
@@ -91,7 +104,7 @@ const SavedNotes = () => {
                 <div className="flex-1 overflow-y-auto px-6 scrollbar">
                     {initialLoading ? (
                         <div className="w-full">
-                        <CardsShimmer count={5} />
+                            <CardsShimmer count={5} />
                         </div>
                     ) : notes.length === 0 ? (
                         <div className="flex-1 flex items-center justify-center mt-30">

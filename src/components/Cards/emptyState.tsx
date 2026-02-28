@@ -4,7 +4,7 @@ import { PiCardsLight } from "react-icons/pi";
 const EmptyState = ({
   type,
 }: {
-  type: "notes" | "flashcards";
+  type: "notes" | "flashcards" | "library";
 }) => {
   const config = {
     notes: {
@@ -26,6 +26,16 @@ const EmptyState = ({
       ),
       title: "No Saved Flashcards Yet",
       desc: "You haven’t saved any flashcards. Save one to see it here.",
+    },
+    library: {
+      icon: (
+        <PiCardsLight
+          size={120}
+          className="text-gray-300"
+        />
+      ),
+      title: "No Saved Library Yet",
+      desc: "You haven’t saved any library. Save one to see it here.",
     },
   };
 
