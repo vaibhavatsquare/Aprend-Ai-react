@@ -13,39 +13,12 @@ import { TbCards } from "react-icons/tb";
 import NotesIcon from "../icons/notesIcon";
 import UserIcon from "../icons/userIcon";
 import { useRouter } from "next/navigation";
+import { t } from "@/src/libs/i18n";
 
 const poppins = Poppins({
   weight: ["300", "400", "500", "600", "700"],
   subsets: ["latin"],
 });
-
-// Menu config for future scalability
-const menuItems = [
-  {
-    key: "home",
-    label: "Home",
-    icon: GoHome,
-    href: "/home",
-  },
-  {
-    key: "flashcards",
-    label: "Flashcards",
-    icon: TbCards,
-    href: "/flashcards",
-  },
-  {
-    key: "notes",
-    label: "Notes",
-    icon: NotesIcon,
-    href: "/notes",
-  },
-  {
-    key: "profile",
-    label: "Profile",
-    icon: UserIcon,
-    href: "/profile",
-  },
-];
 
 const Sidebar = () => {
   const path = usePathname();
@@ -53,6 +26,34 @@ const Sidebar = () => {
 
   const { isCollapsed, setIsCollapsed, setIsTabChangeLoading } =
     useSidebarContext();
+
+  // Menu config for future scalability - moved inside component
+  const menuItems = [
+    {
+      key: "home",
+      label: t('nav.home'),
+      icon: GoHome,
+      href: "/home",
+    },
+    {
+      key: "flashcards",
+      label: t('nav.flashcards'),
+      icon: TbCards,
+      href: "/flashcards",
+    },
+    {
+      key: "notes",
+      label: t('nav.notes'),
+      icon: NotesIcon,
+      href: "/notes",
+    },
+    {
+      key: "profile",
+      label: t('nav.profile'),
+      icon: UserIcon,
+      href: "/profile",
+    },
+  ];
 
   useEffect(() => {
     const page = path.split("/")[1];
@@ -79,9 +80,9 @@ const Sidebar = () => {
       ${poppins.className} flex flex-col transition-all duration-500
       ${isCollapsed ? "w-[60px]" : "w-[230px]"}
     `}
-    style={{
-      boxShadow: "0px 0px 10px 0px #0000001A inset",
-    }}
+      style={{
+        boxShadow: "0px 0px 10px 0px #0000001A inset",
+      }}
     >
       {/* Logo */}
       <Link href="/home" className={`flex flex-col items-center`}>
@@ -118,11 +119,10 @@ const Sidebar = () => {
 
                 {!isCollapsed && (
                   <span
-                    className={`${
-                      isActive
-                        ? "text-white"
-                        : "text-secondary"
-                    } text-[12px] truncate font-medium`}
+                    className={`${isActive
+                      ? "text-white"
+                      : "text-secondary"
+                      } text-[12px] truncate font-medium`}
                   >
                     {item.label}
                   </span>

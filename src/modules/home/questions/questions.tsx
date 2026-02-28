@@ -5,6 +5,7 @@ import Image from "next/image";
 import { GoArrowLeft, GoArrowRight } from "react-icons/go";
 import { useBack, useRedirect } from "@/src/hooks/router.hooks";
 import ChooseSubjects from "./chooseSubjects";
+import { t } from "@/src/libs/i18n";
 
 const Questions = () => {
 
@@ -40,12 +41,12 @@ const Questions = () => {
                         {/* Main Container */}
                         {/* Title */}
                         <h1 className="text-[32px] font-semibold text-[#121212] text-center mt-16">
-                            Choose How You Want to Practice ✍️
+                            {t('questions.chooseHowToPractice')} ✍️
                         </h1>
 
                         {/* Subtitle */}
                         <p className="text-[22px] text-[#121212] text-center">
-                            Select a mode to continue
+                            {t('questions.selectModeToContinue')}
                         </p>
 
                         {/* Cards */}
@@ -76,22 +77,22 @@ const Questions = () => {
 
                                         {/* Title */}
                                         <h3 className="text-[26px] font-medium text-[#121212] mb-1">
-                                            Question bank
+                                            {t('questions.questionBank')}
                                         </h3>
 
                                         {/* Subtitle */}
                                         <p className="text-[21px] text-[#555555] mb-6">
-                                            Practice topic wise questions
+                                            {t('questions.practiceTopicWise')}
                                         </p>
 
                                         {/* Button */}
                                         <button
-                                            onClick={() => ChooseQuestionsBank()} 
+                                            onClick={() => ChooseQuestionsBank()}
                                             className="w-full h-[50px] bg-primary rounded-[16px] flex items-center justify-center cursor-pointer"
                                         >
                                             {/* Text */}
                                             <span className="text-white text-[18px] font-semibold">
-                                                Explore Questions
+                                                {t('questions.exploreQuestions')}
                                             </span>
 
                                             {/* Arrow */}
@@ -121,12 +122,12 @@ const Questions = () => {
 
                                         {/* Title */}
                                         <h3 className="text-[26px] font-medium text-[#121212] mb-1">
-                                            Create your own simulados
+                                            {t('questions.createSimulados')}
                                         </h3>
 
                                         {/* Subtitle */}
                                         <p className="text-[21px] text-[#555555] mb-6">
-                                            Build A custom mock test your way
+                                            {t('questions.buildCustomMockTest')}
                                         </p>
 
                                         <button
@@ -135,7 +136,7 @@ const Questions = () => {
                                         >
                                             {/* Text */}
                                             <span className="text-white text-[18px] font-semibold">
-                                                Create simulados
+                                                {t('home.simulados.createSimulados')}
                                             </span>
 
                                             {/* Arrow */}

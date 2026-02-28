@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { t } from "@/src/libs/i18n";
 
 type NotificationItem = {
     id: string;
@@ -13,30 +14,29 @@ type NotificationItem = {
 const dummyData: NotificationItem[] = [
     {
         id: "1",
-        title: "Project Alpha Due tomorrow",
-        description: "Project Alpha Due tomorrow",
+        title: t('notifications.projectAlphaDue'),
+        description: t('notifications.projectAlphaDue'),
         time: "2h ago",
         section: "Today",
     },
     {
         id: "2",
-        title: "Review Your Weak Spots",
-        description:
-            "Your daily quiz is ready! Let’s practice the areas that need a little more focus.",
+        title: t('notifications.reviewWeakSpots'),
+        description: t('notifications.dailyQuizReady'),
         time: "2h ago",
         section: "Today",
     },
     {
         id: "3",
-        title: "Progress snippet",
-        description: "You improved by +12% yesterday! Keep it up",
+        title: t('notifications.progressImproved'),
+        description: t('notifications.progressImproved'),
         time: "1d ago",
         section: "Yesterday",
     },
     {
         id: "4",
-        title: "Project Alpha Due tomorrow",
-        description: "Project Alpha Due tomorrow",
+        title: t('notifications.projectAlphaDue'),
+        description: t('notifications.projectAlphaDue'),
         time: "2d ago",
         section: "Yesterday",
     },
@@ -59,7 +59,7 @@ const NotificationDropdown = () => {
            transition-all duration-300">
 
             <h2 className="text-xl font-semibold text-center mb-6">
-                Notification
+                {t('notifications.title')}
             </h2>
 
             {/* Scrollable Content */}
@@ -67,7 +67,7 @@ const NotificationDropdown = () => {
                 {today.length > 0 && (
                     <>
                         <h3 className="font-medium text-[18px] text-secondary mb-3">
-                            Today
+                            {t('notifications.today')}
                         </h3>
                         <div className="space-y-2 mb-4">
                             {today.map((item) => (
@@ -80,7 +80,7 @@ const NotificationDropdown = () => {
                 {yesterday.length > 0 && (
                     <>
                         <h3 className="font-medium text-[18px] text-secondary mb-3">
-                            Yesterday
+                            {t('notifications.yesterday')}
                         </h3>
                         <div className="space-y-2">
                             {yesterday.map((item) => (
@@ -95,27 +95,27 @@ const NotificationDropdown = () => {
 };
 
 const Card = ({ item }: { item: NotificationItem }) => {
-  return (
-    <div className="bg-[#F5F5F5] rounded-xl p-3 flex flex-col gap-1">
-      
-      {/* Title */}
-      <h4 className="font-medium text-[18px] text-[#121212]">
-        {item.title}
-      </h4>
+    return (
+        <div className="bg-[#F5F5F5] rounded-xl p-3 flex flex-col gap-1">
 
-      {/* Description + Time Row */}
-      <div className="flex justify-between items-start gap-4">
-        <p className="text-[14px] text-secondary">
-          {item.description}
-        </p>
+            {/* Title */}
+            <h4 className="font-medium text-[18px] text-[#121212]">
+                {item.title}
+            </h4>
 
-        <span className="text-xs text-secondary whitespace-nowrap">
-          {item.time}
-        </span>
-      </div>
+            {/* Description + Time Row */}
+            <div className="flex justify-between items-start gap-4">
+                <p className="text-[14px] text-secondary">
+                    {item.description}
+                </p>
 
-    </div>
-  );
+                <span className="text-xs text-secondary whitespace-nowrap">
+                    {item.time}
+                </span>
+            </div>
+
+        </div>
+    );
 };
 
 export default NotificationDropdown;

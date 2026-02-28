@@ -1,59 +1,60 @@
 import { HiOutlineDocumentText } from "react-icons/hi2";
 import { PiCardsLight } from "react-icons/pi";
+import { t } from "@/src/libs/i18n";
 
 const EmptyState = ({
-  type,
+    type,
 }: {
-  type: "notes" | "flashcards" | "library";
+    type: "notes" | "flashcards" | "library";
 }) => {
-  const config = {
-    notes: {
-      icon: (
-        <HiOutlineDocumentText
-          size={120}
-          className="text-gray-300"
-        />
-      ),
-      title: "No Saved Notes Yet",
-      desc: "You haven’t saved any notes. Start saving notes to see them here.",
-    },
-    flashcards: {
-      icon: (
-        <PiCardsLight
-          size={120}
-          className="text-gray-300"
-        />
-      ),
-      title: "No Saved Flashcards Yet",
-      desc: "You haven’t saved any flashcards. Save one to see it here.",
-    },
-    library: {
-      icon: (
-        <PiCardsLight
-          size={120}
-          className="text-gray-300"
-        />
-      ),
-      title: "No Saved Library Yet",
-      desc: "You haven’t saved any library. Save one to see it here.",
-    },
-  };
+    const config = {
+        notes: {
+            icon: (
+                <HiOutlineDocumentText
+                    size={120}
+                    className="text-gray-300"
+                />
+            ),
+            title: t('notes.noSavedNotes'),
+            desc: t('notes.noSavedNotesDesc'),
+        },
+        flashcards: {
+            icon: (
+                <PiCardsLight
+                    size={120}
+                    className="text-gray-300"
+                />
+            ),
+            title: t('flashcards.noSavedFlashcards'),
+            desc: t('flashcards.noSavedFlashcardsDesc'),
+        },
+        library: {
+            icon: (
+                <PiCardsLight
+                    size={120}
+                    className="text-gray-300"
+                />
+            ),
+            title: t('library.noSavedLibrary'),
+            desc: t('library.noSavedLibraryDesc'),
+        },
+    };
 
-  const data = config[type];
+    const data = config[type];
 
-  return (
-    <div className="flex flex-col items-center justify-center text-center px-6">
-      {data.icon}
+    return (
+        <div className="flex flex-col items-center justify-center text-center px-6">
+            {data.icon}
 
-      <h2 className="text-[20px] font-semibold text-primaryText mt-6">
-        {data.title}
-      </h2>
+            <h2 className="text-[20px] font-semibold text-primaryText mt-6">
+                {data.title}
+            </h2>
 
-      <p className="text-[14px] text-secondary mt-2 max-w-[320px]">
-        {data.desc}
-      </p>
-    </div>
-  );
+            <p className="text-[14px] text-secondary mt-2 max-w-[320px]">
+                {data.desc}
+            </p>
+        </div>
+    );
 };
 
 export default EmptyState;

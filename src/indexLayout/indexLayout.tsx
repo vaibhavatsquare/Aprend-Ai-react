@@ -5,6 +5,7 @@ import { authPathNames, protectedPathNames } from "@/src/libs/constants";
 import ProtectedComponents from "./protectedComponents";
 import PublicComponents from "./publicComponents";
 import { setRouterInstance } from "@/src/hooks/router.hooks";
+import { initializeAppLanguage } from "@/src/libs/helpers";
 
 /**
  * This layout component acts as a middleware for routing logic on the client side.
@@ -18,6 +19,11 @@ const IndexLayout = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     setRouterInstance(router);
   }, [router]);
+
+  useEffect(() => {
+    // Initialize language on app load
+    initializeAppLanguage();
+  }, []);
 
   const isAuthPath = authPathNames.some(
     (path) => pathname === path || pathname.startsWith(`${path}/`)

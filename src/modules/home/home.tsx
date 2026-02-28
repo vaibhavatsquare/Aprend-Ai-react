@@ -12,10 +12,11 @@ import { IoArrowForwardSharp } from "react-icons/io5";
 import { LuChevronRight } from "react-icons/lu";
 import QuestionsBank from "./questions/questionsBank";
 import Flashcards from "../flashcards/flashCards";
+import { t } from "@/src/libs/i18n";
 
 const formatTaskType = (type: string) => {
-  if (type === "FLASHCARD") return "Flashcards";
-  if (type === "PRACTICE_QUESTION") return "Practice Questions";
+  if (type === "FLASHCARD") return t('flashcards.title');
+  if (type === "PRACTICE_QUESTION") return t('questions.practiceTopicWise');
   if (type === "CONCEPT_EXPLANATION") return "Concept Explanation";
   return type;
 };
@@ -46,72 +47,72 @@ const Home = () => {
   }, []);
 
   if (loading) {
-  return (
-    <div className="px-4 grid grid-cols-3 gap-2 animate-pulse">
-      
-      {/* LEFT SIDE */}
-      <div className="h-[calc(100vh-80px)] p-2 col-span-2 flex flex-col gap-4">
+    return (
+      <div className="px-4 grid grid-cols-3 gap-2 animate-pulse">
 
-        {/* Streak Card */}
-        <div className="h-[120px] rounded-lg bg-gray-200" />
+        {/* LEFT SIDE */}
+        <div className="h-[calc(100vh-80px)] p-2 col-span-2 flex flex-col gap-4">
 
-        {/* Week Selector */}
-        <div className="flex gap-2">
-          {[1,2,3,4,5,6,7].map((i) => (
-            <div
-              key={i}
-              className="w-[56px] h-[66px] rounded-lg bg-gray-200"
-            />
-          ))}
+          {/* Streak Card */}
+          <div className="h-[120px] rounded-lg bg-gray-200" />
+
+          {/* Week Selector */}
+          <div className="flex gap-2">
+            {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+              <div
+                key={i}
+                className="w-[56px] h-[66px] rounded-lg bg-gray-200"
+              />
+            ))}
+          </div>
+
+          {/* Task Header */}
+          <div className="flex justify-between items-center">
+            <div className="h-6 w-32 bg-gray-200 rounded" />
+            <div className="h-6 w-24 bg-gray-200 rounded" />
+          </div>
+
+          {/* Task List */}
+          <div className="flex flex-col gap-3">
+            {[1, 2, 3, 4].map((i) => (
+              <div
+                key={i}
+                className="h-[72px] rounded-[14px] bg-gray-200"
+              />
+            ))}
+          </div>
         </div>
 
-        {/* Task Header */}
-        <div className="flex justify-between items-center">
-          <div className="h-6 w-32 bg-gray-200 rounded" />
-          <div className="h-6 w-24 bg-gray-200 rounded" />
-        </div>
+        {/* RIGHT SIDE */}
+        <div className="flex flex-col gap-4 h-[calc(100vh-80px)] p-2">
 
-        {/* Task List */}
-        <div className="flex flex-col gap-3">
-          {[1,2,3,4].map((i) => (
-            <div
-              key={i}
-              className="h-[72px] rounded-[14px] bg-gray-200"
-            />
-          ))}
+          {/* AI Tutor Card */}
+          <div className="h-[126px] rounded-xl bg-gray-200" />
+
+          {/* Upload Notes */}
+          <div className="h-[166px] rounded-xl bg-gray-200" />
+
+          {/* Question Bank */}
+          <div className="h-[60px] rounded-xl bg-gray-200" />
+
+          {/* Weak Spot */}
+          <div className="h-[60px] rounded-xl bg-gray-200" />
         </div>
       </div>
-
-      {/* RIGHT SIDE */}
-      <div className="flex flex-col gap-4 h-[calc(100vh-80px)] p-2">
-        
-        {/* AI Tutor Card */}
-        <div className="h-[126px] rounded-xl bg-gray-200" />
-
-        {/* Upload Notes */}
-        <div className="h-[166px] rounded-xl bg-gray-200" />
-
-        {/* Question Bank */}
-        <div className="h-[60px] rounded-xl bg-gray-200" />
-
-        {/* Weak Spot */}
-        <div className="h-[60px] rounded-xl bg-gray-200" />
-      </div>
-    </div>
-  );
-}
+    );
+  }
 
   const streak = dashboard?.currentStreak ?? 0;
   localStorage.setItem("streak", streak);
   const streakTitle =
     streak === 0
-      ? "Start your learning journey today 🚀"
-      : `You've studied ${streak} days in a row!`;
+      ? t('home.streak.startJourney')
+      : t('home.streak.studiedDays', { count: streak });
 
   const streakSub =
     streak === 0
       ? "Consistency builds mastery. Let's begin!"
-      : "Keep it up 💪";
+      : t('home.streak.keepItUp');
 
   const tasksForDate =
     dashboard?.tasks?.filter(
@@ -220,16 +221,16 @@ const Home = () => {
         {/* TASK SECTION SAME */}
         <div className="flex flex-col gap-6">
           <div className="flex gap-2 items-center justify-between">
-            <h2 className="text-xl font-semibold">{isToday ? "Today's Task" : ""}</h2>
+            <h2 className="text-xl font-semibold">{isToday ? t('home.tasks.todaysTask') : ""}</h2>
             <p className="text-secondary">
-              Progress: <span className="text-black font-medium">{progress}%</span>
+              {t('home.tasks.progress')}: <span className="text-black font-medium">{progress}%</span>
             </p>
           </div>
 
           <div className="flex flex-col gap-3">
             {tasksForDate.length === 0 && (
               <div className="p-3 border border-gray-200 rounded-lg text-secondary">
-                No tasks scheduled
+                {t('home.tasks.noTasksScheduled')}
               </div>
             )}
 
@@ -248,7 +249,7 @@ const Home = () => {
                     {formatTaskType(task.task.taskType)}
                     <GoDotFill className="text-primary" />
                     <span className="text-primary font-normal">
-                      {task.status === "COMPLETED" ? "Completed" : "Pending"}
+                      {task.status === "COMPLETED" ? t('home.tasks.completed') : t('home.tasks.pending')}
                     </span>
                   </p>
                 </div>
@@ -268,7 +269,9 @@ const Home = () => {
         >
           <IconSparkel />
           <h2 className="text-white text-sm tracking-wider">
-            YOUR <span className="font-medium">AI TUTOR</span> IS READY TO HELP
+            {t('home.aiTutor.ready').split(' ').map((word, index) =>
+              index === 2 ? <span key={index} className="font-medium">{word}</span> : word
+            )}
           </h2>
           <Image
             src="/images/home/robot.svg"
@@ -281,10 +284,9 @@ const Home = () => {
 
         <div className="relative flex flex-col gap-3 justify-end p-4 rounded-xl h-[166px] bg-[#BDFF43]">
           <IoArrowForwardSharp className="text-xl -rotate-45 absolute top-4 right-4 cursor-pointer" />
-          <h2 className="text-lg font-medium">Upload Notes</h2>
+          <h2 className="text-lg font-medium">{t('home.aiTutor.uploadNotes')}</h2>
           <p>
-            Upload images to create new <br />
-            study sets.
+            {t('home.aiTutor.uploadDescription')}
           </p>
         </div>
 
@@ -292,12 +294,12 @@ const Home = () => {
           className="flex gap-2 items-center justify-between p-4 rounded-xl border border-[#DADADA] cursor-pointer hover:bg-gray-50 transition-colors"
           onClick={() => useRedirect("/home/questions")}
         >
-          <p className="text-sm font-medium">Question Bank</p>
+          <p className="text-sm font-medium">{t('home.questionBank.title')}</p>
           <IoArrowForwardSharp className="text-lg -rotate-45" />
         </div>
 
         <div className="flex gap-2 items-center justify-between p-4 rounded-xl border border-[#DADADA]">
-          <p className="text-sm font-medium">Weak Spot Tracker</p>
+          <p className="text-sm font-medium">{t('home.weakSpotTracker.title')}</p>
           <IoArrowForwardSharp className="text-lg -rotate-45 cursor-pointer" />
         </div>
       </div>

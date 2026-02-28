@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import SavedCard from "../../components/Cards/savedCards";
 import EmptyState from "@/src/components/Cards/emptyState";
 import { GoArrowLeft } from "react-icons/go";
+import { t } from "@/src/libs/i18n";
 
 type LibraryItem = {
     id: string;
@@ -44,8 +45,8 @@ const SavedLibrary = ({ showBack = false, onBack }: SavedLibraryProps) => {
                         i === 2
                             ? "Computer Science / Coding"
                             : i % 2 === 0
-                                ? "History"
-                                : "Science",
+                                ? t('questions.history')
+                                : t('questions.science'),
                     createdAt: "July 07, 2025 10:28 am",
                 })
             );
@@ -99,7 +100,7 @@ const SavedLibrary = ({ showBack = false, onBack }: SavedLibraryProps) => {
                     )}
 
                     <h1 className="text-[28px] font-semibold text-primaryText w-full text-center">
-                        {!initialLoading && library.length === 0 ? "" : "Saved library"}
+                        {!initialLoading && library.length === 0 ? "" : t('library.savedLibrary')}
                     </h1>
                 </div>
 

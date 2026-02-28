@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { GoArrowLeft } from "react-icons/go";
+import { t } from "@/src/libs/i18n";
 
 const ChooseSubjects = ({ onBack }: { onBack?: () => void }) => {
   const [value, setValue] = useState(12);
@@ -12,8 +13,8 @@ const ChooseSubjects = ({ onBack }: { onBack?: () => void }) => {
   // ✅ DIFFICULTY STATE (single select)
   const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null);
 
-  const subjects = ["All Subjects", "English", "Mathematics", "Science", "History", "Geography"];
-  const difficulties = ["Easy", "Medium", "Hard", "Mix"];
+  const subjects = [t('questions.allSubjects'), t('questions.english'), t('questions.mathematics'), t('questions.science'), t('questions.history'), t('questions.geography')];
+  const difficulties = [t('home.simulados.easy'), t('home.simulados.medium'), t('home.simulados.hard'), t('home.simulados.mix')];
 
   // ✅ TOGGLE SUBJECT
   const handleSubject = (item: string) => {
@@ -34,7 +35,7 @@ const ChooseSubjects = ({ onBack }: { onBack?: () => void }) => {
 
       {/* TITLE */}
       <h1 className="text-[30px] font-medium text-[#121212] mb-3 mt-12">
-        Choose Subject
+        {t('questions.chooseSubject')}
       </h1>
 
       {/* SUBJECT BUTTONS */}
@@ -64,7 +65,7 @@ const ChooseSubjects = ({ onBack }: { onBack?: () => void }) => {
 
       {/* NUMBER */}
       <h1 className="text-[30px] font-medium text-[#121212] mb-4">
-        Number of Question
+        {t('questions.numberOfQuestions')}
       </h1>
 
       {/* SLIDER */}
@@ -97,7 +98,7 @@ const ChooseSubjects = ({ onBack }: { onBack?: () => void }) => {
 
       {/* DIFFICULTY */}
       <h1 className="text-[30px] font-medium text-[#121212] mb-6">
-        Select difficulty
+        {t('questions.selectDifficulty')}
       </h1>
 
       <div className="w-full flex justify-left">

@@ -1,5 +1,6 @@
 import { FiLogOut } from "react-icons/fi";
 import { FiTrash2 } from "react-icons/fi";
+import { t } from "@/src/libs/i18n";
 
 const ConfirmModal = ({
   type,
@@ -36,8 +37,8 @@ const ConfirmModal = ({
         {/* Text */}
         <p className="text-center text-[16px] text-primaryText mb-6 px-10">
           {isDelete
-            ? "Are you sure you want to delete your account?"
-            : "Are you sure you want to logout from the app?"}
+            ? t('profile.confirmDelete')
+            : t('profile.confirmLogout')}
         </p>
 
         {/* Buttons */}
@@ -46,16 +47,15 @@ const ConfirmModal = ({
             onClick={onClose}
             className="flex-1 h-[40px] bg-gray-100 rounded-[8px]"
           >
-            Cancel
+            {t('common.cancel')}
           </button>
 
           <button
             onClick={onConfirm}
-            className={`flex-1 h-[40px] rounded-[8px] text-white ${
-              isDelete ? "bg-red-500" : "bg-[#0F3057]"
-            }`}
+            className={`flex-1 h-[40px] rounded-[8px] text-white ${isDelete ? "bg-red-500" : "bg-[#0F3057]"
+              }`}
           >
-            {isDelete ? "Delete" : "Logout"}
+            {isDelete ? t('common.delete') : t('nav.logout')}
           </button>
         </div>
       </div>

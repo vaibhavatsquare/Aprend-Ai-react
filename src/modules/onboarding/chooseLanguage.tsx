@@ -6,9 +6,10 @@ import { Button, message } from "antd";
 import { useRedirect } from "@/src/hooks/router.hooks";
 import { useLanguageStore } from "@/src/store/language.store";
 import { saveLanguage } from "@/src/services/api/user.api";
+import { UserLanguage } from "@/src/libs/types";
 
 const ChooseLanguage = () => {
-  const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
+  const [selectedLanguage, setSelectedLanguage] = useState<UserLanguage | null>(null);
   const setLanguage = useLanguageStore((s) => s.setLanguage);
 
   const handleContinue = async () => {

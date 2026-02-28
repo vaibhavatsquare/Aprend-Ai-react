@@ -15,6 +15,8 @@ import SavedLibrary from "./savedLibrary";
 import SavedFlashCards from "../flashcards/savedFlashCards";
 import SavedNotes from "../notes/savedNotes";
 import LanguageSection from "./chooseLanguage";
+import { initializeAppLanguage } from "@/src/libs/helpers";
+import { t } from "@/src/libs/i18n";
 
 const UserProfile = () => {
     const [user, setUser] = useState<UserDetail | null>(null);
@@ -22,7 +24,7 @@ const UserProfile = () => {
     const [notifications, setNotifications] = useState(true);
     const [logoutOpen, setLogoutOpen] = useState(false);
     const [deleteOpen, setDeleteOpen] = useState(false);
-    const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
+    const [selectedLanguage, setSelectedLanguage] = useState<UserLanguage | null>(null);
 
     const router = useRouter();
 
@@ -48,10 +50,10 @@ const UserProfile = () => {
     const handleLogout = async () => {
         try {
             await signOutUser();
-            message.success("Logged out successfully");
+            message.success(t('auth.logoutSuccess'));
             router.replace("/login");
         } catch {
-            message.error("Logout failed");
+            message.error(t('auth.logoutFailed'));
         }
     };
 
@@ -133,7 +135,7 @@ const UserProfile = () => {
 
                                 <div className="mt-2">
                                     <span className="text-[16px] font-semibold text-primaryText">
-                                        Education level:
+                                        {t('profile.educationLevel')}
                                     </span>{" "}
                                     <span className="text-[16px] font-medium text-secondary">
                                         {educationLabel(user?.user_EducationLevel)}
@@ -147,7 +149,7 @@ const UserProfile = () => {
 
                                 {/* Preferred Language */}
                                 <ProfileItem
-                                    title="Preferred Language"
+                                    title={t('profile.preferredLanguage')}
                                     onClick={() => setSelected("language")}
                                     rightContent={
                                         <span className="text-[14px] text-secondary">
@@ -158,7 +160,7 @@ const UserProfile = () => {
 
                                 {/* Notification Preference */}
                                 <ProfileItem
-                                    title="Notification Preference"
+                                    title={t('profile.notificationPreference')}
                                     rightContent={
                                         <CustomSwitch
                                             checked={notifications}
@@ -168,27 +170,27 @@ const UserProfile = () => {
                                 />
 
                                 <ProfileItem
-                                    title="Saved Notes"
+                                    title={t('profile.savedNotes')}
                                     onClick={() => setSelected("notes")}
                                 />
 
                                 <ProfileItem
-                                    title="Saved Flashcards"
+                                    title={t('profile.savedFlashcards')}
                                     onClick={() => setSelected("flashcards")}
                                 />
 
                                 <ProfileItem
-                                    title="Saved Summaries"
+                                    title={t('profile.savedSummaries')}
                                     onClick={() => setSelected("Summaries")}
                                 />
 
                                 <ProfileItem
-                                    title="Achievements"
+                                    title={t('profile.achievements')}
                                     onClick={() => setSelected("achievements")}
                                 />
 
                                 <ProfileItem
-                                    title="My Subscription"
+                                    title={t('profile.mySubscription')}
                                     onClick={() => setSelected("subscription")}
                                     rightContent={
                                         <span className="text-[12px] text-secondary">Premium</span>
@@ -196,22 +198,22 @@ const UserProfile = () => {
                                 />
 
                                 <ProfileItem
-                                    title="Terms & Conditions"
+                                    title={t('profile.termsConditions')}
                                     onClick={() => setSelected("terms")}
                                 />
 
                                 <ProfileItem
-                                    title="Privacy Policy"
+                                    title={t('profile.privacyPolicy')}
                                     onClick={() => setSelected("privacy")}
                                 />
 
                                 <ProfileItem
-                                    title="Logout"
+                                    title={t('profile.logout')}
                                     onClick={() => setLogoutOpen(true)}
                                 />
 
                                 <ProfileItem
-                                    title="Delete Account"
+                                    title={t('profile.deleteAccount')}
                                     titleClass="text-red-500"
                                     rightContent={
                                         <IoChevronForward size={18} className="text-red-500" />
@@ -243,9 +245,11 @@ const UserProfile = () => {
                                 onClose={(lang) => {
                                     setSelectedLanguage(lang);
 
-                                    // setUser((prev) =>
-                                    //     prev ? { ...prev, user_language: lang } : prev
-                                    // );
+                                    setUser((prev) =>
+                                        prev ? { ...prev, user_language: lang } : prev
+                                    
+                                    );
+                                    initializeAppLanguage();
                                     setSelected(null); // close split
                                 }}
                             />
@@ -269,9 +273,9 @@ const UserProfile = () => {
                         {/* ACHIEVEMENTS */}
                         {selected === "achievements" && (
                             <div className="grid grid-cols-2 gap-6">
-                                <AchievementCard icon="🔥" title="7-day streak!" />
-                                <AchievementCard icon="📘" title="Module Complete" />
-                                <AchievementCard icon="🏅" title="You're a Star!" />
+                                <AchievementCard icon="🔥" title={t('profile.achievementsList.dayStreak')} />
+                                <AchievementCard icon="📘" title={t('profile.achievementsList.moduleComplete')} />
+                                <AchievementCard icon="🏅" title={t('profile.achievementsList.star')} />
                             </div>
                         )}
                     </div>
@@ -301,21 +305,21 @@ const EditProfileSection = ({ user }: { user: UserDetail | null }) => {
     return (
         <div>
             <h3 className="text-[20px] font-semibold mb-6">
-                Edit Profile
+                {t('profile.editProfile')}
             </h3>
 
             <div className="space-y-4">
-                <InputField label="Name" value={user?.name || ""} />
-                <InputField label="Email Address" value={user?.email || ""} disabled />
-                <InputField label="Education Level" value="High School" />
+                <InputField label={t('profile.name')} value={user?.name || ""} />
+                <InputField label={t('profile.emailAddress')} value={user?.email || ""} disabled />
+                <InputField label="High School" value="High School" />
             </div>
 
             <div className="flex justify-end mt-6 gap-3">
                 <button className="px-4 py-2 bg-gray-100 rounded-[8px]">
-                    Cancel
+                    {t('common.cancel')}
                 </button>
                 <button className="px-4 py-2 bg-[#0F3057] text-white rounded-[8px]">
-                    Save
+                    {t('common.save')}
                 </button>
             </div>
         </div>
@@ -344,13 +348,13 @@ const InputField = ({
 const SubscriptionSection = () => (
     <div>
         <h3 className="text-[20px] font-semibold mb-6">
-            My Subscription
+            {t('profile.mySubscription')}
         </h3>
 
         <div className="bg-[#F7F7F8] rounded-[12px] p-4">
-            <p className="text-[16px] font-medium">Premium Plan</p>
+            <p className="text-[16px] font-medium">{t('profile.subscription.premiumPlan')}</p>
             <p className="text-[14px] text-secondary mt-1">
-                You are currently subscribed to Premium.
+                {t('profile.subscription.currentlySubscribed')}
             </p>
         </div>
     </div>
@@ -359,7 +363,7 @@ const SubscriptionSection = () => (
 const TermsSection = () => (
     <div>
         <h3 className="text-[20px] font-semibold mb-4">
-            Terms & Conditions
+            {t('profile.termsConditions')}
         </h3>
 
         <div className="text-[14px] text-secondary space-y-3">
@@ -372,7 +376,7 @@ const TermsSection = () => (
 const PrivacySection = () => (
     <div>
         <h3 className="text-[20px] font-semibold mb-4">
-            Privacy Policy
+            {t('profile.privacyPolicy')}
         </h3>
 
         <div className="text-[14px] text-secondary space-y-3">

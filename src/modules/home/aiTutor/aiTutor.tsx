@@ -19,6 +19,7 @@ import { deleteFile, uploadImage } from "@/src/services/api/upload.api";
 import { createNote } from "@/src/services/api/notes.api";
 import { generateFlashcards } from "@/src/services/api/flashcards.api";
 import { getStoredUser } from "@/src/libs/helpers";
+import { t } from "@/src/libs/i18n";
 
 const AudioWaveform = dynamic(
   () => import("@/src/components/AudioWaveform/AudioWaveform"),
@@ -205,7 +206,7 @@ const AiTutor = () => {
         ...prev,
         {
           role: "tutor",
-          message: "Something went wrong. Please try again.",
+          message: t('errors.somethingWentWrong'),
         },
       ]);
     } finally {
@@ -252,7 +253,7 @@ const AiTutor = () => {
       console.error("Failed to save note", err);
     } finally {
       setIsSavingNote(false);
-      antMessage.success("Note generated...");
+      antMessage.success(t('success.saved'));
     }
   };
 
@@ -270,7 +271,7 @@ const AiTutor = () => {
       console.error("Flashcard generation failed", err);
     } finally {
       setIsGeneratingFlashcard(false);
-      antMessage.success("Flashcard generated...");
+      antMessage.success(t('success.saved'));
     }
   };
 
@@ -278,13 +279,13 @@ const AiTutor = () => {
 
   const streakTitle =
     streak === 0
-      ? "Start your learning journey today 🚀"
-      : `You've studied ${streak} days in a row!`;
+      ? t('home.streak.startJourney')
+      : t('home.streak.studiedDays', { count: streak });
 
   const streakSub =
     streak === 0
       ? "Consistency builds mastery. Let's begin!"
-      : "Keep it up 💪";
+      : t('home.streak.keepItUp');
 
   return (
     <div className="px-4 grid grid-cols-3 gap-2">
@@ -359,7 +360,7 @@ const AiTutor = () => {
                   </div>
                   <div className="flex items-center h-12">
                     <p className="text-secondary leading-none">
-                      AI is typing...
+                      {t('common.loading')}...
                     </p>
                   </div>
                 </div>
@@ -381,7 +382,7 @@ const AiTutor = () => {
                 onClick={handleGenerateNote}
               >
                 <p className="text-sm text-secondary">
-                  {isSavingNote ? "Saving..." : "Save to Notes"}
+                  {isSavingNote ? t('common.saving') : t('notes.title')}
                 </p>
 
                 {isSavingNote ? (
@@ -400,7 +401,7 @@ const AiTutor = () => {
                 onClick={handleGenerateFlashcard}
               >
                 <p className="text-sm text-secondary">
-                  {isGeneratingFlashcard ? "Generating..." : "Generate Flashcards"}
+                  {isGeneratingFlashcard ? t('common.generating') : t('flashcards.title')}
                 </p>
 
                 {isGeneratingFlashcard ? (
@@ -576,12 +577,12 @@ const AiTutor = () => {
         </div>
 
         <div className="flex gap-2 items-center justify-between p-4 rounded-xl border border-[#DADADA]">
-          <p className="text-sm font-medium">Question Bank</p>
+          <p className="text-sm font-medium">{t('home.questionBank.title')}</p>
           <IoArrowForwardSharp className="text-lg -rotate-45 cursor-pointer" />
         </div>
 
         <div className="flex gap-2 items-center justify-between p-4 rounded-xl border border-[#DADADA]">
-          <p className="text-sm font-medium">Weak Spot Tracker</p>
+          <p className="text-sm font-medium">{t('home.weakSpotTracker.title')}</p>
           <IoArrowForwardSharp className="text-lg -rotate-45 cursor-pointer" />
         </div>
       </div>

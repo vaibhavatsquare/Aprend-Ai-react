@@ -1,7 +1,8 @@
 import { fetch } from "@/src/libs/helpers";
+import { UserLanguage } from "@/src/libs/types";
 
 export const saveLanguage = async (data: {
-  user_language: string;
+  user_language: UserLanguage;
 }) => {
   return await fetch({
     url: "/onboarding/Language",

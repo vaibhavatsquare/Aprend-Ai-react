@@ -6,16 +6,18 @@ import Image from "next/image";
 import { message } from "antd";
 import { useLanguageStore } from "@/src/store/language.store";
 import { saveLanguage } from "@/src/services/api/user.api";
+import { t } from "@/src/libs/i18n";
+import { UserLanguage } from "@/src/libs/types";
 
 const LanguageSection = ({
     currentLanguage,
     onClose,
 }: {
-    currentLanguage: string | null;
-    onClose: (lang: string) => void;
+    currentLanguage: UserLanguage | null;
+    onClose: (lang: UserLanguage) => void;
 }) => {
 
-    const [selectedLang, setSelectedLang] = useState<string | null>(null);
+    const [selectedLang, setSelectedLang] = useState<UserLanguage | null>(null);
     const setLanguage = useLanguageStore((s) => s.setLanguage);
 
     // Preselect existing language
@@ -32,11 +34,11 @@ const LanguageSection = ({
             });
 
             setLanguage(selectedLang);
-            message.success("Language updated");
+            message.success(t('profile.languageUpdated'));
 
             onClose(selectedLang); // parent update + close split
         } catch {
-            message.error("Failed to update language");
+            message.error(t('profile.languageUpdateFailed'));
         }
     };
 
@@ -47,7 +49,7 @@ const LanguageSection = ({
             <div className="flex flex-col gap-6 items-center mt-6 w-full">
 
                 <h1 className="text-xl font-semibold">
-                    Choose your language
+                    {t('onboarding.chooseLanguage')}
                 </h1>
 
                 <div className="flex flex-col gap-[14px] mt-4 px-4 w-full">
@@ -75,7 +77,7 @@ const LanguageSection = ({
                     disabled={!selectedLang}
                     className="w-[280px] h-10 rounded-xl text-white bg-primary disabled:opacity-50"
                 >
-                    Save to Profile
+                    {t('onboarding.completeProfile')}
                 </button>
             </div>
         </div>

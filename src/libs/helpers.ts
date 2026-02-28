@@ -147,6 +147,16 @@ export const getGreeting = () => {
     return "Good Evening";
 };
 
+export const initializeAppLanguage = () => {
+    if (typeof window === 'undefined') return;
+
+    const { useLanguageStore } = require('@/src/store/language.store');
+    const user = getStoredUser();
+
+    // Initialize language with user preference or fallback
+    useLanguageStore.getState().initializeLanguage(user?.user_language);
+};
+
 export const lightenColor = (hex: string, percent: number) => {
     const num = parseInt(hex.replace("#", ""), 16),
         amt = Math.round(2.3 * percent),

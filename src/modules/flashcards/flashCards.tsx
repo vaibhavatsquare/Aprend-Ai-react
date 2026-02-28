@@ -5,6 +5,7 @@ import { darkenColor, lightenColor } from "@/src/libs/helpers";
 import { GoChevronLeft, GoChevronRight, GoX } from "react-icons/go";
 import { IoCheckmark, IoClose } from "react-icons/io5";
 import { Question } from "@/src/libs/types/dashboard.types";
+import { t } from "@/src/libs/i18n";
 // import { getFlashcardTask } from "@/src/services/api/dashboard.api";
 
 const COLORS = [
@@ -193,7 +194,7 @@ const Flashcards = ({
                 {/* HEADER */}
                 <div className="relative flex justify-center items-center">
                     <h1 className="text-[26px] font-semibold text-[#121212]">
-                        Flashcard
+                        {t('flashcards.title')}
                     </h1>
 
                     <div className="absolute right-8 text-[22px]">

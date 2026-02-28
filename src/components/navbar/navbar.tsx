@@ -6,6 +6,7 @@ import IconNotificationBell from "../icons/iconNotificationBell";
 import { UserDetail } from "@/src/libs/types";
 import { getStoredUser, getGreeting } from "@/src/libs/helpers";
 import NotificationDropdown from "@/src/modules/notification/notification";
+import { t } from "@/src/libs/i18n";
 
 const Navbar = () => {
   const [user, setUser] = useState<UserDetail | null>(null);
@@ -46,7 +47,7 @@ const Navbar = () => {
           {displayName === "" ? "" : "," + displayName + "!"} 👋
         </h1>
         <p className="text-xs text-secondary">
-          Ready to start your learning journey today
+          {t('home.readyToStart')}
         </p>
       </div>
 
@@ -54,6 +55,7 @@ const Navbar = () => {
         <Switch
           checkedChildren={<p className="font-semibold text-white">ON</p>}
           unCheckedChildren={<p className="font-semibold text-black">OFF</p>}
+          defaultChecked={false}
         />
 
         {/* 🔔 Notification Button */}
