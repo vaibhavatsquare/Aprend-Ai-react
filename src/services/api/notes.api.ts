@@ -1,13 +1,14 @@
 import { fetch } from "@/src/libs/helpers";
-import { Note } from "@/src/libs/types/notes.types";
+import { Note, PaginatedNotes } from "@/src/libs/types/notes.types";
 
 // GET all notes
 export const getNotes = async (params?: {
   skip?: number;
   take?: number;
   search?: string;
-}): Promise<Note[]> => {
-  return fetch<Note[]>({
+  orderBy?: string;
+}): Promise<PaginatedNotes> => {
+  return fetch<PaginatedNotes>({
     url: "/ai-tutor/notes",
     method: "GET",
     params,

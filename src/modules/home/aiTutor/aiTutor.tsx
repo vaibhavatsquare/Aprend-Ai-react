@@ -1,7 +1,7 @@
 "use client";
 
 import IconSparkel from "@/src/components/icons/iconSparkel";
-import { useBack } from "@/src/hooks/router.hooks";
+import { setSearchParam, useBack, useRedirect } from "@/src/hooks/router.hooks";
 import { useAudioRecorder } from "@/src/hooks/useAudioRecorder";
 import dynamic from "next/dynamic";
 import { Image as AntImage, message as antMessage } from "antd";
@@ -20,6 +20,7 @@ import { createNote } from "@/src/services/api/notes.api";
 import { generateFlashcards } from "@/src/services/api/flashcards.api";
 import { getStoredUser } from "@/src/libs/helpers";
 import { t } from "@/src/libs/i18n";
+import { useSearchParams } from "next/navigation";
 
 const AudioWaveform = dynamic(
   () => import("@/src/components/AudioWaveform/AudioWaveform"),
@@ -48,6 +49,8 @@ const AiTutor = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [isSavingNote, setIsSavingNote] = useState(false);
   const [isGeneratingFlashcard, setIsGeneratingFlashcard] = useState(false);
+  const searchParams = useSearchParams();
+  const hasTriggeredUpload = useRef(false);
 
   const adjustTextareaHeight = () => {
     const el = textareaRef.current;
@@ -104,6 +107,22 @@ const AiTutor = () => {
         "");
     };
   }, []);
+
+  useEffect(() => {
+    const shouldUpload = searchParams.get("upload");
+
+    if (shouldUpload === "true" && !hasTriggeredUpload.current) {
+      hasTriggeredUpload.current = true;
+
+      setTimeout(() => {
+        if (!uploadedImageUrl) {
+          inputRef.current?.click();
+        }
+
+        setSearchParam("upload", null);
+      }, 300);
+    }
+  }, [searchParams]);
 
   const {
     recordingState,

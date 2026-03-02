@@ -121,18 +121,8 @@ const SavedLibrary = ({ showBack = false, onBack }: SavedLibraryProps) => {
                                     key={item.id}
                                     type="library"
                                     item={item}
-                                    onRename={(id, title) =>
-                                        setLibrary((prev) =>
-                                            prev.map((n) =>
-                                                n.id === id ? { ...n, title } : n
-                                            )
-                                        )
-                                    }
-                                    onDelete={(id) =>
-                                        setLibrary((prev) =>
-                                            prev.filter((n) => n.id !== id)
-                                        )
-                                    }
+                                    onRename={(id, title) =>{}}
+                                    onDelete={(id) =>{}}
                                     onRemove={(id) =>
                                         setLibrary((prev) =>
                                             prev.filter((n) => n.id !== id)

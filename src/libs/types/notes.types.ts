@@ -22,3 +22,10 @@ export interface Note {
   updatedAt: string;
   conversation?: ConversationInfo;
 }
+
+export interface PaginatedNotes {
+  total: number;
+  list: Note[];
+  hasMany: boolean;
+  count: number;
+}

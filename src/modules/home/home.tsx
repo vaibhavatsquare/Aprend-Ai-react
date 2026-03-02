@@ -282,7 +282,10 @@ const Home = () => {
           />
         </div>
 
-        <div className="relative flex flex-col gap-3 justify-end p-4 rounded-xl h-[166px] bg-[#BDFF43]">
+        <div
+          className="relative flex flex-col gap-3 justify-end p-4 rounded-xl h-[166px] bg-[#BDFF43] cursor-pointer"
+          onClick={() => useRedirect("/home/ai-tutor?upload=true")}
+        >
           <IoArrowForwardSharp className="text-xl -rotate-45 absolute top-4 right-4 cursor-pointer" />
           <h2 className="text-lg font-medium">{t('home.aiTutor.uploadNotes')}</h2>
           <p>

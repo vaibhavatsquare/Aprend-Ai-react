@@ -3,6 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { useRedirect } from "@/src/hooks/router.hooks";
+import { formatDate } from "@/src/libs/constants/helper";
 
 type CardType = "notes" | "flashcards" | "library";
 
@@ -27,13 +28,8 @@ const SavedCard = ({
 }: Props) => {
 
   const handleCardClick = () => {
-    useRedirect("${type}/${item.id}");
-  };
-
-  const handleDeleteClick = () => {
-    if (confirm("Are you sure you want to delete this item?")) {
-      onDelete(item.id);
-    }
+    sessionStorage.setItem("selectedNote", JSON.stringify(item));
+    useRedirect(`/${type}/${item.id}`);
   };
 
   let mainIcon;
@@ -49,7 +45,7 @@ const SavedCard = ({
   return (
     <div
       onClick={handleCardClick}
-      className="flex items-center justify-between px-2 py-4 pr-5"
+      className="flex items-center justify-between px-2 py-4 pr-5 cursor-pointer"
       style={{
         height: "76px",
         boxShadow: "0px 0px 4px 0px #00000040",
@@ -72,7 +68,7 @@ const SavedCard = ({
           </h3>
 
           <p className="text-[14px] text-secondary mt-1">
-            {item.createdAt}
+            {formatDate(item.createdAt)} 
           </p>
         </div>
       </div>
@@ -82,30 +78,29 @@ const SavedCard = ({
         onClick={(e) => e.stopPropagation()}
       >
 
-        {type !== "library" &&
+        {type !== "library" && (
           <ActionButton
             icon="/images/notes/rename.svg"
             label="Rename"
-            onClick={() => {
-              const newTitle = prompt("Rename", item.title);
-              if (newTitle) onRename(item.id, newTitle);
-            }}
+            onClick={() => onRename(item.id, item.title)}
+          />
+        )}
+
+        {type === "library" &&
+          <ActionButton
+            icon="/images/notes/unsave.svg"
+            label="Remove"
+            onClick={() => onRemove(item.id)}
           />
         }
 
-        <ActionButton
-          icon="/images/notes/unsave.svg"
-          label="Remove"
-          onClick={() => onRemove(item.id)}
-        />
-
-        {type !== "library" &&
+        {type !== "library" && (
           <ActionButton
             icon="/images/notes/delete.svg"
             label="Delete"
-            onClick={handleDeleteClick}
+            onClick={() => onDelete(item.id)}
           />
-        }
+        )}
       </div>
 
     </div>
