@@ -21,6 +21,7 @@ export const getFlashcards = async (params?: {
   skip?: number;
   take?: number;
   search?: string;
+  orderBy?: string;
 }): Promise<FlashcardListResponse> => {
   return fetch<FlashcardListResponse>({
     url: "/ai-tutor/flashcards",

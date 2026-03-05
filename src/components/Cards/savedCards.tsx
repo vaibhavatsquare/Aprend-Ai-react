@@ -17,6 +17,7 @@ type Props = {
   onRename: (id: string, title: string) => void;
   onDelete: (id: string) => void;
   onRemove: (id: string) => void;
+  onOpenFlashcard?: (id: string) => void; 
 };
 
 const SavedCard = ({
@@ -25,11 +26,17 @@ const SavedCard = ({
   onRename,
   onDelete,
   onRemove,
+  onOpenFlashcard,
 }: Props) => {
 
   const handleCardClick = () => {
-    sessionStorage.setItem("selectedNote", JSON.stringify(item));
-    useRedirect(`/${type}/${item.id}`);
+    if (type === "flashcards") {
+    onOpenFlashcard?.(item.id);
+    return;
+  }
+
+  sessionStorage.setItem("selectedNote", JSON.stringify(item));
+  useRedirect(`/${type}/${item.id}`);
   };
 
   let mainIcon;

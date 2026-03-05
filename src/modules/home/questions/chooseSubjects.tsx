@@ -3,32 +3,86 @@
 import { useState } from "react";
 import { GoArrowLeft } from "react-icons/go";
 import { t } from "@/src/libs/i18n";
+import { generateSimuladoQuestions } from "@/src/services/api/question.api";
+import QuestionsBank from "./questionsBank";
+import { useRedirect } from "@/src/hooks/router.hooks";
+import { Question } from "@/src/libs/types/dashboard.types";
+import { difficulties, subjects } from "@/src/libs/constants/helper";
 
-const ChooseSubjects = ({ onBack }: { onBack?: () => void }) => {
+const ChooseSubjects = ({
+  onBack,
+  onStartQuestions,
+}: {
+  onBack?: () => void;
+  onStartQuestions?: () => void;
+}) => {
   const [value, setValue] = useState(12);
 
-  // ✅ SUBJECT STATE (multi select)
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
-
-  // ✅ DIFFICULTY STATE (single select)
   const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [activeTask, setActiveTask] = useState<{
+    id: string;
+    questions: Question[];
+  } | null>(null);
 
-  const subjects = [t('questions.allSubjects'), t('questions.english'), t('questions.mathematics'), t('questions.science'), t('questions.history'), t('questions.geography')];
-  const difficulties = [t('home.simulados.easy'), t('home.simulados.medium'), t('home.simulados.hard'), t('home.simulados.mix')];
 
-  // ✅ TOGGLE SUBJECT
-  const handleSubject = (item: string) => {
+  // TOGGLE SUBJECT
+  const handleSubject = (value: string) => {
     setSelectedSubjects((prev) =>
-      prev.includes(item)
-        ? prev.filter((i) => i !== item)
-        : [...prev, item]
+      prev.includes(value)
+        ? prev.filter((i) => i !== value)
+        : [...prev, value]
     );
   };
 
-  // ✅ SELECT DIFFICULTY
+  // SELECT DIFFICULTY
   const handleDifficulty = (item: string) => {
     setSelectedDifficulty(item);
   };
+
+  const handleContinue = async () => {
+    if (!selectedSubjects.length) {
+      alert("Please select at least one subject");
+      return;
+    }
+
+    if (!selectedDifficulty) {
+      alert("Please select difficulty");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const res = await generateSimuladoQuestions({
+        subject: selectedSubjects,
+        numberOfQuestions: value,
+        difficulty: selectedDifficulty,
+      });
+
+      setActiveTask({
+        id: res.id,
+        questions: res.questions,
+      });
+
+      onStartQuestions?.();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (activeTask) {
+    return (
+      <QuestionsBank
+        taskId={activeTask.id}
+        initialQuestions={activeTask.questions}
+        onClose={() => useRedirect("/home", true)}
+      />
+    );
+  }
 
   return (
     <div className="px-6">
@@ -41,12 +95,12 @@ const ChooseSubjects = ({ onBack }: { onBack?: () => void }) => {
       {/* SUBJECT BUTTONS */}
       <div className="flex gap-3 flex-wrap">
         {subjects.map((item) => {
-          const isSelected = selectedSubjects.includes(item);
+          const isSelected = selectedSubjects.includes(item.value);
 
           return (
             <div
-              key={item}
-              onClick={() => handleSubject(item)}
+              key={item.value}
+              onClick={() => handleSubject(item.value)}
               className="h-[36px] px-4 flex items-center rounded-[4px] border text-[18px] cursor-pointer transition-all"
               style={{
                 borderColor: isSelected ? "#0F3057" : "#DADADA",
@@ -54,7 +108,7 @@ const ChooseSubjects = ({ onBack }: { onBack?: () => void }) => {
                 background: isSelected ? "#F5F9FF" : "white",
               }}
             >
-              {item}
+              {item.label}
             </div>
           );
         })}
@@ -104,12 +158,12 @@ const ChooseSubjects = ({ onBack }: { onBack?: () => void }) => {
       <div className="w-full flex justify-left">
         <div className="grid grid-cols-5 gap-4 w-full max-w-[900px]">
           {difficulties.map((item) => {
-            const isSelected = selectedDifficulty === item;
+            const isSelected = selectedDifficulty === item.value;
 
             return (
               <div
-                key={item}
-                onClick={() => handleDifficulty(item)}
+                key={item.value}
+                onClick={() => handleDifficulty(item.value)}
                 className="w-full h-[70px] border rounded-[12px] px-4 flex items-center justify-between cursor-pointer transition-all"
                 style={{
                   borderColor: isSelected ? "#0F3057" : "#DADADA",
@@ -122,7 +176,7 @@ const ChooseSubjects = ({ onBack }: { onBack?: () => void }) => {
                     color: isSelected ? "#0F3057" : "#121212",
                   }}
                 >
-                  {item}
+                  {item.label}
                 </span>
 
                 {/* RADIO */}
@@ -160,14 +214,18 @@ const ChooseSubjects = ({ onBack }: { onBack?: () => void }) => {
 
         {/* CONTINUE */}
         <button
-          onClick={() => {
-            console.log("Subjects:", selectedSubjects);
-            console.log("Difficulty:", selectedDifficulty);
-            console.log("Questions:", value);
-          }}
-          className="w-80 h-[50px] px-16 bg-[#0F3057] text-white rounded-[12px]"
+          onClick={handleContinue}
+          disabled={loading}
+          className="w-80 h-[50px] px-16 bg-[#0F3057] text-white rounded-[12px] flex items-center justify-center gap-2 disabled:opacity-60"
         >
-          Continue
+          {loading ? (
+            <>
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              Generating...
+            </>
+          ) : (
+            "Continue"
+          )}
         </button>
 
       </div>

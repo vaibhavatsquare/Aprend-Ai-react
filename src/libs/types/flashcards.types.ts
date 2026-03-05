@@ -1,3 +1,5 @@
+import { Question } from "./dashboard.types";
+
 export interface FlashcardOption {
   id: string;
   text: string;
@@ -25,7 +27,7 @@ export interface Flashcard {
   isDeleted: boolean;
   createdAt: string;
   updatedAt: string;
-  questions?: FlashcardQuestion[];
+  questions?: Question[];
 }
 
 // GET response

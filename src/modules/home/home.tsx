@@ -131,7 +131,7 @@ const Home = () => {
   if (activeTask) {
     const type = activeTask.task.taskType;
 
-    if (type === "PRACTICE_QUESTION") {
+    if (type === "PRACTICE_QUESTION" || type === "CONCEPT_EXPLANATION") {
       return (
         <QuestionsBank
           taskId={activeTask.task.id}
@@ -150,16 +150,6 @@ const Home = () => {
         />
       );
     }
-
-    // if (type === "CONCEPT_EXPLANATION") {
-    //   return (
-    //     <ConceptExplanationScreen
-    //       taskId={activeTask.task.id}
-    //       initialData={activeTask.task}
-    //       onClose={() => setActiveTask(null)}
-    //     />
-    //   );
-    // }
   }
 
   return (

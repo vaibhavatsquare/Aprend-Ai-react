@@ -6,7 +6,6 @@ import { GoChevronLeft, GoChevronRight, GoX } from "react-icons/go";
 import { IoCheckmark, IoClose } from "react-icons/io5";
 import { Question } from "@/src/libs/types/dashboard.types";
 import { t } from "@/src/libs/i18n";
-// import { getFlashcardTask } from "@/src/services/api/dashboard.api";
 
 const COLORS = [
     "#FDD891",
@@ -16,61 +15,33 @@ const COLORS = [
     "#C0DAEB",
 ];
 
-type FlashQuestion = {
-    question: string;
-    options: string[];
-    correctIndex: number;
-};
-
 type Props = {
     taskId?: string;
     initialQuestions?: Question[];
     onClose?: () => void;
 };
 
-const Flashcards = ({
-    taskId,
-    initialQuestions,
-    onClose,
-}: Props) => {
+const Flashcards = ({ taskId, initialQuestions, onClose }: Props) => {
     const [questions, setQuestions] = useState<Question[]>(
         initialQuestions || []
     );
     const [loading, setLoading] = useState(!initialQuestions);
 
     const [index, setIndex] = useState(0);
-    const [selected, setSelected] =
-        useState<number | null>(null);
+    const [selected, setSelected] = useState<number | null>(null);
     const [revealed, setRevealed] = useState(false);
-    const [direction, setDirection] =
-        useState<"next" | "prev" | null>(null);
-
-    // ================= FETCH IF NEEDED =================
+    const [checking, setChecking] = useState(false);
+    const [showResult, setShowResult] = useState(false);
+    const [direction, setDirection] = useState<"next" | "prev" | null>(null);
 
     useEffect(() => {
-        if (!initialQuestions && taskId) {
-            fetchFlashcards();
-        } else {
-            setLoading(false);
-        }
+        setLoading(false);
     }, []);
-
-    const fetchFlashcards = async () => {
-        try {
-            // const res = await getFlashcardTask(taskId!);
-            // setQuestions(res.questions);
-        } catch (err) {
-            console.error("Flashcard fetch error", err);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     if (!questions.length) return null;
 
     const current = questions[index];
     const total = questions.length;
-
     const isFirst = index === 0;
     const isLast = index === total - 1;
     const bgColor = COLORS[index % COLORS.length];
@@ -78,6 +49,20 @@ const Flashcards = ({
     const resetState = () => {
         setSelected(null);
         setRevealed(false);
+        setShowResult(false);
+        setChecking(false);
+    };
+
+    const handleSelect = (i: number) => {
+        if (checking || showResult) return;
+
+        setSelected(i);
+        setChecking(true);
+
+        setTimeout(() => {
+            setChecking(false);
+            setShowResult(true);
+        }, 2000);
     };
 
     const next = () => {
@@ -93,9 +78,7 @@ const Flashcards = ({
             resetState();
         }, 200);
 
-        setTimeout(() => {
-            setDirection(null);
-        }, 400);
+        setTimeout(() => setDirection(null), 400);
     };
 
     const prev = () => {
@@ -108,93 +91,19 @@ const Flashcards = ({
             resetState();
         }, 200);
 
-        setTimeout(() => {
-            setDirection(null);
-        }, 400);
+        setTimeout(() => setDirection(null), 400);
     };
-
-    const getQuestionFontSize = (text: string) => {
-        if (text.length > 140) return "text-[16px]";
-        if (text.length > 100) return "text-[18px]";
-        return "text-[20px]";
-    };
-
-    const getOptionFontSize = (text: string) => {
-        if (text.length > 80) return "text-[14px]";
-        return "text-[16px]";
-    };
-
-    // ================= LOADING SHIMMER =================
-
-    if (loading) {
-        return (
-            <div className="px-4">
-                <div
-                    className="h-[calc(100vh-100px)] mt-1 mb-4 py-6 rounded-[32px] flex flex-col animate-pulse"
-                    style={{ boxShadow: "0px 0px 4px 0px #00000040" }}
-                >
-                    {/* Header shimmer */}
-                    <div className="relative flex justify-center items-center">
-                        <div className="h-7 w-40 bg-gray-200 rounded-md" />
-                        <div className="absolute right-8 h-6 w-12 bg-gray-200 rounded-md" />
-                    </div>
-
-                    {/* Card area */}
-                    <div className="flex-1 flex flex-col items-center justify-center mb-10">
-
-                        {/* 1/25 shimmer */}
-                        <div className="w-[640px] max-w-[90vw] mb-2 flex justify-end">
-                            <div className="h-5 w-12 bg-gray-200 rounded-md" />
-                        </div>
-
-                        {/* Card shimmer */}
-                        <div className="w-[640px] max-w-[90vw] min-h-[420px] rounded-[20px] p-8 bg-gray-200">
-
-                            {/* Question shimmer */}
-                            <div className="space-y-3 mt-6 px-12">
-                                <div className="h-5 bg-gray-300 rounded w-3/4 mx-auto" />
-                                <div className="h-5 bg-gray-300 rounded w-2/3 mx-auto" />
-                                <div className="h-5 bg-gray-300 rounded w-1/2 mx-auto" />
-                            </div>
-
-                            {/* Options shimmer */}
-                            <div className="mt-16 px-10 space-y-6">
-                                {[1, 2, 3, 4].map((i) => (
-                                    <div key={i}>
-                                        <div className="h-4 bg-gray-300 rounded w-1/2 mb-2" />
-                                        {i !== 4 && (
-                                            <div className="h-[1px] bg-gray-300 opacity-50" />
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-
-                            {/* Arrows shimmer */}
-                            <div className="absolute bottom-[36px] left-0 w-full px-6 flex items-center justify-between">
-                                <div className="w-9 h-9 bg-gray-300 rounded-full" />
-                                <div className="w-9 h-9 bg-gray-300 rounded-full" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    // ================= DESIGN (UNCHANGED) =================
 
     return (
         <div className="px-4">
             <div
                 className="h-[calc(100vh-100px)] mt-1 mb-4 py-6 rounded-[32px] flex flex-col"
-                style={{
-                    boxShadow: "0px 0px 4px 0px #00000040",
-                }}
+                style={{ boxShadow: "0px 0px 4px 0px #00000040" }}
             >
                 {/* HEADER */}
                 <div className="relative flex justify-center items-center">
-                    <h1 className="text-[26px] font-semibold text-[#121212]">
-                        {t('flashcards.title')}
+                    <h1 className="text-[26px] font-semibold">
+                        {t("flashcards.title")}
                     </h1>
 
                     <div className="absolute right-8 text-[22px]">
@@ -233,65 +142,82 @@ const Flashcards = ({
                         <div
                             className="relative w-full h-full transition-transform duration-500"
                             style={{
-                                transform: revealed
-                                    ? "rotateY(180deg)"
-                                    : "rotateY(0deg)",
+                                transform: revealed ? "rotateY(180deg)" : "rotateY(0deg)",
                                 transformStyle: "preserve-3d",
                             }}
                         >
-                            {/* FRONT */}
+                            {/* FRONT SIDE */}
                             <div
                                 className="absolute inset-0 flex flex-col"
                                 style={{ backfaceVisibility: "hidden" }}
                             >
-                                <div className="flex items-center justify-center text-center">
-                                    <h2
-                                        className={`px-12 font-semibold text-[#121212] leading-relaxed text-center ${getQuestionFontSize(
-                                            current.questionText
-                                        )}`}
-                                        style={{
-                                            display: "-webkit-box",
-                                            WebkitLineClamp: 3,
-                                            WebkitBoxOrient: "vertical",
-                                            overflow: "hidden",
-                                        }}
-                                    >
+                                {/* Question */}
+                                <div className="text-center px-12">
+                                    <h2 className="text-[20px] font-semibold leading-relaxed">
                                         {current.questionText}
                                     </h2>
                                 </div>
 
+                                {/* Options */}
                                 <div className="px-10 mt-14 flex flex-col gap-6">
-                                    {current.options.map((option, i) => (
-                                        <div
-                                            key={i}
-                                            onClick={() => setSelected(i)}
-                                            className="cursor-pointer"
-                                        >
-                                            <p
-                                                className={`${getOptionFontSize(option.text)} ${selected === i ? "font-semibold" : "font-normal"
-                                                    } text-[#121212] ml-2 leading-relaxed`}
-                                                style={{
-                                                    display: "-webkit-box",
-                                                    WebkitLineClamp: 2,
-                                                    WebkitBoxOrient: "vertical",
-                                                    overflow: "hidden",
-                                                }}
-                                            >
-                                                {option.text}
-                                            </p>
+                                    {current.options.map((option, i) => {
+                                        const isCorrect =
+                                            option.id === current.correctOptionId;
+                                        const isSelected = i === selected;
 
-                                            {i !== current.options.length - 1 && (
+                                        return (
+                                            <div
+                                                key={i}
+                                                onClick={() => handleSelect(i)}
+                                                className="cursor-pointer"
+                                            >
+                                                <div className="flex justify-between items-center">
+                                                    <p
+                                                        className={`text-[16px] ml-2 ${isSelected ? "font-semibold" : ""
+                                                            }`}
+                                                    >
+                                                        {option.text}
+                                                    </p>
+
+                                                    {checking && isSelected && (
+                                                        <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                                                    )}
+
+                                                    {showResult && isCorrect && (
+                                                        <IoCheckmark size={24} color="green" />
+                                                    )}
+
+                                                    {showResult &&
+                                                        isSelected &&
+                                                        !isCorrect && (
+                                                            <IoClose size={24} color="red" />
+                                                        )}
+                                                </div>
+
                                                 <div className="mt-2 h-[1px] bg-gray-400 opacity-40" />
-                                            )}
-                                        </div>
-                                    ))}
+                                            </div>
+                                        );
+                                    })}
                                 </div>
 
+                                {/* Tap to flip */}
+                                {showResult && (
+                                    <div className="absolute bottom-4 w-full text-center">
+                                        <p
+                                            onClick={() => setRevealed(true)}
+                                            className="text-[16px] font-medium cursor-pointer"
+                                        >
+                                            Tap to view explanation
+                                        </p>
+                                    </div>
+                                )}
+
+                                {/* Arrows */}
                                 <div className="absolute bottom-[36px] left-0 w-full px-6 flex items-center justify-between mt-[20px]">
                                     <button
                                         onClick={prev}
                                         disabled={isFirst}
-                                        className={`w-9 h-9 rounded-full flex items-center justify-center shadow ${isFirst ? "opacity-30" : ""
+                                        className={`w-9 h-9 rounded-full flex items-center justify-center shadow cursor-pointer ${isFirst ? "opacity-30" : ""
                                             }`}
                                         style={{
                                             backgroundColor:
@@ -310,7 +236,7 @@ const Flashcards = ({
                                     <button
                                         onClick={next}
                                         disabled={isLast}
-                                        className={`w-9 h-9 rounded-full flex items-center justify-center shadow ${isLast ? "opacity-30" : ""
+                                        className={`w-9 h-9 rounded-full flex items-center justify-center shadow cursor-pointer ${isLast ? "opacity-30" : ""
                                             }`}
                                         style={{
                                             backgroundColor:
@@ -326,99 +252,43 @@ const Flashcards = ({
                                         />
                                     </button>
                                 </div>
-
-                                <div className="absolute bottom-[1px] w-full text-center">
-                                    {!revealed &&
-                                        selected !== null && (
-                                            <p
-                                                onClick={() =>
-                                                    setRevealed(true)
-                                                }
-                                                className="text-[16px] font-medium cursor-pointer"
-                                            >
-                                                Tap to reveal the answer
-                                            </p>
-                                        )}
-                                </div>
                             </div>
 
-                            {/* BACK */}
+                            {/* BACK SIDE */}
                             <div
-                                className="absolute inset-0 flex flex-col"
+                                className="absolute inset-0 flex flex-col items-center justify-start px-10 pt-10"
                                 style={{
                                     transform: "rotateY(180deg)",
-                                    backfaceVisibility:
-                                        "hidden",
+                                    backfaceVisibility: "hidden",
                                 }}
                             >
-                                <div className="flex items-center justify-center text-center">
-                                    <h2
-                                        className={`px-12 font-semibold text-[#121212] leading-relaxed text-center ${getQuestionFontSize(
-                                            current.questionText
-                                        )}`}
-                                        style={{
-                                            display: "-webkit-box",
-                                            WebkitLineClamp: 3,
-                                            WebkitBoxOrient: "vertical",
-                                            overflow: "hidden",
-                                        }}
-                                    >
-                                        {current.questionText}
-                                    </h2>
-                                </div>
+                                <h2 className="text-[22px] font-semibold text-center">
+                                    Correct Answer
+                                </h2>
 
-                                <div className="px-10 mt-14 flex flex-col gap-6">
-                                    {current.options.map((option, i) => {
-                                        const isCorrect =
-                                            option.id === current.correctOptionId;
-                                        const isSelected =
-                                            i === selected;
+                                <p className="mt-3 text-[18px] font-medium text-green-600 text-center">
+                                    {
+                                        current.options.find(
+                                            (o) => o.id === current.correctOptionId
+                                        )?.text
+                                    }
+                                </p>
 
-                                        return (
-                                            <div key={i}>
-                                                <div className="flex justify-between items-center">
-                                                    <p
-                                                        className={`${getOptionFontSize(option.text)} ${selected === i ? "font-semibold" : "font-normal"
-                                                            } text-[#121212] ml-2 leading-relaxed`}
-                                                        style={{
-                                                            display: "-webkit-box",
-                                                            WebkitLineClamp: 2,
-                                                            WebkitBoxOrient: "vertical",
-                                                            overflow: "hidden",
-                                                        }}
-                                                    >
-                                                        {option.text}
-                                                    </p>
+                                <div className="mt-10 text-center">
+                                    <h3 className="text-[18px] font-semibold mb-3">
+                                        Explanation
+                                    </h3>
 
-                                                    {isCorrect && (
-                                                        <IoCheckmark
-                                                            size={26}
-                                                            color="green"
-                                                        />
-                                                    )}
-
-                                                    {isSelected &&
-                                                        !isCorrect && (
-                                                            <IoClose
-                                                                size={26}
-                                                                color="red"
-                                                            />
-                                                        )}
-                                                </div>
-
-                                                {i !== current.options.length - 1 && (
-                                                    <div className="mt-2 h-[1px] bg-gray-400 opacity-40" />
-                                                )}
-                                            </div>
-                                        );
-                                    })}
+                                    <p className="text-[16px] text-gray-700 leading-relaxed">
+                                        {current.stepByStepExplanation}
+                                    </p>
                                 </div>
 
                                 <div className="absolute bottom-[36px] left-0 w-full px-6 flex items-center justify-between mt-[20px]">
                                     <button
                                         onClick={prev}
                                         disabled={isFirst}
-                                        className={`w-9 h-9 rounded-full flex items-center justify-center shadow ${isFirst ? "opacity-30" : ""
+                                        className={`w-9 h-9 rounded-full flex items-center justify-center shadow cursor-pointer ${isFirst ? "opacity-30" : ""
                                             }`}
                                         style={{
                                             backgroundColor:
@@ -437,7 +307,7 @@ const Flashcards = ({
                                     <button
                                         onClick={next}
                                         disabled={isLast}
-                                        className={`w-9 h-9 rounded-full flex items-center justify-center shadow ${isLast ? "opacity-30" : ""
+                                        className={`w-9 h-9 rounded-full flex items-center justify-center shadow cursor-pointer ${isLast ? "opacity-30" : ""
                                             }`}
                                         style={{
                                             backgroundColor:
