@@ -6,10 +6,19 @@ import { GoArrowLeft, GoArrowRight } from "react-icons/go";
 import { useBack, useRedirect } from "@/src/hooks/router.hooks";
 import ChooseSubjects from "./chooseSubjects";
 import { t } from "@/src/libs/i18n";
+import { Question } from "@/src/libs/types/dashboard.types";
+import QuestionsBank from "./questionsBank";
 
 const Questions = () => {
 
-    const [step, setStep] = useState<"question" | "chooseSubject">("question");
+    const [step, setStep] = useState<
+        "question" | "chooseSubject" | "questionsBank"
+    >("question");
+
+    const [activeTask, setActiveTask] = useState<{
+        id: string;
+        questions: Question[];
+    } | null>(null);
 
     const ChooseSubject = async () => {
         setStep("chooseSubject")
@@ -164,9 +173,23 @@ const Questions = () => {
                                 onClick={() => setStep("question")}
                             />
                         </div>
-                        <ChooseSubjects />
+                        <ChooseSubjects
+                            onBack={() => setStep("question")}
+                            onStartQuestions={(task) => {
+                                setActiveTask(task);
+                                setStep("questionsBank");
+                            }}
+                        />
                     </div>
                 </div>
+            )}
+
+            {step === "questionsBank" && (
+                <QuestionsBank
+                    taskId={activeTask?.id ?? ""}
+                    initialQuestions={activeTask?.questions ?? []}
+                    onClose={() => useRedirect("/home", true)}
+                />
             )}
         </>
     );

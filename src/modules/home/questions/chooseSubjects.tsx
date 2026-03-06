@@ -14,18 +14,13 @@ const ChooseSubjects = ({
   onStartQuestions,
 }: {
   onBack?: () => void;
-  onStartQuestions?: () => void;
+  onStartQuestions?: (task: { id: string; questions: Question[] }) => void;
 }) => {
   const [value, setValue] = useState(12);
 
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [activeTask, setActiveTask] = useState<{
-    id: string;
-    questions: Question[];
-  } | null>(null);
-
 
   // TOGGLE SUBJECT
   const handleSubject = (value: string) => {
@@ -61,28 +56,16 @@ const ChooseSubjects = ({
         difficulty: selectedDifficulty,
       });
 
-      setActiveTask({
+      onStartQuestions?.({
         id: res.id,
         questions: res.questions,
       });
-
-      onStartQuestions?.();
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
-
-  if (activeTask) {
-    return (
-      <QuestionsBank
-        taskId={activeTask.id}
-        initialQuestions={activeTask.questions}
-        onClose={() => useRedirect("/home", true)}
-      />
-    );
-  }
 
   return (
     <div className="px-6">
