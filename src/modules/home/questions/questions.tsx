@@ -8,6 +8,7 @@ import ChooseSubjects from "./chooseSubjects";
 import { t } from "@/src/libs/i18n";
 import { Question } from "@/src/libs/types/dashboard.types";
 import QuestionsBank from "./questionsBank";
+import { QuestionSource } from "@/src/libs/constants/helper";
 
 const Questions = () => {
 
@@ -19,13 +20,10 @@ const Questions = () => {
         id: string;
         questions: Question[];
     } | null>(null);
+     const [source, setSource] = useState<QuestionSource>(QuestionSource.EXPLORE_QUESTION);
 
     const ChooseSubject = async () => {
         setStep("chooseSubject")
-    };
-
-    const ChooseQuestionsBank = async () => {
-        useRedirect("/home/questions-bank");
     };
 
     return (
@@ -96,7 +94,10 @@ const Questions = () => {
 
                                         {/* Button */}
                                         <button
-                                            onClick={() => ChooseQuestionsBank()}
+                                            onClick={() => {
+                                                ChooseSubject();
+                                                setSource(QuestionSource.EXPLORE_QUESTION);
+                                            }}
                                             className="w-full h-[50px] bg-primary rounded-[16px] flex items-center justify-center cursor-pointer"
                                         >
                                             {/* Text */}
@@ -140,7 +141,10 @@ const Questions = () => {
                                         </p>
 
                                         <button
-                                            onClick={() => ChooseSubject()}
+                                            onClick={() => {
+                                                ChooseSubject();
+                                                setSource(QuestionSource.SIMULADO);
+                                            }}
                                             className="w-full h-[50px] bg-primary rounded-[16px] flex items-center justify-center cursor-pointer"
                                         >
                                             {/* Text */}
@@ -174,6 +178,7 @@ const Questions = () => {
                             />
                         </div>
                         <ChooseSubjects
+                            source={source}
                             onBack={() => setStep("question")}
                             onStartQuestions={(task) => {
                                 setActiveTask(task);
@@ -188,6 +193,7 @@ const Questions = () => {
                 <QuestionsBank
                     taskId={activeTask?.id ?? ""}
                     initialQuestions={activeTask?.questions ?? []}
+                    source={source}
                     onClose={() => useRedirect("/home", true)}
                 />
             )}

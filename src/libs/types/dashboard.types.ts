@@ -1,9 +1,13 @@
 export type Question = {
     id: string;
+    taskId: string;
     questionText: string;
     options: Option[];
     correctOptionId: string;
     stepByStepExplanation: string;
+    source: string;
+    reinforcement: boolean;
+    createdAt: string;
 };
 
 export type TaskDetail = {

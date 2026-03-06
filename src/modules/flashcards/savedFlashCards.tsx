@@ -12,7 +12,7 @@ import {
 import RenameModal from "@/src/components/common/RenameModal";
 import ConfirmModal from "@/src/components/common/ConfirmModal";
 import { message } from "antd";
-import { Flashcard } from "@/src/libs/types/flashcards.types";
+import { Flashcard, FlashcardUI, mapFlashcardQuestions } from "@/src/libs/types/flashcards.types";
 import Flashcards from "./flashCards";
 
 const PAGE_LIMIT = 10;
@@ -24,13 +24,13 @@ const SavedFlashCards = ({
     showBack?: boolean;
     onBack?: () => void;
 }) => {
-    const [flashCards, setFlashCards] = useState<Flashcard[]>([]);
+    const [flashCards, setFlashCards] = useState<FlashcardUI[]>([]);
     const [skip, setSkip] = useState(0);
     const [loading, setLoading] = useState(false);
     const [initialLoading, setInitialLoading] = useState(true);
     const [hasMore, setHasMore] = useState(true);
 
-    const [selectedCard, setSelectedCard] = useState<Flashcard | null>(null);
+    const [selectedCard, setSelectedCard] = useState<FlashcardUI | null>(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showRenameModal, setShowRenameModal] = useState(false);
     const [actionLoading, setActionLoading] = useState(false);
@@ -52,16 +52,23 @@ const SavedFlashCards = ({
             const res = await getFlashcards({
                 skip: currentSkip,
                 take: PAGE_LIMIT,
+                include: "questions",
                 orderBy: "createdAt|desc",
             });
 
+            const mappedList: FlashcardUI[] = res.list.map((card) => ({
+                ...card,
+                questions: mapFlashcardQuestions(card.questions || []),
+            }));
+
             if (isFirst) {
-                setFlashCards(res.list);
+                setFlashCards(mappedList);
             } else {
-                setFlashCards((prev) => [...prev, ...res.list]);
+                setFlashCards((prev) => [...prev, ...mappedList]);
             }
 
             setHasMore(res.hasMany);
+
         } catch (err) {
             console.error("Failed to fetch flashcards", err);
         } finally {
@@ -137,7 +144,10 @@ const SavedFlashCards = ({
             <Flashcards
                 taskId={activeFlashcard}
                 initialQuestions={selectedCard?.questions || []}
-                onClose={() => setSelectedCard(null)}
+                onClose={() => {
+                    setSelectedCard(null);
+                    setActiveFlashcard(null);
+                }}
             />
         );
     }

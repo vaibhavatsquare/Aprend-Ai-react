@@ -27,7 +27,7 @@ export interface Flashcard {
   isDeleted: boolean;
   createdAt: string;
   updatedAt: string;
-  questions?: Question[];
+  questions?: FlashcardQuestion[];
 }
 
 // GET response
@@ -37,3 +37,23 @@ export interface FlashcardListResponse {
   hasMany: boolean;
   count: number;
 }
+
+export const mapFlashcardQuestions = (
+  questions: FlashcardQuestion[]
+): Question[] => {
+  return questions.map((q) => ({
+    id: q.id,
+    taskId: q.flashCardId,
+    questionText: q.question,
+    options: q.options,
+    correctOptionId: q.correctOptionId,
+    stepByStepExplanation: q.explanation,
+    source: "AI_generated",
+    reinforcement: false,
+    createdAt: q.createdAt,
+  }));
+};
+
+export type FlashcardUI = Omit<Flashcard, "questions"> & {
+  questions?: Question[];
+};

@@ -12,6 +12,7 @@ export const formatDate = (dateString: string) => {
 };
 
 export const subjects = [
+  { label: "All", value: "ALL" },
   { label: "English", value: "ENGLISH" },
   { label: "Mathematics", value: "MATHEMATICS" },
   { label: "Science", value: "SCIENCE" },
@@ -19,8 +20,6 @@ export const subjects = [
   { label: "Geography", value: "GEOGRAPHY" },
   { label: "Computer Science", value: "COMPUTER_SCIENCE" },
   { label: "Business Economics", value: "BUSINESS_ECONOMICS" },
-  { label: "Languages", value: "LANGUAGES" },
-  { label: "Other", value: "OTHER" },
 ];
 
 export const difficulties = [
@@ -29,3 +28,10 @@ export const difficulties = [
   { label: "Hard", value: "HARD" },
   { label: "Mix", value: "MIX" },
 ];
+
+export enum QuestionSource {
+  HOME_PRACTICE_QUESTION = "HOME_PRACTICE_QUESTION",
+  HOME_CONCEPT_EXPLANATION = "HOME_CONCEPT_EXPLANATION",
+  SIMULADO = "SIMULADO",
+  EXPLORE_QUESTION = "EXPLORE_QUESTION",
+}

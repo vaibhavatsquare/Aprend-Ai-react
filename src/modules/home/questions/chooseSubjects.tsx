@@ -7,14 +7,16 @@ import { generateSimuladoQuestions } from "@/src/services/api/question.api";
 import QuestionsBank from "./questionsBank";
 import { useRedirect } from "@/src/hooks/router.hooks";
 import { Question } from "@/src/libs/types/dashboard.types";
-import { difficulties, subjects } from "@/src/libs/constants/helper";
+import { difficulties, QuestionSource, subjects } from "@/src/libs/constants/helper";
 
 const ChooseSubjects = ({
   onBack,
   onStartQuestions,
+  source,
 }: {
   onBack?: () => void;
   onStartQuestions?: (task: { id: string; questions: Question[] }) => void;
+  source: QuestionSource;
 }) => {
   const [value, setValue] = useState(12);
 
@@ -22,13 +24,29 @@ const ChooseSubjects = ({
   const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const isSimulado = source === QuestionSource.SIMULADO;
+  const isExplore = source === QuestionSource.EXPLORE_QUESTION;
+
   // TOGGLE SUBJECT
   const handleSubject = (value: string) => {
-    setSelectedSubjects((prev) =>
-      prev.includes(value)
-        ? prev.filter((i) => i !== value)
-        : [...prev, value]
-    );
+
+    // If ALL clicked
+    if (value === "ALL") {
+      setSelectedSubjects(["ALL"]);
+      return;
+    }
+
+    setSelectedSubjects((prev) => {
+
+      // remove ALL if selecting specific subject
+      const filtered = prev.filter((s) => s !== "ALL");
+
+      if (filtered.includes(value)) {
+        return filtered.filter((s) => s !== value);
+      }
+
+      return [...filtered, value];
+    });
   };
 
   // SELECT DIFFICULTY
@@ -37,12 +55,13 @@ const ChooseSubjects = ({
   };
 
   const handleContinue = async () => {
+
     if (!selectedSubjects.length) {
       alert("Please select at least one subject");
       return;
     }
 
-    if (!selectedDifficulty) {
+    if (isSimulado && !selectedDifficulty) {
       alert("Please select difficulty");
       return;
     }
@@ -50,15 +69,33 @@ const ChooseSubjects = ({
     try {
       setLoading(true);
 
-      const res = await generateSimuladoQuestions({
-        subject: selectedSubjects,
-        numberOfQuestions: value,
-        difficulty: selectedDifficulty,
-      });
+      let subjectsForApi = selectedSubjects;
+
+      if (selectedSubjects.includes("ALL")) {
+        subjectsForApi = subjects
+          .filter((s) => s.value !== "ALL")
+          .map((s) => s.value);
+      }
+
+      let res;
+
+      if (isSimulado) {
+        res = await generateSimuladoQuestions({
+          subject: subjectsForApi,
+          numberOfQuestions: value,
+          difficulty: selectedDifficulty!,
+        });
+      }
+
+      if (isExplore) {
+        // res = await generateExploreQuestions({
+        //   subject: subjectsForApi,
+        // });
+      }
 
       onStartQuestions?.({
-        id: res.id,
-        questions: res.questions,
+        id: res?.id || "",
+        questions: res?.questions || [],
       });
     } catch (err) {
       console.error(err);
@@ -97,87 +134,98 @@ const ChooseSubjects = ({
         })}
       </div>
 
-      {/* SPACING */}
-      <div className="h-[34px]" />
+      {isSimulado && (
+        <>
+          {/* SPACING */}
+          <div className="h-[34px]" />
 
-      {/* NUMBER */}
-      <h1 className="text-[30px] font-medium text-[#121212] mb-4">
-        {t('questions.numberOfQuestions')}
-      </h1>
+          {/* NUMBER */}
+          <h1 className="text-[30px] font-medium text-[#121212] mb-4">
+            {t('questions.numberOfQuestions')}
+          </h1>
 
-      {/* SLIDER */}
-      <div className="flex justify-start">
-        <div className="relative w-[60%]">
+          {/* SLIDER */}
+          <div className="flex justify-start">
+            <div className="relative w-[60%]">
 
-          <input
-            type="range"
-            min={1}
-            max={40}
-            value={value}
-            onChange={(e) => setValue(Number(e.target.value))}
-            className="w-full accent-[#0F3057]"
-          />
+              <input
+                type="range"
+                min={1}
+                max={40}
+                value={value}
+                onChange={(e) => setValue(Number(e.target.value))}
+                className="w-full accent-[#0F3057]"
+              />
 
-          {/* VALUE UNDER THUMB */}
-          <div
-            className="absolute top-6 text-[16px] text-[#121212] -translate-x-1/2"
-            style={{
-              left: `calc(${(value - 0.5) / 40 * 100}%)`,
-            }}
-          >
-            {value}
-          </div>
-        </div>
-      </div>
-
-      {/* SPACING */}
-      <div className="h-[52px]" />
-
-      {/* DIFFICULTY */}
-      <h1 className="text-[30px] font-medium text-[#121212] mb-6">
-        {t('questions.selectDifficulty')}
-      </h1>
-
-      <div className="w-full flex justify-left">
-        <div className="grid grid-cols-5 gap-4 w-full max-w-[900px]">
-          {difficulties.map((item) => {
-            const isSelected = selectedDifficulty === item.value;
-
-            return (
+              {/* VALUE UNDER THUMB */}
               <div
-                key={item.value}
-                onClick={() => handleDifficulty(item.value)}
-                className="w-full h-[70px] border rounded-[12px] px-4 flex items-center justify-between cursor-pointer transition-all"
+                className="absolute top-6 text-[16px] text-[#121212] -translate-x-1/2"
                 style={{
-                  borderColor: isSelected ? "#0F3057" : "#DADADA",
-                  background: isSelected ? "#F5F9FF" : "white",
+                  left: `calc(${(value - 0.5) / 40 * 100}%)`,
                 }}
               >
-                <span
-                  className="text-[18px]"
-                  style={{
-                    color: isSelected ? "#0F3057" : "#121212",
-                  }}
-                >
-                  {item.label}
-                </span>
-
-                {/* RADIO */}
-                <div
-                  className="w-4 h-4 rounded-full border flex items-center justify-center"
-                  style={{
-                    borderColor: isSelected ? "#0F3057" : "#DADADA",
-                  }}
-                >
-                  {isSelected && (
-                    <div className="w-2 h-2 rounded-full bg-[#0F3057]" />
-                  )}
-                </div>
+                {value}
               </div>
-            );
-          })}
-        </div>
-      </div>
+            </div>
+          </div>
+
+
+          {/* SPACING */}
+          <div className="h-[52px]" />
+
+          {/* DIFFICULTY */}
+          <h1 className="text-[30px] font-medium text-[#121212] mb-6">
+            {t('questions.selectDifficulty')}
+          </h1>
+
+          <div className="w-full flex justify-left">
+            <div className="grid grid-cols-5 gap-4 w-full max-w-[900px]">
+              {difficulties.map((item) => {
+                const isSelected = selectedDifficulty === item.value;
+
+                return (
+                  <div
+                    key={item.value}
+                    onClick={() => handleDifficulty(item.value)}
+                    className="w-full h-[70px] border rounded-[12px] px-4 flex items-center justify-between cursor-pointer transition-all"
+                    style={{
+                      borderColor: isSelected ? "#0F3057" : "#DADADA",
+                      background: isSelected ? "#F5F9FF" : "white",
+                    }}
+                  >
+                    <span
+                      className="text-[18px]"
+                      style={{
+                        color: isSelected ? "#0F3057" : "#121212",
+                      }}
+                    >
+                      {item.label}
+                    </span>
+
+                    {/* RADIO */}
+                    <div
+                      className="w-4 h-4 rounded-full border flex items-center justify-center"
+                      style={{
+                        borderColor: isSelected ? "#0F3057" : "#DADADA",
+                      }}
+                    >
+                      {isSelected && (
+                        <div className="w-2 h-2 rounded-full bg-[#0F3057]" />
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </>
+      )}
+
+      {isExplore && (
+        <>
+          <div className="h-[300px]" />
+        </>
+      )}
 
       {/* BUTTONS */}
       <div className="flex justify-center gap-6 mt-20">

@@ -6,6 +6,7 @@ import { GoChevronLeft, GoChevronRight, GoX } from "react-icons/go";
 import { IoCheckmark, IoClose } from "react-icons/io5";
 import { Question } from "@/src/libs/types/dashboard.types";
 import { t } from "@/src/libs/i18n";
+import { validateFlashcardAnswer } from "@/src/services/api/flashcards.api";
 
 const COLORS = [
     "#FDD891",
@@ -53,16 +54,29 @@ const Flashcards = ({ taskId, initialQuestions, onClose }: Props) => {
         setChecking(false);
     };
 
-    const handleSelect = (i: number) => {
+    const handleSelect = async (i: number) => {
         if (checking || showResult) return;
+
+        const option = current.options[i];
 
         setSelected(i);
         setChecking(true);
 
-        setTimeout(() => {
+        try {
+            const res = await validateFlashcardAnswer({
+                questionId: current.id,
+                selectedOptionId: option.id,
+            });
+
+            // update explanation from API
+            current.stepByStepExplanation = res.explanation;
+
+        } catch (err) {
+            console.error("Flashcard validate error", err);
+        } finally {
             setChecking(false);
             setShowResult(true);
-        }, 2000);
+        }
     };
 
     const next = () => {

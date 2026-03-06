@@ -595,12 +595,15 @@ const AiTutor = () => {
           )}
         </div>
 
-        <div className="flex gap-2 items-center justify-between p-4 rounded-xl border border-[#DADADA]">
+        <div
+          className="flex gap-2 items-center justify-between p-4 rounded-xl border border-[#DADADA] cursor-pointer hover:bg-gray-50 transition-colors"
+          onClick={() => useRedirect("/home/questions")}
+        >
           <p className="text-sm font-medium">{t('home.questionBank.title')}</p>
           <IoArrowForwardSharp className="text-lg -rotate-45 cursor-pointer" />
         </div>
 
-        <div className="flex gap-2 items-center justify-between p-4 rounded-xl border border-[#DADADA]">
+        <div className="flex gap-2 items-center justify-between p-4 rounded-xl border border-[#DADADA] cursor-pointer hover:bg-gray-50 transition-colors">
           <p className="text-sm font-medium">{t('home.weakSpotTracker.title')}</p>
           <IoArrowForwardSharp className="text-lg -rotate-45 cursor-pointer" />
         </div>

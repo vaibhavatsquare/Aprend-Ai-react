@@ -13,6 +13,7 @@ import { LuChevronRight } from "react-icons/lu";
 import QuestionsBank from "./questions/questionsBank";
 import Flashcards from "../flashcards/flashCards";
 import { t } from "@/src/libs/i18n";
+import { QuestionSource } from "@/src/libs/constants/helper";
 
 const formatTaskType = (type: string) => {
   if (type === "FLASHCARD") return t('flashcards.title');
@@ -136,6 +137,7 @@ const Home = () => {
         <QuestionsBank
           taskId={activeTask.task.id}
           initialQuestions={activeTask.task.questions}
+          source={type === "PRACTICE_QUESTION" ? QuestionSource.HOME_PRACTICE_QUESTION : QuestionSource.HOME_CONCEPT_EXPLANATION}
           onClose={() => setActiveTask(null)}
         />
       );
@@ -291,7 +293,7 @@ const Home = () => {
           <IoArrowForwardSharp className="text-lg -rotate-45" />
         </div>
 
-        <div className="flex gap-2 items-center justify-between p-4 rounded-xl border border-[#DADADA]">
+        <div className="flex gap-2 items-center justify-between p-4 rounded-xl border border-[#DADADA] cursor-pointer hover:bg-gray-50 transition-colors">
           <p className="text-sm font-medium">{t('home.weakSpotTracker.title')}</p>
           <IoArrowForwardSharp className="text-lg -rotate-45 cursor-pointer" />
         </div>

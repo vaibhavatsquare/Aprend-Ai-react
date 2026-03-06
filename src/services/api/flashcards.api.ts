@@ -20,6 +20,7 @@ export const generateFlashcards = async (
 export const getFlashcards = async (params?: {
   skip?: number;
   take?: number;
+  include?: string;
   search?: string;
   orderBy?: string;
 }): Promise<FlashcardListResponse> => {
@@ -47,5 +48,21 @@ export const deleteFlashcard = async (id: string): Promise<void> => {
   return fetch<void>({
     url: `/ai-tutor/flashcards/${id}`,
     method: "DELETE",
+  });
+};
+
+// VALIDATE FLASHCARD ANSWER
+export const validateFlashcardAnswer = async (payload: {
+  questionId: string;
+  selectedOptionId: string;
+}): Promise<{
+  isCorrect: boolean;
+  correctOptionId: string;
+  explanation: string;
+}> => {
+  return fetch({
+    url: "/ai-tutor/flashcards/validate",
+    method: "POST",
+    data: payload,
   });
 };
