@@ -44,3 +44,13 @@ export interface UserDetail {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface Achievement {
+    id: number;
+    icon: string;
+    title: string;
+    description: string;
+    image: string;
+    buttonText: string;
+    buttonColor: string;
+};
