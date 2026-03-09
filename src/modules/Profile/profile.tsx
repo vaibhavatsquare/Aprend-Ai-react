@@ -17,6 +17,7 @@ import SavedNotes from "../notes/savedNotes";
 import LanguageSection from "./chooseLanguage";
 import { initializeAppLanguage } from "@/src/libs/helpers";
 import { t } from "@/src/libs/i18n";
+import AchievementsSection from "./achievementsSection";
 
 const UserProfile = () => {
     const [user, setUser] = useState<UserDetail | null>(null);
@@ -26,61 +27,7 @@ const UserProfile = () => {
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [selectedLanguage, setSelectedLanguage] = useState<UserLanguage | null>(null);
 
-    const [achievements, setAchievements] = useState<Achievement[]>([]);
-    const [achievementOpen, setAchievementOpen] = useState(false);
-    const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
-
     const router = useRouter();
-
-    const dummyAchievements: Achievement[] = [
-        {
-            id: 1,
-            icon: "🔥",
-            title: "7-day streak!",
-            description: "You’ve maintained your learning streak for 7 days! Keep it going",
-            image: "/images/achievements/streak.png",
-            buttonText: "Keep it going",
-            buttonColor: "#E74C3C"
-        },
-        {
-            id: 2,
-            icon: "📘",
-            title: "Module Complete",
-            description: "Well done! You’ve completed the 'Human Anatomy' module.",
-            image: "/images/achievements/module.png",
-            buttonText: "Continue learning",
-            buttonColor: "#3B5BDB"
-        },
-        {
-            id: 3,
-            icon: "🏅",
-            title: "You're a Star!",
-            description: "Amazing work! You’ve scored the highest in this week’s quiz challenge.",
-            image: "/images/achievements/star.png",
-            buttonText: "Awesome",
-            buttonColor: "#1A936F"
-        }
-    ];
-
-    useEffect(() => {
-        const fetchAchievements = async () => {
-            try {
-
-                // Future API
-                // const res = await getAchievements()
-
-                // Dummy for now
-                const res = dummyAchievements
-
-                setAchievements(res);
-
-            } catch (error) {
-                console.error("achievement fetch error", error);
-            }
-        };
-
-        fetchAchievements();
-    }, []);
 
     useEffect(() => {
         const storedUser = getStoredUser();
@@ -326,32 +273,7 @@ const UserProfile = () => {
 
                         {/* ACHIEVEMENTS */}
                         {selected === "achievements" && (
-                            <div className="flex flex-col h-full">
-
-                                {/* Top Title */}
-                                <h3 className="text-[22px] font-semibold text-center mt-4 mb-4">
-                                    Achievements
-                                </h3>
-
-                                {/* Scrollable Content */}
-                                <div className="flex-1 overflow-y-auto px-5 scrollbar">
-
-                                    <div className="grid grid-cols-2 gap-x-6 gap-y-8 mb-4">
-                                        {achievements.map((item) => (
-                                            <AchievementCard
-                                                key={item.id}
-                                                icon={item.icon}
-                                                title={item.title}
-                                                onClick={() => {
-                                                    setSelectedAchievement(item);
-                                                    setAchievementOpen(true);
-                                                }}
-                                            />
-                                        ))}
-                                    </div>
-
-                                </div>
-                            </div>
+                            <AchievementsSection />
                         )}
                     </div>
                 )}
@@ -369,14 +291,6 @@ const UserProfile = () => {
                         type="delete"
                         onClose={() => setDeleteOpen(false)}
                         onConfirm={() => console.log("delete api call")}
-                    />
-                )}
-
-                {achievementOpen && selectedAchievement && (
-                    <ConfirmModal
-                        type="achievement"
-                        achievement={selectedAchievement}
-                        onClose={() => setAchievementOpen(false)}
                     />
                 )}
             </div>
@@ -494,29 +408,6 @@ const ProfileItem = ({
             ) : (
                 <IoChevronForward size={18} />
             )}
-        </div>
-    );
-};
-
-const AchievementCard = ({
-    icon,
-    title,
-    onClick
-}: {
-    icon: string;
-    title: string;
-    onClick: () => void;
-}) => {
-    return (
-        <div
-            onClick={onClick}
-            className="bg-white rounded-[16px] p-3 shadow-md text-center cursor-pointer hover:shadow-lg transition"
-        >
-            <div className="text-[70px]">{icon}</div>
-
-            <p className="text-[18px] font-medium">
-                {title}
-            </p>
         </div>
     );
 };

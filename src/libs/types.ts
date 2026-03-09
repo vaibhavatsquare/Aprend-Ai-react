@@ -46,11 +46,10 @@ export interface UserDetail {
 }
 
 export interface Achievement {
-    id: number;
+    id: string;
     icon: string;
     title: string;
     description: string;
-    image: string;
     buttonText: string;
     buttonColor: string;
 };

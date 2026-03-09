@@ -1,5 +1,5 @@
 import { fetch } from "@/src/libs/helpers";
-import { UserLanguage } from "@/src/libs/types";
+import { UserLanguage, Achievement } from "@/src/libs/types";
 
 export const saveLanguage = async (data: {
   user_language: UserLanguage;
@@ -32,5 +32,24 @@ export const savePlacementQuiz = async (data: {
     url: "/onboarding/placement-quiz",
     method: "POST",
     data,
+  });
+};
+
+export type AchievementListResponse = {
+  data: Achievement[];
+  total: number;
+};
+
+export const getUserAchievements = async (params?: {
+  skip?: number;
+  take?: number;
+  include?: string;
+  search?: string;
+  orderBy?: string;
+}): Promise<AchievementListResponse> => {
+  return fetch<AchievementListResponse>({
+    url: "/reward/user-achievements",
+    method: "GET",
+    params,
   });
 };
