@@ -35,6 +35,11 @@ const SavedCard = ({
     return;
   }
 
+  if (type === "library") {
+    onOpenFlashcard?.(item.id);
+    return;
+  }
+
   sessionStorage.setItem("selectedNote", JSON.stringify(item));
   useRedirect(`/${type}/${item.id}`);
   };

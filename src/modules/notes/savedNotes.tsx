@@ -130,8 +130,8 @@ const SavedNotes = ({ showBack = false, onBack }: SavedNotesProps) => {
                 }}
             >
                 {/* 🔹 FIXED HEADER */}
-                <div className="py-3 px-6 flex items-center relative">
-
+                <div
+                    className={`py-3 px-6 flex items-center relative ${!initialLoading && notes.length === 0 ? "mt-5" : ""}`}>
                     {showBack && (
                         <GoArrowLeft
                             className="text-xl absolute left-8 cursor-pointer"

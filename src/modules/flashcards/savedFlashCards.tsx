@@ -158,7 +158,8 @@ const SavedFlashCards = ({
                 className="h-[calc(100vh-100px)] mt-1 mb-4 rounded-[32px] col-span-2 flex flex-col gap-4 overflow-hidden"
                 style={{ boxShadow: "0px 0px 4px 0px #00000040" }}
             >
-                <div className="py-3 px-6 flex items-center relative">
+                <div
+                    className={`py-3 px-6 flex items-center relative ${!initialLoading && flashCards.length === 0 ? "mt-5" : ""}`}>
                     {showBack && (
                         <GoArrowLeft
                             className="text-xl absolute left-8 cursor-pointer"

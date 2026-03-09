@@ -66,3 +66,13 @@ export const validateFlashcardAnswer = async (payload: {
     data: payload,
   });
 };
+
+export const generateVideoFlashcards = async (
+  videoSummaryId: string
+): Promise<Flashcard> => {
+  return fetch<Flashcard>({
+    url: "/ai-tutor/flashcards/video",
+    method: "POST",
+    data: { videoSummaryId },
+  });
+};
