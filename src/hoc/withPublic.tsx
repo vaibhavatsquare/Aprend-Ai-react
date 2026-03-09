@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { waitForAuthState } from "../libs/helpers";
+import { clearData, waitForAuthState } from "../libs/helpers";
 import { auth } from "../configs/firebase.config";
 import FullScreenLoader from "../components/loaders/fullScreenLoader";
 import { getCookie, removeCookie } from "../services/coockies/coockie.service";
@@ -20,8 +20,7 @@ function withPublic<P extends object>(
         if (user && idToken) {
           router.replace("/home"); // Replace with your protected home route
         } else {
-          removeCookie("idToken");
-          localStorage.clear();
+          clearData();
           setLoading(false);
         }
       });

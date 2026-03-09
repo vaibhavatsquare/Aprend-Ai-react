@@ -3,8 +3,9 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { User } from "firebase/auth";
 import { app } from "../configs/firebase.config";
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
-import { setCookie } from "../services/coockies/coockie.service";
+import { removeCookie, setCookie } from "../services/coockies/coockie.service";
 import { UserDetail } from "@/src/libs/types";
+import { disconnectSocket } from "../socket/socket";
 
 // Axios instance
 let axiosInstance: AxiosInstance | null = null;
@@ -179,4 +180,10 @@ export const lightenColor = (hex: string, percent: number) => {
 
 export const darkenColor = (hex: string, percent: number) => {
     return lightenColor(hex, -percent);
+};
+
+export const clearData = () => {
+    removeCookie("idToken");
+    disconnectSocket();
+    localStorage.clear();
 };

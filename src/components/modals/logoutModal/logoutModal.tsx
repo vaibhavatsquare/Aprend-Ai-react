@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Modal } from "antd";
 import { signOutUser } from "@/src/services/auth/auth.firebase.service";
 import { useRedirect } from "@/src/hooks/router.hooks";
-import { removeCookie } from "@/src/services/coockies/coockie.service";
+import { clearData } from "@/src/libs/helpers";
 
 const LogoutModal = ({ isModalOpen, setIsModalOpen }: any) => {
 
@@ -16,8 +16,7 @@ const LogoutModal = ({ isModalOpen, setIsModalOpen }: any) => {
       console.log(error);
     } finally {
       setIsModalOpen(false);
-      removeCookie("idToken");
-      localStorage.clear();
+      clearData();
       useRedirect("/login", true);
       setLoading(false);
     }

@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   env: {
     // API Endpoint Config
     NEXT_API_ENDPOINT: process.env.NEXT_API_ENDPOINT,
+    EXT_PUBLIC_SOCKET_URL: process.env.EXT_PUBLIC_SOCKET_URL,
 
     // Firebase Configuration
     FB_API_KEY: process.env.FB_API_KEY,

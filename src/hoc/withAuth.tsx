@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { waitForAuthState } from "../libs/helpers";
+import { clearData, waitForAuthState } from "../libs/helpers";
 import { auth } from "../configs/firebase.config";
 import FullScreenLoader from "../components/loaders/fullScreenLoader";
 import { getCookie, removeCookie } from "../services/coockies/coockie.service";
@@ -18,8 +18,7 @@ const withAuth = <P extends object>(
       const idToken = getCookie("idToken");
       waitForAuthState().then((user) => {
         if (!user || !idToken) {
-          removeCookie("idToken");
-          localStorage.clear();
+          clearData();
           router.replace("/login"); // Replace with your public login route
         } else {
           setLoading(false);
