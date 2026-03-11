@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { GoX } from "react-icons/go";
 import { Question } from "@/src/libs/types/dashboard.types";
-import { validateSimuladoAnswer } from "@/src/services/api/question.api";
-import { QuestionSource } from "@/src/libs/constants/helper";
+import { submitTaskAnswer, validateSimuladoAnswer } from "@/src/services/api/question.api";
+import { QuestionSource } from "@/src/libs/helpers";
 // import { getTaskQuestions } from "@/src/services/api/dashboard.api";
 
 type Props = {
@@ -113,26 +113,23 @@ const QuestionsBank = ({
 
         try {
             setSubmitting(true);
-
-            if (source === QuestionSource.SIMULADO) {
-                const res = await validateSimuladoAnswer({
+            let res;
+            if (source === QuestionSource.SIMULADO || source === QuestionSource.EXPLORE_QUESTION) {
+                res = await validateSimuladoAnswer({
                     questionId: currentQuestion.id,
                     selectedOptionId: selectedOption,
                 });
-
-                setStatus(res.isCorrect ? "correct" : "wrong");
-
-                // update explanation if API sends
-                currentQuestion.stepByStepExplanation = res.explanation;
-
             } else {
-                // normal flow
-                setStatus(
-                    selectedOption === currentQuestion.correctOptionId
-                        ? "correct"
-                        : "wrong"
-                );
+                res = await submitTaskAnswer({
+                    userTaskId: taskId!,
+                    questionId: currentQuestion.id,
+                    selectedOptionId: selectedOption,
+                });
             }
+
+            setStatus(res.isCorrect ? "correct" : "wrong");
+            currentQuestion.correctOptionId = res.correctOptionId;
+            currentQuestion.stepByStepExplanation = res.explanation ?? "";
 
         } catch (err) {
             console.error("Validate error", err);
@@ -140,6 +137,28 @@ const QuestionsBank = ({
             setSubmitting(false);
         }
     };
+
+    useEffect(() => {
+
+        if (!currentQuestion) return;
+
+        const attempt = currentQuestion.userQuestionAttempts?.[0];
+
+        if (!attempt) {
+            setSelectedOption(null);
+            setStatus("idle");
+            return;
+        }
+
+        setSelectedOption(attempt.selectedOptionId);
+
+        if (attempt.isCorrect) {
+            setStatus("correct");
+        } else {
+            setStatus("wrong");
+        }
+
+    }, [currentQuestion]);
 
     const resetState = () => {
         setSelectedOption(null);

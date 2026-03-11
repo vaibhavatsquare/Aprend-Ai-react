@@ -2,52 +2,52 @@ import { fetch } from "@/src/libs/helpers";
 import { Question } from "@/src/libs/types/dashboard.types";
 
 type GenerateSimuladoRequest = {
-    subject: string[];
-    numberOfQuestions: number;
-    difficulty: string;
+  subject: string[];
+  numberOfQuestions: number;
+  difficulty: string;
 };
 
 type SimuladoResponse = {
+  id: string;
+  title: string;
+  subject: string[];
+  difficulty: string;
+  questions: {
     id: string;
-    title: string;
-    subject: string[];
-    difficulty: string;
-    questions: {
-        id: string;
-        question: string;
-        explanation: string;
-        correctOptionId: string;
-        options: {
-            id: string;
-            text: string;
-        }[];
+    question: string;
+    explanation: string;
+    correctOptionId: string;
+    options: {
+      id: string;
+      text: string;
     }[];
+  }[];
 };
 
 export const generateSimuladoQuestions = async (
-    payload: GenerateSimuladoRequest
+  payload: GenerateSimuladoRequest
 ): Promise<{ id: string; questions: Question[] }> => {
 
-    const res = await fetch<SimuladoResponse>({
-        url: "/question-simulados/generate",
-        method: "POST",
-        data: payload,
-    });
+  const res = await fetch<SimuladoResponse>({
+    url: "/question-simulados/generate",
+    method: "POST",
+    data: payload,
+  });
 
-    return {
-        id: res.id,
-        questions: res.questions.map((q) => ({
-            id: q.id,
-            taskId: q.id,
-            questionText: q.question,
-            correctOptionId: q.correctOptionId,
-            stepByStepExplanation: q.explanation,
-            options: q.options,
-            source: "",
-            reinforcement: false,
-            createdAt: "",
-        })),
-    };
+  return {
+    id: res.id,
+    questions: res.questions.map((q) => ({
+      id: q.id,
+      taskId: q.id,
+      questionText: q.question,
+      correctOptionId: q.correctOptionId,
+      stepByStepExplanation: q.explanation,
+      options: q.options,
+      source: "",
+      reinforcement: false,
+      createdAt: "",
+    })),
+  };
 };
 
 type ValidateSimuladoRequest = {
@@ -69,5 +69,31 @@ export const validateSimuladoAnswer = async (
     url: "/question-simulados/validate",
     method: "POST",
     data: payload,
+  });
+};
+
+type SubmitTaskAnswerRequest = {
+  userTaskId: string;
+  questionId: string;
+  selectedOptionId: string;
+};
+
+type SubmitTaskAnswerResponse = {
+  questionId: string;
+  isCorrect: boolean;
+  correctOptionId: string;
+  explanation?: string;
+};
+
+export const submitTaskAnswer = async (
+  payload: SubmitTaskAnswerRequest
+): Promise<SubmitTaskAnswerResponse> => {
+
+  const { userTaskId, ...data } = payload;
+
+  return fetch<SubmitTaskAnswerResponse>({
+    url: `/tasks/submit-answer/${userTaskId}`,
+    method: "PATCH",
+    data,
   });
 };

@@ -7,7 +7,7 @@ import { generateSimuladoQuestions } from "@/src/services/api/question.api";
 import QuestionsBank from "./questionsBank";
 import { useRedirect } from "@/src/hooks/router.hooks";
 import { Question } from "@/src/libs/types/dashboard.types";
-import { difficulties, QuestionSource, subjects } from "@/src/libs/constants/helper";
+import { difficulties, QuestionSource, subjects } from "@/src/libs/helpers";
 
 const ChooseSubjects = ({
   onBack,

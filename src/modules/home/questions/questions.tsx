@@ -8,7 +8,7 @@ import ChooseSubjects from "./chooseSubjects";
 import { t } from "@/src/libs/i18n";
 import { Question } from "@/src/libs/types/dashboard.types";
 import QuestionsBank from "./questionsBank";
-import { QuestionSource } from "@/src/libs/constants/helper";
+import { QuestionSource } from "@/src/libs/helpers";
 
 const Questions = () => {
 
@@ -20,7 +20,7 @@ const Questions = () => {
         id: string;
         questions: Question[];
     } | null>(null);
-     const [source, setSource] = useState<QuestionSource>(QuestionSource.EXPLORE_QUESTION);
+    const [source, setSource] = useState<QuestionSource>(QuestionSource.EXPLORE_QUESTION);
 
     const ChooseSubject = async () => {
         setStep("chooseSubject")

@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-import { getMessaging, getToken } from "firebase/messaging";
+import { getMessaging, getToken, Messaging } from "firebase/messaging";
 
 const firebaseConfig = {
     apiKey: process.env.FB_API_KEY,
@@ -10,7 +10,7 @@ const firebaseConfig = {
     storageBucket: process.env.FB_STORAGE_BUCKET,
     messagingSenderId: process.env.FB_MESSAGING_SENDER_ID,
     appId: process.env.FB_APP_ID
-    
+
 };
 
 const app = initializeApp(firebaseConfig);
@@ -32,37 +32,37 @@ if (typeof window !== "undefined") {
     }
 }
 
+if (typeof window !== "undefined" && "serviceWorker" in navigator) {
+    try {
+        messaging = getMessaging(app);
+    } catch (error) {
+        console.error("Firebase messaging init error:", error);
+    }
+}
+
 /* FCM */
-const getFCMToken = async (registration: any): Promise<string> => {
-    if (typeof window !== "undefined" && "Notification" in window) {
-        try {
-            let permission = Notification.permission;
+const getFCMToken = async (
+    registration: ServiceWorkerRegistration
+): Promise<string | null> => {
+    if (!messaging) return null;
 
-            while (permission !== "granted") {
-                permission = await Notification.requestPermission();
+    try {
+        const permission = await Notification.requestPermission();
 
-                if (permission === "denied") {
-                    throw new Error("Notification permission denied by the user");
-                }
-            }
-
-            const currentToken = await getToken(messaging, {
-                vapidKey: process.env.FB_VAPID_KEY,
-                serviceWorkerRegistration: registration,
-            });
-
-            if (currentToken) {
-                return currentToken;
-            } else {
-                throw new Error("No registration token available.");
-            }
-        } catch (error) {
-            console.error("An error occurred while retrieving token:", error);
-            throw error;
+        if (permission !== "granted") {
+            console.warn("Notification permission not granted.");
+            return null;
         }
-    } else {
-        throw new Error("Notifications are not supported in this environment.");
+
+        const token = await getToken(messaging, {
+            vapidKey: process.env.NEXT_PUBLIC_FB_VAPID_KEY,
+            serviceWorkerRegistration: registration,
+        });
+
+        return token || null;
+    } catch (error) {
+        console.error("Error retrieving FCM token:", error);
+        return null;
     }
 };
-
 export { auth, app, db, getFCMToken, messaging };

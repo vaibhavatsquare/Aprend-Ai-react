@@ -10,6 +10,7 @@ import { message } from "antd";
 import ConfirmModal from "@/src/components/common/ConfirmModal";
 import SummaryDetail from "./SummaryDetail";
 import Flashcards from "../flashcards/flashCards";
+import { useInitialFetch } from "@/src/libs/helpersWithUseClient";
 
 const PAGE_LIMIT = 10;
 
@@ -35,9 +36,7 @@ const SavedLibrary = ({ showBack = false, onBack }: SavedLibraryProps) => {
 
     const observerRef = useRef<HTMLDivElement | null>(null);
 
-    useEffect(() => {
-        fetchLibrary(0, true);
-    }, []);
+    useInitialFetch(() => fetchLibrary(0, true));
 
     const fetchLibrary = async (currentSkip: number, isFirst = false) => {
         try {

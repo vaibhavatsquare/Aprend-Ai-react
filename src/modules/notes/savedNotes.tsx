@@ -9,6 +9,7 @@ import RenameModal from "@/src/components/common/RenameModal";
 import ConfirmModal from "@/src/components/common/ConfirmModal";
 import { message } from "antd";
 import { Note } from "@/src/libs/types/notes.types";
+import { useInitialFetch } from "@/src/libs/helpersWithUseClient";
 
 const PAGE_LIMIT = 10;
 
@@ -31,11 +32,10 @@ const SavedNotes = ({ showBack = false, onBack }: SavedNotesProps) => {
 
     const observerRef = useRef<HTMLDivElement | null>(null);
 
-    useEffect(() => {
-        fetchNotes(0, true);
-    }, []);
+    useInitialFetch(() => fetchNotes(0, true));
 
     const fetchNotes = async (currentSkip: number, isFirst = false) => {
+        if (loading) return;
         try {
             setLoading(true);
 
@@ -66,7 +66,12 @@ const SavedNotes = ({ showBack = false, onBack }: SavedNotesProps) => {
 
         const observer = new IntersectionObserver(
             (entries) => {
-                if (entries[0].isIntersecting && !loading) {
+                if (
+                    entries[0].isIntersecting &&
+                    !loading &&
+                    !initialLoading &&
+                    hasMore
+                ) {
                     const newSkip = skip + PAGE_LIMIT;
                     setSkip(newSkip);
                     fetchNotes(newSkip);

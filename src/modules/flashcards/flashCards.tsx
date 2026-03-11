@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { darkenColor, lightenColor } from "@/src/libs/helpers";
+import { darkenColor, lightenColor, QuestionSource } from "@/src/libs/helpers";
 import { GoChevronLeft, GoChevronRight, GoX } from "react-icons/go";
 import { IoCheckmark, IoClose } from "react-icons/io5";
 import { Question } from "@/src/libs/types/dashboard.types";
 import { t } from "@/src/libs/i18n";
 import { validateFlashcardAnswer } from "@/src/services/api/flashcards.api";
+import { submitTaskAnswer } from "@/src/services/api/question.api";
 
 const COLORS = [
     "#FDD891",
@@ -19,10 +20,16 @@ const COLORS = [
 type Props = {
     taskId?: string;
     initialQuestions?: Question[];
+    source?: QuestionSource;
     onClose?: () => void;
 };
 
-const Flashcards = ({ taskId, initialQuestions, onClose }: Props) => {
+const Flashcards = ({
+    taskId,
+    initialQuestions,
+    source,
+    onClose,
+}: Props) => {
     const [questions, setQuestions] = useState<Question[]>(
         initialQuestions || []
     );
@@ -46,6 +53,7 @@ const Flashcards = ({ taskId, initialQuestions, onClose }: Props) => {
     const isFirst = index === 0;
     const isLast = index === total - 1;
     const bgColor = COLORS[index % COLORS.length];
+    const streak = Number(localStorage.getItem("streak")) || 0;
 
     const resetState = () => {
         setSelected(null);
@@ -63,13 +71,43 @@ const Flashcards = ({ taskId, initialQuestions, onClose }: Props) => {
         setChecking(true);
 
         try {
-            const res = await validateFlashcardAnswer({
-                questionId: current.id,
-                selectedOptionId: option.id,
-            });
-
+            let res;
+            if (source === QuestionSource.HOME_PRACTICE_QUESTION) {
+                res = await submitTaskAnswer({
+                    userTaskId: taskId!,
+                    questionId: current.id,
+                    selectedOptionId: option.id,
+                });
+            } else {
+                res = await validateFlashcardAnswer({
+                    questionId: current.id,
+                    selectedOptionId: option.id,
+                });
+            }
             // update explanation from API
-            current.stepByStepExplanation = res.explanation;
+
+            setQuestions((prev) =>
+                prev.map((q) =>
+                    q.id === current.id
+                        ? {
+                            ...q,
+                            correctOptionId: res.correctOptionId,
+                            stepByStepExplanation: res.explanation ?? "",
+                            userQuestionAttempts: [
+                                {
+                                    id: "local",
+                                    userId: "",
+                                    userTaskId: taskId ?? "",
+                                    questionId: current.id,
+                                    selectedOptionId: option.id,
+                                    isCorrect: res.isCorrect,
+                                    createdAt: new Date().toISOString(),
+                                },
+                            ],
+                        }
+                        : q
+                )
+            );
 
         } catch (err) {
             console.error("Flashcard validate error", err);
@@ -78,6 +116,30 @@ const Flashcards = ({ taskId, initialQuestions, onClose }: Props) => {
             setShowResult(true);
         }
     };
+
+    useEffect(() => {
+
+        if (!current) return;
+
+        const attempt = current.userQuestionAttempts?.[0];
+        console.log("attempt: ", attempt)
+        if (!attempt) {
+            setSelected(null);
+            setShowResult(false);
+            setChecking(false);
+            return;
+        }
+
+        const selectedIndex = current.options.findIndex(
+            (o) => o.id === attempt.selectedOptionId
+        );
+        console.log("selectedIndex: ", selectedIndex)
+        if (selectedIndex !== -1) {
+            setSelected(selectedIndex);
+            setShowResult(true);
+        }
+
+    }, [current]);
 
     const next = () => {
         if (isLast) {
@@ -120,9 +182,11 @@ const Flashcards = ({ taskId, initialQuestions, onClose }: Props) => {
                         {t("flashcards.title")}
                     </h1>
 
-                    <div className="absolute right-8 text-[22px]">
-                        3 🔥
-                    </div>
+                    {streak > 0 && (
+                        <div className="absolute right-8 text-[22px]">
+                            {streak} 🔥
+                        </div>
+                    )}
 
                     {onClose && (
                         <GoX

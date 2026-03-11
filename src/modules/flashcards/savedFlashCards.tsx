@@ -38,7 +38,12 @@ const SavedFlashCards = ({
 
     const observerRef = useRef<HTMLDivElement | null>(null);
 
+    const fetched = useRef(false);
+
     useEffect(() => {
+        if (fetched.current) return;
+        fetched.current = true;
+
         fetchFlashCards(0, true);
     }, []);
 
@@ -46,6 +51,7 @@ const SavedFlashCards = ({
         currentSkip: number,
         isFirst = false
     ) => {
+        if (loading) return;
         try {
             setLoading(true);
 
@@ -82,11 +88,18 @@ const SavedFlashCards = ({
 
         const observer = new IntersectionObserver(
             (entries) => {
-                if (entries[0].isIntersecting && !loading) {
+
+                if (
+                    entries[0].isIntersecting &&
+                    !loading &&
+                    !initialLoading &&
+                    hasMore
+                ) {
                     const newSkip = skip + PAGE_LIMIT;
                     setSkip(newSkip);
                     fetchFlashCards(newSkip);
                 }
+
             },
             { threshold: 0.5 }
         );

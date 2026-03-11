@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { useRedirect } from "@/src/hooks/router.hooks";
-import { formatDate } from "@/src/libs/constants/helper";
+import { formatDate } from "@/src/libs/helpers";
 
 type CardType = "notes" | "flashcards" | "library";
 
@@ -17,7 +17,7 @@ type Props = {
   onRename: (id: string, title: string) => void;
   onDelete: (id: string) => void;
   onRemove: (id: string) => void;
-  onOpenFlashcard?: (id: string) => void; 
+  onOpenFlashcard?: (id: string) => void;
 };
 
 const SavedCard = ({
@@ -31,17 +31,17 @@ const SavedCard = ({
 
   const handleCardClick = () => {
     if (type === "flashcards") {
-    onOpenFlashcard?.(item.id);
-    return;
-  }
+      onOpenFlashcard?.(item.id);
+      return;
+    }
 
-  if (type === "library") {
-    onOpenFlashcard?.(item.id);
-    return;
-  }
+    if (type === "library") {
+      onOpenFlashcard?.(item.id);
+      return;
+    }
 
-  sessionStorage.setItem("selectedNote", JSON.stringify(item));
-  useRedirect(`/${type}/${item.id}`);
+    sessionStorage.setItem("selectedNote", JSON.stringify(item));
+    useRedirect(`/${type}/${item.id}`);
   };
 
   let mainIcon;
@@ -80,7 +80,7 @@ const SavedCard = ({
           </h3>
 
           <p className="text-[14px] text-secondary mt-1">
-            {formatDate(item.createdAt)} 
+            {formatDate(item.createdAt)}
           </p>
         </div>
       </div>

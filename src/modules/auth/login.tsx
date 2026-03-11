@@ -62,6 +62,7 @@ const Login = () => {
         if (token) {
           // console.log("FCM Token retrieved:", token);
           localStorage.setItem("notificationToken", token);
+          console.log("FCM Token set:", token);
           setFcmToken(token);
         } else {
           console.error("No FCM Token available.");

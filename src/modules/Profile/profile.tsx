@@ -8,7 +8,7 @@ import Image from "next/image";
 import { FiEdit2 } from "react-icons/fi";
 import { IoChevronForward } from "react-icons/io5";
 import { FaUserCircle } from "react-icons/fa";
-import { Switch, message } from "antd";
+import { Spin, Switch, message } from "antd";
 import { signOutUser } from "@/src/services/auth/auth.firebase.service";
 import ConfirmModal from "./confirmModal";
 import SavedLibrary from "./savedLibrary";
@@ -18,11 +18,13 @@ import LanguageSection from "./chooseLanguage";
 import { initializeAppLanguage } from "@/src/libs/helpers";
 import { t } from "@/src/libs/i18n";
 import AchievementsSection from "./achievementsSection";
+import { updateNotificationPreference } from "@/src/services/api/notification.api";
 
 const UserProfile = () => {
     const [user, setUser] = useState<UserDetail | null>(null);
     const [selected, setSelected] = useState<string | null>(null);
-    const [notifications, setNotifications] = useState(true);
+    const [notifications, setNotifications] = useState(false);
+    const [notificationLoading, setNotificationLoading] = useState(false);
     const [logoutOpen, setLogoutOpen] = useState(false);
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [selectedLanguage, setSelectedLanguage] = useState<UserLanguage | null>(null);
@@ -33,6 +35,10 @@ const UserProfile = () => {
         const storedUser = getStoredUser();
         setUser(storedUser);
         setSelectedLanguage(storedUser?.user_language || null);
+
+        if (storedUser) {
+            setNotifications(storedUser.notificationsEnabled);
+        }
     }, []);
 
     const educationLabel = (level?: string) => {
@@ -55,6 +61,25 @@ const UserProfile = () => {
             router.replace("/login");
         } catch {
             message.error(t('auth.logoutFailed'));
+        }
+    };
+
+    const handleNotificationToggle = async (value: boolean) => {
+        const notificationToken = localStorage.getItem("notificationToken");
+        console.log("FCM Token set:", notificationToken);
+        if (notificationLoading) return;
+        setNotificationLoading(true);
+        try {
+            await updateNotificationPreference(value);
+            setNotifications(value);
+            setUser((prev) =>
+                prev ? { ...prev, notificationsEnabled: value } : prev
+            );
+            message.success("Notification preference updated");
+        } catch (err) {
+            message.error("Failed to update notification preference");
+        } finally {
+            setNotificationLoading(false);
         }
     };
 
@@ -165,7 +190,8 @@ const UserProfile = () => {
                                     rightContent={
                                         <CustomSwitch
                                             checked={notifications}
-                                            onChange={setNotifications}
+                                            loading={notificationLoading}
+                                            onChange={handleNotificationToggle}
                                         />
                                     }
                                 />
@@ -415,20 +441,39 @@ const ProfileItem = ({
 const CustomSwitch = ({
     checked,
     onChange,
+    loading,
 }: {
     checked: boolean;
+    loading?: boolean;
     onChange: (val: boolean) => void;
 }) => {
+
     return (
-        <div
-            onClick={() => onChange(!checked)}
-            className={`w-[44px] h-[26px] flex items-center rounded-full cursor-pointer transition-all duration-300 ${checked ? "bg-[#0F3057]" : "bg-gray-300"
-                }`}
-        >
+        <div className="relative w-[44px] h-[26px] flex items-center">
+
+            {/* SWITCH */}
             <div
-                className={`w-[20px] h-[20px] bg-white rounded-full shadow-md transform transition-all duration-300 ${checked ? "translate-x-[21px]" : "translate-x-[3px]"
+                onClick={() => {
+                    if (!loading) onChange(!checked);
+                }}
+                className={`w-[44px] h-[26px] flex items-center rounded-full cursor-pointer transition-all duration-300 ${checked ? "bg-[#0F3057]" : "bg-gray-300"
                     }`}
-            />
+            >
+
+                <div
+                    className={`w-[20px] h-[20px] bg-white rounded-full shadow-md transform transition-all duration-300 ${checked ? "translate-x-[21px]" : "translate-x-[3px]"
+                        }`}
+                />
+
+            </div>
+
+            {/* LOADER */}
+            {loading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-white/60 rounded-full">
+                    <Spin size="small" />
+                </div>
+            )}
+
         </div>
     );
 };

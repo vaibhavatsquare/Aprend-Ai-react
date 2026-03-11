@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { GoArrowLeft } from "react-icons/go";
-import { formatDate } from "@/src/libs/constants/helper";
 import ReactMarkdown from "react-markdown";
+import { formatDate } from "@/src/libs/helpers";
 
 const NoteDetail = () => {
   const router = useRouter();

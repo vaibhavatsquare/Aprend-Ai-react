@@ -2,10 +2,10 @@
 
 import IconSparkel from "@/src/components/icons/iconSparkel";
 import { useRedirect } from "@/src/hooks/router.hooks";
-import { getCurrentWeek, getGreeting, getStoredUser } from "@/src/libs/helpers";
+import { getCurrentWeek, QuestionSource } from "@/src/libs/helpers";
 import { getDashboard } from "@/src/services/api/dashboard.api";
 import Image from "next/image";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AiOutlineFire } from "react-icons/ai";
 import { GoDotFill } from "react-icons/go";
 import { IoArrowForwardSharp } from "react-icons/io5";
@@ -13,7 +13,6 @@ import { LuChevronRight } from "react-icons/lu";
 import QuestionsBank from "./questions/questionsBank";
 import Flashcards from "../flashcards/flashCards";
 import { t } from "@/src/libs/i18n";
-import { QuestionSource } from "@/src/libs/constants/helper";
 
 const formatTaskType = (type: string) => {
   if (type === "FLASHCARD") return t('flashcards.title');
@@ -31,7 +30,12 @@ const Home = () => {
   const isToday = selectedDate === todayIso;
   const [activeTask, setActiveTask] = useState<any>(null);
 
+  const fetched = useRef(false);
+
   useEffect(() => {
+    if (fetched.current) return;
+    fetched.current = true;
+
     const load = async () => {
       try {
         const res = await getDashboard();
@@ -135,7 +139,7 @@ const Home = () => {
     if (type === "PRACTICE_QUESTION" || type === "CONCEPT_EXPLANATION") {
       return (
         <QuestionsBank
-          taskId={activeTask.task.id}
+          taskId={activeTask.id}
           initialQuestions={activeTask.task.questions}
           source={type === "PRACTICE_QUESTION" ? QuestionSource.HOME_PRACTICE_QUESTION : QuestionSource.HOME_CONCEPT_EXPLANATION}
           onClose={() => setActiveTask(null)}
@@ -146,8 +150,9 @@ const Home = () => {
     if (type === "FLASHCARD") {
       return (
         <Flashcards
-          taskId={activeTask.task.id}
+          taskId={activeTask.id}
           initialQuestions={activeTask.task.questions}
+          source={QuestionSource.HOME_PRACTICE_QUESTION}
           onClose={() => setActiveTask(null)}
         />
       );

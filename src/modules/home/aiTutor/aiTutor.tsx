@@ -590,7 +590,7 @@ const AiTutor = () => {
           {streak > 0 && (
             <div className="absolute -bottom-3 right-5 flex gap-2 items-center text-[#FFFFFF80] font-medium">
               <h2 className="text-5xl">{streak}</h2>
-              <p className="text-xl">days</p>
+              <p className="text-xl">{streak > 1 ? "days" : "day"}</p>
             </div>
           )}
         </div>

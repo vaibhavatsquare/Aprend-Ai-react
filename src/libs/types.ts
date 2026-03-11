@@ -1,6 +1,6 @@
 export interface response {
-    data?: any;
-    message?: string;
+  data?: any;
+  message?: string;
 }
 
 export interface UserSession {
@@ -37,6 +37,7 @@ export interface UserDetail {
   status: UserStatus;
   user_language: UserLanguage;
   user_EducationLevel: UserEducationLevel;
+  notificationsEnabled: boolean
   isDeleted: boolean;
   isEmailVerified: boolean;
   isPasswordReset: boolean;
@@ -46,10 +47,10 @@ export interface UserDetail {
 }
 
 export interface Achievement {
-    id: string;
-    icon: string;
-    title: string;
-    description: string;
-    buttonText: string;
-    buttonColor: string;
+  id: string;
+  icon: string;
+  title: string;
+  description: string;
+  buttonText: string;
+  buttonColor: string;
 };

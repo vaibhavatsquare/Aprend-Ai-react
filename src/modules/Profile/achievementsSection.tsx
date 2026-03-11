@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import ConfirmModal from "./confirmModal";
 import { Achievement } from "@/src/libs/types";
 import { getUserAchievements } from "@/src/services/api/user.api";
+import { useInitialFetch } from "@/src/libs/helpersWithUseClient";
 
 const PAGE_LIMIT = 10;
 
@@ -86,9 +87,7 @@ const AchievementsSection = () => {
     }
   };
 
-  useEffect(() => {
-    fetchAchievements(0, true);
-  }, []);
+  useInitialFetch(() => fetchAchievements(0, true));
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
 
