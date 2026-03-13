@@ -1,14 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { getStoredUser } from "@/src/libs/helpers";
-import { Achievement, UserDetail, UserLanguage } from "@/src/libs/types";
+import { useEffect, useRef, useState } from "react";
+import { getInitials, getStoredUser } from "@/src/libs/helpers";
+import { UserDetail, UserLanguage } from "@/src/libs/types";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { FiEdit2 } from "react-icons/fi";
 import { IoChevronForward } from "react-icons/io5";
-import { FaUserCircle } from "react-icons/fa";
-import { Spin, Switch, message } from "antd";
+import { Image as AntImage, Spin, Switch, message } from "antd";
 import { signOutUser } from "@/src/services/auth/auth.firebase.service";
 import ConfirmModal from "./confirmModal";
 import SavedLibrary from "./savedLibrary";
@@ -19,6 +18,9 @@ import { initializeAppLanguage } from "@/src/libs/helpers";
 import { t } from "@/src/libs/i18n";
 import AchievementsSection from "./achievementsSection";
 import { updateNotificationPreference } from "@/src/services/api/notification.api";
+import { getUserProfile } from "@/src/services/api/user.api";
+import EditProfileSection from "./editProfileSection";
+import { educationLevels } from "@/src/libs/constants/onboarding.constants";
 
 const UserProfile = () => {
     const [user, setUser] = useState<UserDetail | null>(null);
@@ -31,28 +33,40 @@ const UserProfile = () => {
 
     const router = useRouter();
 
-    useEffect(() => {
-        const storedUser = getStoredUser();
-        setUser(storedUser);
-        setSelectedLanguage(storedUser?.user_language || null);
+    // useEffect(() => {
+    const storedUser = getStoredUser();
+    //     setUser(storedUser);
+    //     setSelectedLanguage(storedUser?.user_language || null);
 
-        if (storedUser) {
-            setNotifications(storedUser.notificationsEnabled);
-        }
+    //     if (storedUser) {
+    //         setNotifications(storedUser.notificationsEnabled);
+    //     }
+    // }, []);
+
+    const fetched = useRef(false);
+
+    useEffect(() => {
+        if (fetched.current) return;
+        fetched.current = true;
+
+        const loadProfile = async () => {
+            try {
+                const res = await getUserProfile();
+                localStorage.setItem("user", JSON.stringify(res));
+                setUser(res);
+                setSelectedLanguage(res.user_language);
+                setNotifications(res.notificationsEnabled);
+            } catch (err) {
+                message.error("Failed to load profile");
+            }
+        };
+
+        loadProfile();
     }, []);
 
-    const educationLabel = (level?: string) => {
-        switch (level) {
-            case "HIGH_SCHOOL":
-                return "High School";
-            case "UNIVERSITY":
-                return "University";
-            case "COMPETITIVE_EXAMS":
-                return "Competitive Exams";
-            default:
-                return "—";
-        }
-    };
+    const educationLabel = educationLevels.find(
+        (e) => e.value === user?.user_EducationLevel
+    )?.label || "—";
 
     const handleLogout = async () => {
         try {
@@ -129,24 +143,25 @@ const UserProfile = () => {
                         <div className="p-4">
                             {/* PROFILE HEADER */}
                             <div className="flex flex-col items-center text-center">
-                                <div className="relative w-[100px] h-[100px]">
+                                <div className="relative w-[110px] h-[110px]">
                                     {user?.image ? (
-                                        <Image
+                                        <AntImage
                                             src={user.image}
                                             alt="profile"
-                                            fill
-                                            className="rounded-full object-cover"
+                                            width={100}
+                                            height={100}
+                                            preview={false}
+                                            className="rounded-full object-fill shadow-[0_-3px_8px_rgba(0,0,0,0.15)]"
                                         />
                                     ) : (
-                                        <FaUserCircle
-                                            size={100}
-                                            className="text-gray-300"
-                                        />
+                                        <div className="w-full h-full rounded-full bg-[#0F3057] flex items-center justify-center text-white text-[32px] font-semibold">
+                                            {getInitials(displayName)}
+                                        </div>
                                     )}
 
                                     <div
                                         onClick={() => setSelected("editProfile")}
-                                        className="absolute bottom-0 right-0 w-[32px] h-[32px] bg-white rounded-full flex items-center justify-center shadow">
+                                        className="absolute bottom-1 right-1 w-[32px] h-[32px] bg-white rounded-full flex items-center justify-center shadow">
                                         <FiEdit2 size={16} />
                                     </div>
                                 </div>
@@ -164,7 +179,7 @@ const UserProfile = () => {
                                         {t('profile.educationLevel')}
                                     </span>{" "}
                                     <span className="text-[16px] font-medium text-secondary">
-                                        {educationLabel(user?.user_EducationLevel)}
+                                        {educationLabel}
                                     </span>
                                 </div>
                             </div>
@@ -262,7 +277,13 @@ const UserProfile = () => {
 
                         {/* EDIT PROFILE */}
                         {selected === "editProfile" && (
-                            <EditProfileSection user={user} />
+                            <EditProfileSection
+                                user={user}
+                                onUpdated={(data) =>
+                                    setUser((prev) => prev ? { ...prev, ...data } : prev)
+                                }
+                                onCancel={() => setSelected(null)}
+                            />
                         )}
 
                         {/* LANGUAGE */}
@@ -319,31 +340,6 @@ const UserProfile = () => {
                         onConfirm={() => console.log("delete api call")}
                     />
                 )}
-            </div>
-        </div>
-    );
-};
-
-const EditProfileSection = ({ user }: { user: UserDetail | null }) => {
-    return (
-        <div>
-            <h3 className="text-[20px] font-semibold mb-6">
-                {t('profile.editProfile')}
-            </h3>
-
-            <div className="space-y-4">
-                <InputField label={t('profile.name')} value={user?.name || ""} />
-                <InputField label={t('profile.emailAddress')} value={user?.email || ""} disabled />
-                <InputField label="High School" value="High School" />
-            </div>
-
-            <div className="flex justify-end mt-6 gap-3">
-                <button className="px-4 py-2 bg-gray-100 rounded-[8px]">
-                    {t('common.cancel')}
-                </button>
-                <button className="px-4 py-2 bg-[#0F3057] text-white rounded-[8px]">
-                    {t('common.save')}
-                </button>
             </div>
         </div>
     );

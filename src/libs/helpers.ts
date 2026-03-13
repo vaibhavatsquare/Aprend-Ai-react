@@ -235,3 +235,12 @@ export enum QuestionSource {
     SIMULADO = "SIMULADO",
     EXPLORE_QUESTION = "EXPLORE_QUESTION",
 }
+
+export const getInitials = (name: string) => {
+    const parts = name.split(" ");
+    if (parts.length === 1) return parts[0][0]?.toUpperCase();
+    return (
+        parts[0][0].toUpperCase() +
+        parts[parts.length - 1][0].toUpperCase()
+    );
+};
