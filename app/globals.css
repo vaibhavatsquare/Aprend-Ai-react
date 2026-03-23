@@ -114,3 +114,9 @@ body {
 .custom-switch.ant-switch-checked {
   background-color: #0F3057 !important;
 }
+
+.custom-notification {
+  border-radius: 12px !important;
+  padding: 14px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+}

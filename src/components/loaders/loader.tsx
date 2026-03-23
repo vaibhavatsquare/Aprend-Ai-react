@@ -6,9 +6,9 @@ const Loader = () => {
   return (
     <div className="w-full h-full absolute top-0 left-0 flex items-center justify-center bg-[#ffffff] z-50">
       <div className="flex gap-3 justify-center items-center">
-        <Image src="/images/appLogo.svg" alt="Loading" width={150} height={150} />
+        <img src="/images/appLogo.svg" alt="Loading" className="w-[150px] h-[150px]" />
         <div className="flex flex-col text-primary items-center">
-          <div className={`${styles.loader}`}/>
+          <div className={`${styles.loader}`} />
         </div>
       </div>
     </div>

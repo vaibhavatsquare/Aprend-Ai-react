@@ -270,12 +270,10 @@ const Home = () => {
               index === 2 ? <span key={index} className="font-medium">{word}</span> : word
             )}
           </h2>
-          <Image
+          <img
             src="/images/home/robot.svg"
             alt="AI Tutor"
-            width={120}
-            height={120}
-            className="absolute bottom-0 right-0"
+            className="w-[120px] h-[120px] absolute bottom-0 right-0"
           />
         </div>
 

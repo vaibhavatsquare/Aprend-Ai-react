@@ -174,7 +174,7 @@ const SignUp = () => {
 
     try {
       setIsLoading(true);
-       await resendOtp(userEmail)
+      await resendOtp(userEmail)
       message.success("OTP resent");
       startResendTimer();
     } catch {

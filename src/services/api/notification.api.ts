@@ -12,6 +12,8 @@ export interface NotificationItem {
 export interface NotificationListResponse {
     list: NotificationItem[];
     hasMany: boolean;
+    total?: number;
+    count?: number;
 };
 
 export const getNotifications = async (params?: {
