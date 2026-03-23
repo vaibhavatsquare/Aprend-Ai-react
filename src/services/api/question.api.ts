@@ -97,3 +97,34 @@ export const submitTaskAnswer = async (
     data,
   });
 };
+
+export const questionBankSimuladoQuestions = async (
+  payload: GenerateSimuladoRequest
+): Promise<{ id: string; questions: Question[] }> => {
+
+  const res = await fetch<SimuladoResponse>({
+    url: "/question-simulados/question-bank",
+    method: "GET",
+    params: {
+      subject: payload.subject.join(","),
+      difficulty: payload.difficulty,
+      skip: 0,
+      take: 50,
+    }
+  });
+
+  return {
+    id: res.id,
+    questions: res.questions.map((q) => ({
+      id: q.id,
+      taskId: q.id,
+      questionText: q.question,
+      correctOptionId: q.correctOptionId,
+      stepByStepExplanation: q.explanation,
+      options: q.options,
+      source: "",
+      reinforcement: false,
+      createdAt: "",
+    })),
+  };
+};

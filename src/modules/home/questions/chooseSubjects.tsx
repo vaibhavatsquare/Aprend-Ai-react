@@ -3,11 +3,12 @@
 import { useState } from "react";
 import { GoArrowLeft } from "react-icons/go";
 import { t } from "@/src/libs/i18n";
-import { generateSimuladoQuestions } from "@/src/services/api/question.api";
+import { generateSimuladoQuestions, questionBankSimuladoQuestions } from "@/src/services/api/question.api";
 import QuestionsBank from "./questionsBank";
 import { useRedirect } from "@/src/hooks/router.hooks";
 import { Question } from "@/src/libs/types/dashboard.types";
 import { difficulties, QuestionSource, subjects } from "@/src/libs/helpers";
+import { message } from "antd";
 
 const ChooseSubjects = ({
   onBack,
@@ -30,15 +31,19 @@ const ChooseSubjects = ({
   // TOGGLE SUBJECT
   const handleSubject = (value: string) => {
 
-    // If ALL clicked
+    // 👉 Explore = single select
+    if (isExplore) {
+      setSelectedSubjects([value]);
+      return;
+    }
+
+    // 👉 Simulado = multi select (existing logic)
     if (value === "ALL") {
       setSelectedSubjects(["ALL"]);
       return;
     }
 
     setSelectedSubjects((prev) => {
-
-      // remove ALL if selecting specific subject
       const filtered = prev.filter((s) => s !== "ALL");
 
       if (filtered.includes(value)) {
@@ -61,7 +66,7 @@ const ChooseSubjects = ({
       return;
     }
 
-    if (isSimulado && !selectedDifficulty) {
+    if ((isSimulado || isExplore) && !selectedDifficulty) {
       alert("Please select difficulty");
       return;
     }
@@ -78,7 +83,7 @@ const ChooseSubjects = ({
       }
 
       let res;
-
+      console.log("isSimulado", subjectsForApi, selectedDifficulty)
       if (isSimulado) {
         res = await generateSimuladoQuestions({
           subject: subjectsForApi,
@@ -88,17 +93,27 @@ const ChooseSubjects = ({
       }
 
       if (isExplore) {
-        // res = await generateExploreQuestions({
-        //   subject: subjectsForApi,
-        // });
+        res = await questionBankSimuladoQuestions({
+          subject: Array.isArray(subjectsForApi)
+            ? subjectsForApi
+            : [subjectsForApi],
+          numberOfQuestions: value,
+          difficulty: selectedDifficulty || "EASY",
+        });
       }
 
       onStartQuestions?.({
         id: res?.id || "",
         questions: res?.questions || [],
       });
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+
+      console.log("ERROR RAW:", err);
+
+      const errorMessage =
+        err?.message || "Something went wrong";
+
+      message.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -114,27 +129,29 @@ const ChooseSubjects = ({
 
       {/* SUBJECT BUTTONS */}
       <div className="flex gap-3 flex-wrap">
-        {subjects.map((item) => {
-          const isSelected = selectedSubjects.includes(item.value);
+        {subjects
+          .filter((item) => !(isExplore && item.value === "ALL"))
+          .map((item) => {
+            const isSelected = selectedSubjects.includes(item.value);
 
-          return (
-            <div
-              key={item.value}
-              onClick={() => handleSubject(item.value)}
-              className="h-[36px] px-4 flex items-center rounded-[4px] border text-[18px] cursor-pointer transition-all"
-              style={{
-                borderColor: isSelected ? "#0F3057" : "#DADADA",
-                color: isSelected ? "#0F3057" : "#121212",
-                background: isSelected ? "#F5F9FF" : "white",
-              }}
-            >
-              {item.label}
-            </div>
-          );
-        })}
+            return (
+              <div
+                key={item.value}
+                onClick={() => handleSubject(item.value)}
+                className="h-[36px] px-4 flex items-center rounded-[4px] border text-[18px] cursor-pointer transition-all"
+                style={{
+                  borderColor: isSelected ? "#0F3057" : "#DADADA",
+                  color: isSelected ? "#0F3057" : "#121212",
+                  background: isSelected ? "#F5F9FF" : "white",
+                }}
+              >
+                {item.label}
+              </div>
+            );
+          })}
       </div>
 
-      {isSimulado && (
+      {(isSimulado || isExplore) && (
         <>
           {/* SPACING */}
           <div className="h-[34px]" />
@@ -221,11 +238,11 @@ const ChooseSubjects = ({
         </>
       )}
 
-      {isExplore && (
+      {/* {isExplore && (
         <>
           <div className="h-[300px]" />
         </>
-      )}
+      )} */}
 
       {/* BUTTONS */}
       <div className="flex justify-center gap-6 mt-20">
