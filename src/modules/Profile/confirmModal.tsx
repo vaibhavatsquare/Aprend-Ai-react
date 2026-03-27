@@ -19,9 +19,7 @@ const ConfirmModal = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-[2px]">
-
       <div className="bg-white w-[400px] rounded-[12px] p-4 relative">
-
         {/* Close */}
         <button
           onClick={onClose}
@@ -33,28 +31,17 @@ const ConfirmModal = ({
         {/* Achievement Layout */}
         {isAchievement && achievement ? (
           <div className="text-center pt-2">
+            <h2 className="text-[26px] font-semibold">New Achievement</h2>
 
-            <h2 className="text-[26px] font-semibold">
-              New Achievement
-            </h2>
-
-            {/* <div className="flex justify-center mb-4">
-              <Image
-                src={achievement.icon}
+            <div className="flex justify-center mb-4">
+              <img
+                src={achievement.image}
                 alt="achievement"
-                width={80}
-                height={80}
+                 className="w-50 h-50 object-contain"
               />
-            </div> */}
-            <div className="flex justify-center">
-              <div className="text-[100px]">
-                {achievement.icon}
-              </div>
             </div>
 
-            <h3 className="text-[18px] font-medium">
-              {achievement.title}
-            </h3>
+            <h3 className="text-[18px] font-medium">{achievement.title}</h3>
 
             <p className="text-[14px] text-secondary mt-2 px-4">
               {achievement.description}
@@ -62,10 +49,10 @@ const ConfirmModal = ({
 
             <button
               onClick={onClose}
-              style={{ backgroundColor: achievement.buttonColor }}
+              style={{ backgroundColor: achievement.code }}
               className="h-[40px] rounded-[20px] mt-6 px-6 py-2 rounded-[8px] text-white font-semibold mb-4"
             >
-              {achievement.buttonText}
+              {achievement.buttonName}
             </button>
           </div>
         ) : (
@@ -97,8 +84,9 @@ const ConfirmModal = ({
 
               <button
                 onClick={onConfirm}
-                className={`flex-1 h-[40px] rounded-[8px] text-white ${isDelete ? "bg-red-500" : "bg-[#0F3057]"
-                  }`}
+                className={`flex-1 h-[40px] rounded-[8px] text-white ${
+                  isDelete ? "bg-red-500" : "bg-[#0F3057]"
+                }`}
               >
                 {isDelete ? t("common.delete") : t("nav.logout")}
               </button>

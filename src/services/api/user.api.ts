@@ -36,8 +36,10 @@ export const savePlacementQuiz = async (data: {
 };
 
 export type AchievementListResponse = {
-  data: Achievement[];
+  list: any[];
   total: number;
+  count: number;
+  hasMany: boolean;
 };
 
 export const getUserAchievements = async (params?: {

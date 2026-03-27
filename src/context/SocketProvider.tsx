@@ -8,7 +8,6 @@ import ConfirmModal from "../modules/Profile/confirmModal";
 const SocketContext = createContext<any>(null);
 
 export const SocketProvider = ({ children }: any) => {
-
   const [userId, setUserId] = useState<string | null>(null);
   const [achievement, setAchievement] = useState<any>(null);
 
@@ -28,14 +27,23 @@ export const SocketProvider = ({ children }: any) => {
 
     socket.on("achievementUnlocked", (payload: any) => {
       console.log("🎉 Achievement event:", payload);
-      setAchievement(payload.data);
+
+      const data = payload.data;
+
+      setAchievement({
+        id: Date.now().toString(),
+        title: data.title,
+        description: data.description,
+        image: data.image,
+        buttonName: data.buttonName,
+        code: data.code,
+      });
     });
 
     return () => {
       socket.off("achievementUnlocked");
       disconnectSocket();
     };
-
   }, [userId]);
 
   return (

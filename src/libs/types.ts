@@ -48,9 +48,9 @@ export interface UserDetail {
 
 export interface Achievement {
   id: string;
-  icon: string;
+  image: string;
   title: string;
   description: string;
-  buttonText: string;
-  buttonColor: string;
+  buttonName: string;
+  code: string;
 };
