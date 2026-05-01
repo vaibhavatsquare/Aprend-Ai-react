@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { GoArrowLeft } from "react-icons/go";
-import { t } from "@/src/libs/i18n";
+import { useTranslation } from "@/src/libs/i18n";
 import { generateSimuladoQuestions, questionBankSimuladoQuestions } from "@/src/services/api/question.api";
 import QuestionsBank from "./questionsBank";
 import { useRedirect } from "@/src/hooks/router.hooks";
@@ -20,7 +20,7 @@ const ChooseSubjects = ({
   source: QuestionSource;
 }) => {
   const [value, setValue] = useState(12);
-
+const { t } = useTranslation();
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);

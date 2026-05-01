@@ -19,7 +19,7 @@ import { deleteFile, uploadImage } from "@/src/services/api/upload.api";
 import { createNote } from "@/src/services/api/notes.api";
 import { generateFlashcards } from "@/src/services/api/flashcards.api";
 import { getStoredUser } from "@/src/libs/helpers";
-import { t } from "@/src/libs/i18n";
+import { useTranslation } from "@/src/libs/i18n";
 import { useSearchParams } from "next/navigation";
 
 const AudioWaveform = dynamic(
@@ -33,6 +33,7 @@ const AudioPlayer = dynamic(
 );
 
 const AiTutor = () => {
+  const { t } = useTranslation();
   const inputRef = useRef<HTMLInputElement>(null);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -603,7 +604,10 @@ const AiTutor = () => {
           <IoArrowForwardSharp className="text-lg -rotate-45 cursor-pointer" />
         </div>
 
-        <div className="flex gap-2 items-center justify-between p-4 rounded-xl border border-[#DADADA] cursor-pointer hover:bg-gray-50 transition-colors">
+        <div
+          className="flex gap-2 items-center justify-between p-4 rounded-xl border border-[#DADADA] cursor-pointer hover:bg-gray-50 transition-colors"
+          onClick={() => useRedirect("/home/weak-spot-tracker")}
+        >
           <p className="text-sm font-medium">{t('home.weakSpotTracker.title')}</p>
           <IoArrowForwardSharp className="text-lg -rotate-45 cursor-pointer" />
         </div>

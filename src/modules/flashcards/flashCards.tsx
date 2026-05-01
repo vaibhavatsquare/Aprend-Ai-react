@@ -5,7 +5,7 @@ import { darkenColor, lightenColor, QuestionSource } from "@/src/libs/helpers";
 import { GoChevronLeft, GoChevronRight, GoX } from "react-icons/go";
 import { IoCheckmark, IoClose } from "react-icons/io5";
 import { Question } from "@/src/libs/types/dashboard.types";
-import { t } from "@/src/libs/i18n";
+import { useTranslation } from "@/src/libs/i18n";
 import { validateFlashcardAnswer } from "@/src/services/api/flashcards.api";
 import { submitTaskAnswer } from "@/src/services/api/question.api";
 
@@ -23,7 +23,7 @@ const Flashcards = ({ taskId, initialQuestions, source, onClose }: Props) => {
     initialQuestions || [],
   );
   const [loading, setLoading] = useState(!initialQuestions);
-
+const { t } = useTranslation();
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [revealed, setRevealed] = useState(false);

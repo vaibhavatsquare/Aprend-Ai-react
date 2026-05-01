@@ -13,7 +13,7 @@ import { TbCards } from "react-icons/tb";
 import NotesIcon from "../icons/notesIcon";
 import UserIcon from "../icons/userIcon";
 import { useRouter } from "next/navigation";
-import { t } from "@/src/libs/i18n";
+import { useTranslation } from "@/src/libs/i18n";
 
 const poppins = Poppins({
   weight: ["300", "400", "500", "600", "700"],
@@ -22,6 +22,7 @@ const poppins = Poppins({
 
 const Sidebar = () => {
   const path = usePathname();
+  const { t } = useTranslation();
   const [selectedItem, setSelectedItem] = useState("");
 
   const { isCollapsed, setIsCollapsed, setIsTabChangeLoading } =

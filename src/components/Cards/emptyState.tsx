@@ -1,12 +1,13 @@
 import { HiOutlineDocumentText } from "react-icons/hi2";
 import { PiCardsLight } from "react-icons/pi";
-import { t } from "@/src/libs/i18n";
+import { useTranslation } from "@/src/libs/i18n";
 
 const EmptyState = ({
     type,
 }: {
     type: "notes" | "flashcards" | "library";
 }) => {
+    const { t } = useTranslation();
     const config = {
         notes: {
             icon: (

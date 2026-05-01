@@ -5,13 +5,13 @@ import Image from "next/image";
 import { GoArrowLeft, GoArrowRight } from "react-icons/go";
 import { useBack, useRedirect } from "@/src/hooks/router.hooks";
 import ChooseSubjects from "./chooseSubjects";
-import { t } from "@/src/libs/i18n";
+import { useTranslation } from "@/src/libs/i18n";
 import { Question } from "@/src/libs/types/dashboard.types";
 import QuestionsBank from "./questionsBank";
 import { QuestionSource } from "@/src/libs/helpers";
 
 const Questions = () => {
-
+const { t } = useTranslation();
     const [step, setStep] = useState<
         "question" | "chooseSubject" | "questionsBank"
     >("question");

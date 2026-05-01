@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import SavedCard from "../../components/Cards/savedCards";
 import EmptyState from "@/src/components/Cards/emptyState";
 import { GoArrowLeft } from "react-icons/go";
-import { t } from "@/src/libs/i18n";
+import { useTranslation } from "@/src/libs/i18n";
 import { getSummaries, removeSummary, Summary } from "@/src/services/api/summary.api";
 import { message } from "antd";
 import ConfirmModal from "@/src/components/common/ConfirmModal";
@@ -23,7 +23,7 @@ const SavedLibrary = ({ showBack = false, onBack }: SavedLibraryProps) => {
 
     const [library, setLibrary] = useState<Summary[]>([]);
     const [skip, setSkip] = useState(0);
-
+const { t } = useTranslation();
     const [loading, setLoading] = useState(false);
     const [initialLoading, setInitialLoading] = useState(true);
     const [hasMore, setHasMore] = useState(true);

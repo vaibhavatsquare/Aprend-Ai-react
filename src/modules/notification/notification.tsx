@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { t } from "@/src/libs/i18n";
+import { useTranslation } from "@/src/libs/i18n";
 import {
     getNotifications,
     NotificationItem,
@@ -14,7 +14,7 @@ const NotificationDropdown = () => {
     const [notifications, setNotifications] = useState<NotificationItem[]>([]);
     const [skip, setSkip] = useState(0);
     const [hasMore, setHasMore] = useState(true);
-
+const { t } = useTranslation();
     const [loading, setLoading] = useState(false);
     const [initialLoading, setInitialLoading] = useState(true);
 

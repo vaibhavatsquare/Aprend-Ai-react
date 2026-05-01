@@ -4,7 +4,7 @@ import { useState } from "react";
 import { GoArrowLeft } from "react-icons/go";
 import { Summary } from "@/src/services/api/summary.api";
 import { generateVideoFlashcards } from "@/src/services/api/flashcards.api";
-import { t } from "@/src/libs/i18n";
+import { useTranslation } from "@/src/libs/i18n";
 import { mapFlashcardQuestions } from "@/src/libs/types/flashcards.types";
 import { Question } from "@/src/libs/types/dashboard.types";
 
@@ -20,7 +20,7 @@ type Props = {
 const SummaryDetail = ({ summary, onFlashcardReady, onBack }: Props) => {
 
   const [loading, setLoading] = useState(false);
-
+const { t } = useTranslation();
   const handleGenerate = async () => {
 
   try {

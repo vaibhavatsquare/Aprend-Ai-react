@@ -11,11 +11,11 @@ import {
   setFocusMode
 } from "@/src/libs/helpers";
 import NotificationDropdown from "@/src/modules/notification/notification";
-import { t } from "@/src/libs/i18n";
+import { useTranslation } from "@/src/libs/i18n";
 import { listenForNotifications } from "@/src/libs/notificationListener";
 
 const Navbar = () => {
-
+const { t } = useTranslation();
   const [user, setUser] = useState<UserDetail | null>(null);
   const [greeting, setGreeting] = useState("");
   const [open, setOpen] = useState(false);

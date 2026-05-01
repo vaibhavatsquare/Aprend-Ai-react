@@ -6,7 +6,8 @@ import Image from "next/image";
 import { message } from "antd";
 import { useLanguageStore } from "@/src/store/language.store";
 import { saveLanguage } from "@/src/services/api/user.api";
-import { t } from "@/src/libs/i18n";
+// import { useTranslation } from "@/src/libs/i18n";
+import { useTranslation } from "@/src/libs/i18n";
 import { UserLanguage } from "@/src/libs/types";
 
 const LanguageSection = ({
@@ -18,6 +19,7 @@ const LanguageSection = ({
 }) => {
 
     const [selectedLang, setSelectedLang] = useState<UserLanguage | null>(null);
+    const { t } = useTranslation();
     const setLanguage = useLanguageStore((s) => s.setLanguage);
 
     // Preselect existing language

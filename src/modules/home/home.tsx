@@ -12,7 +12,7 @@ import { IoArrowForwardSharp } from "react-icons/io5";
 import { LuChevronRight } from "react-icons/lu";
 import QuestionsBank from "./questions/questionsBank";
 import Flashcards from "../flashcards/flashCards";
-import { t } from "@/src/libs/i18n";
+import { useTranslation,t } from "@/src/libs/i18n";
 
 const formatTaskType = (type: string) => {
   if (type === "FLASHCARD") return t('flashcards.title');
@@ -22,6 +22,7 @@ const formatTaskType = (type: string) => {
 };
 
 const Home = () => {
+  const { t } = useTranslation();
   const [dashboard, setDashboard] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<string>("");
@@ -296,7 +297,11 @@ const Home = () => {
           <IoArrowForwardSharp className="text-lg -rotate-45" />
         </div>
 
-        <div className="flex gap-2 items-center justify-between p-4 rounded-xl border border-[#DADADA] cursor-pointer hover:bg-gray-50 transition-colors">
+        {/* ── Only change: added onClick to navigate to Weak Spot Tracker ── */}
+        <div
+          className="flex gap-2 items-center justify-between p-4 rounded-xl border border-[#DADADA] cursor-pointer hover:bg-gray-50 transition-colors"
+          onClick={() => useRedirect("/home/weak-spot-tracker")}
+        >
           <p className="text-sm font-medium">{t('home.weakSpotTracker.title')}</p>
           <IoArrowForwardSharp className="text-lg -rotate-45 cursor-pointer" />
         </div>

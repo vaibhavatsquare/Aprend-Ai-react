@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { FiLogOut, FiTrash2 } from "react-icons/fi";
-import { t } from "@/src/libs/i18n";
+import { useTranslation } from "@/src/libs/i18n";
 import { Achievement } from "@/src/libs/types";
 
 const ConfirmModal = ({
@@ -16,7 +16,7 @@ const ConfirmModal = ({
 }) => {
   const isDelete = type === "delete";
   const isAchievement = type === "achievement";
-
+const { t } = useTranslation();
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-[2px]">
       <div className="bg-white w-[400px] rounded-[12px] p-4 relative">

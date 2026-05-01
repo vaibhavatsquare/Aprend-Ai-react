@@ -1,4 +1,5 @@
 import { UserLanguage } from './types';
+import { useLanguageStore } from '@/src/store/language.store';
 
 // Type-safe translation keys
 type TranslationKey =
@@ -1034,3 +1035,20 @@ export const isValidTranslationKey = (key: string): key is TranslationKey => {
 
 // Export translations for type checking
 export { translations };
+
+export const useTranslation = () => {
+    const language = useLanguageStore((s) => s.language);
+
+    const translate = (key: TranslationKey, params?: Record<string, string | number>): string => {
+        const translation = translations[language]?.[key] || translations.ENGLISH[key] || key;
+        if (params) {
+            return Object.entries(params).reduce(
+                (str: string, [param, value]) => str.replace(new RegExp(`{${param}}`, 'g'), String(value)),
+                translation
+            );
+        }
+        return translation;
+    };
+
+    return { t: translate, language };
+};
