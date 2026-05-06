@@ -19,7 +19,16 @@ const nextConfig: NextConfig = {
     //Encryption
     AES_KEY_BASE64: process.env.AES_KEY_BASE64,
     AES_IV_BASE64: process.env.AES_IV_BASE64,
-  }
+  },
+ async rewrites() {
+    return [
+      {
+        source: "/api/:path*",
+        destination: "http://45.55.48.121/:path*",
+      },
+    ];
+  },
+
 };
 
 export default nextConfig;
