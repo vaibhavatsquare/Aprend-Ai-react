@@ -44,6 +44,7 @@ export interface UserDetail {
   isPlacementQuizDone: boolean;
   createdAt: string;
   updatedAt: string;
+  isPremium?: boolean;
 }
 
 export interface Achievement {

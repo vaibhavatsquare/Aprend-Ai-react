@@ -6,4 +6,5 @@ export const protectedPathNames = [
     "/notes",
     "/profile",
     "/onboarding",
+    "/subscription",
 ];

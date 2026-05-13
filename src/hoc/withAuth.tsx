@@ -14,17 +14,24 @@ const withAuth = <P extends object>(
     const router = useRouter();
     const [loading, setLoading] = useState(true);
 
-    const checkAuthState = () => {
-      const idToken = getCookie("idToken");
-      waitForAuthState().then((user) => {
+   const checkAuthState = () => {
+    const idToken = getCookie("idToken");
+
+    // If already authenticated, skip loader
+    if (auth.currentUser && idToken) {
+        setLoading(false);
+        return;
+    }
+
+    waitForAuthState().then((user) => {
         if (!user || !idToken) {
-          clearData();
-          router.replace("/login"); // Replace with your public login route
+            clearData();
+            router.replace("/login");
         } else {
-          setLoading(false);
+            setLoading(false);
         }
-      });
-    };
+    });
+};
 
     useEffect(() => {
       checkAuthState();

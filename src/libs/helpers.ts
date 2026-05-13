@@ -244,3 +244,9 @@ export const getInitials = (name: string) => {
         parts[parts.length - 1][0].toUpperCase()
     );
 };
+
+export const getIsPremium = (): boolean => {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    return user?.isPremium === true ||
+        user?.subscriptions?.some((s: any) => s.subscriptionStatus === "ACTIVE") || false;
+};

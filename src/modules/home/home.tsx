@@ -4,6 +4,7 @@ import IconSparkel from "@/src/components/icons/iconSparkel";
 import { useRedirect } from "@/src/hooks/router.hooks";
 import { getCurrentWeek, QuestionSource } from "@/src/libs/helpers";
 import { getDashboard } from "@/src/services/api/dashboard.api";
+// import { getSubscription } from "@/src/services/api/subscription.api";
 import Image from "next/image";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AiOutlineFire } from "react-icons/ai";
@@ -12,7 +13,8 @@ import { IoArrowForwardSharp } from "react-icons/io5";
 import { LuChevronRight } from "react-icons/lu";
 import QuestionsBank from "./questions/questionsBank";
 import Flashcards from "../flashcards/flashCards";
-import { useTranslation,t } from "@/src/libs/i18n";
+import { useTranslation, t } from "@/src/libs/i18n";
+import { Modal } from "antd";
 
 const formatTaskType = (type: string) => {
   if (type === "FLASHCARD") return t('flashcards.title');
@@ -30,10 +32,22 @@ const Home = () => {
   const todayIso = new Date().toISOString().split("T")[0];
   const isToday = selectedDate === todayIso;
   const [activeTask, setActiveTask] = useState<any>(null);
+  const [isPremium, setIsPremium] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   const fetched = useRef(false);
+useEffect(() => {
+    const checkPremium = () => {
+        const user = JSON.parse(localStorage.getItem("user") || "{}");
+        setIsPremium(
+            user?.isPremium === true ||
+            user?.subscriptions?.some((s: any) => s.subscriptionStatus === "ACTIVE")
+        );
+    };
 
-  useEffect(() => {
+    checkPremium();
+    const timer = setTimeout(checkPremium, 1000);
+
     if (fetched.current) return;
     fetched.current = true;
 
@@ -50,58 +64,44 @@ const Home = () => {
     };
 
     load();
+
+    return () => clearTimeout(timer);
   }, []);
+
+  const handleWeakSpotClick = () => {
+    if (!isPremium) {
+      setShowUpgradeModal(true);
+      return;
+    }
+    useRedirect("/home/weak-spot-tracker");
+  };
 
   if (loading) {
     return (
       <div className="px-4 grid grid-cols-3 gap-2 animate-pulse">
-
         {/* LEFT SIDE */}
         <div className="h-[calc(100vh-80px)] p-2 col-span-2 flex flex-col gap-4">
-
-          {/* Streak Card */}
           <div className="h-[120px] rounded-lg bg-gray-200" />
-
-          {/* Week Selector */}
           <div className="flex gap-2">
             {[1, 2, 3, 4, 5, 6, 7].map((i) => (
-              <div
-                key={i}
-                className="w-[56px] h-[66px] rounded-lg bg-gray-200"
-              />
+              <div key={i} className="w-[56px] h-[66px] rounded-lg bg-gray-200" />
             ))}
           </div>
-
-          {/* Task Header */}
           <div className="flex justify-between items-center">
             <div className="h-6 w-32 bg-gray-200 rounded" />
             <div className="h-6 w-24 bg-gray-200 rounded" />
           </div>
-
-          {/* Task List */}
           <div className="flex flex-col gap-3">
             {[1, 2, 3, 4].map((i) => (
-              <div
-                key={i}
-                className="h-[72px] rounded-[14px] bg-gray-200"
-              />
+              <div key={i} className="h-[72px] rounded-[14px] bg-gray-200" />
             ))}
           </div>
         </div>
-
         {/* RIGHT SIDE */}
         <div className="flex flex-col gap-4 h-[calc(100vh-80px)] p-2">
-
-          {/* AI Tutor Card */}
           <div className="h-[126px] rounded-xl bg-gray-200" />
-
-          {/* Upload Notes */}
           <div className="h-[166px] rounded-xl bg-gray-200" />
-
-          {/* Question Bank */}
           <div className="h-[60px] rounded-xl bg-gray-200" />
-
-          {/* Weak Spot */}
           <div className="h-[60px] rounded-xl bg-gray-200" />
         </div>
       </div>
@@ -164,7 +164,7 @@ const Home = () => {
     <div className="px-4 grid grid-cols-3 gap-2">
       <div className="h-[calc(100vh-80px)] p-2 overflow-y-auto scrollbar col-span-2 flex flex-col gap-4">
 
-        {/* SAME STREAK DESIGN */}
+        {/* STREAK */}
         <div className="relative w-full flex items-start justify-between gap-4 rounded-lg px-4 py-6 bg-linear-to-r from-[#F97316] via-[#ED482F] to-[#EF4444]">
           <h1 className="text-xl text-white">
             {streakTitle}
@@ -180,43 +180,29 @@ const Home = () => {
           )}
         </div>
 
-        {/* SAME WEEK DESIGN */}
+        {/* WEEK */}
         <div className="flex gap-2 items-center">
           {week.map((date, index) => {
             const iso = date.toISOString().split("T")[0];
             const isSelected = iso === selectedDate;
-
             return (
               <div
                 key={index}
                 onClick={() => setSelectedDate(iso)}
                 className={`w-[56px] h-[66px] rounded-lg flex flex-col items-center justify-center cursor-pointer transition-all border
-          ${isSelected
-                    ? "bg-[#1E3A5F] text-white border-[#1E3A5F]"
-                    : "bg-white text-black border-[#E5E5E5]"
-                  }`}
-                style={{
-                  boxShadow: "0px 2px 6px rgba(0,0,0,0.06)",
-                }}
+                  ${isSelected ? "bg-[#1E3A5F] text-white border-[#1E3A5F]" : "bg-white text-black border-[#E5E5E5]"}`}
+                style={{ boxShadow: "0px 2px 6px rgba(0,0,0,0.06)" }}
               >
-                <p
-                  className={`text-[16px] font-regular ${isSelected ? "text-white" : "text-secondary"
-                    }`}
-                >
-                  {date
-                    .toLocaleDateString("en-US", { weekday: "short" })
-                    .toUpperCase()}
+                <p className={`text-[16px] font-regular ${isSelected ? "text-white" : "text-secondary"}`}>
+                  {date.toLocaleDateString("en-US", { weekday: "short" }).toUpperCase()}
                 </p>
-
-                <p className="text-[16px] font-medium">
-                  {date.getDate()}
-                </p>
+                <p className="text-[16px] font-medium">{date.getDate()}</p>
               </div>
             );
           })}
         </div>
 
-        {/* TASK SECTION SAME */}
+        {/* TASKS */}
         <div className="flex flex-col gap-6">
           <div className="flex gap-2 items-center justify-between">
             <h2 className="text-xl font-semibold">{isToday ? t('home.tasks.todaysTask') : ""}</h2>
@@ -251,7 +237,6 @@ const Home = () => {
                     </span>
                   </p>
                 </div>
-
                 <LuChevronRight className="text-2xl text-secondary" />
               </div>
             ))}
@@ -259,7 +244,7 @@ const Home = () => {
         </div>
       </div>
 
-      {/* RIGHT SIDE UNTOUCHED */}
+      {/* RIGHT SIDE */}
       <div className="flex flex-col gap-4 h-[calc(100vh-80px)] p-2 overflow-y-auto scrollbar">
         <div
           className="relative h-[126px] border-2 border-[#3A86FF] flex flex-col justify-end gap-4 bg-primary rounded-xl p-4 cursor-pointer"
@@ -284,9 +269,7 @@ const Home = () => {
         >
           <IoArrowForwardSharp className="text-xl -rotate-45 absolute top-4 right-4 cursor-pointer" />
           <h2 className="text-lg font-medium">{t('home.aiTutor.uploadNotes')}</h2>
-          <p>
-            {t('home.aiTutor.uploadDescription')}
-          </p>
+          <p>{t('home.aiTutor.uploadDescription')}</p>
         </div>
 
         <div
@@ -297,15 +280,66 @@ const Home = () => {
           <IoArrowForwardSharp className="text-lg -rotate-45" />
         </div>
 
-        {/* ── Only change: added onClick to navigate to Weak Spot Tracker ── */}
+        {/* ── Weak Spot Tracker — premium only ── */}
         <div
-          className="flex gap-2 items-center justify-between p-4 rounded-xl border border-[#DADADA] cursor-pointer hover:bg-gray-50 transition-colors"
-          onClick={() => useRedirect("/home/weak-spot-tracker")}
+          onClick={handleWeakSpotClick}
+          className={`flex gap-2 items-center justify-between p-4 rounded-xl border transition-colors
+            ${isPremium
+              ? "border-[#DADADA] cursor-pointer hover:bg-gray-50"
+              : "border-[#DADADA] cursor-pointer opacity-40"
+            }`}
         >
-          <p className="text-sm font-medium">{t('home.weakSpotTracker.title')}</p>
-          <IoArrowForwardSharp className="text-lg -rotate-45 cursor-pointer" />
+          <div className="flex items-center gap-2">
+            {!isPremium && (
+              <svg width="16" height="13" viewBox="0 0 81 63" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4.93797 44.4392L0.0332797 12.56C-0.329533 10.2058 2.35259 8.59866 4.25803 10.0284L19.5392 21.4879C19.9364 21.7855 20.39 21.9989 20.8725 22.1153C21.355 22.2317 21.8561 22.2485 22.3452 22.1648C22.8344 22.081 23.3014 21.8984 23.7177 21.6282C24.1339 21.358 24.4908 21.0057 24.7663 20.593L37.489 1.51172C38.8327 -0.503906 41.7943 -0.503906 43.1381 1.51172L55.8607 20.593C56.1363 21.0057 56.4931 21.358 56.9094 21.6282C57.3257 21.8984 57.7926 22.081 58.2818 22.1648C58.771 22.2485 59.2721 22.2317 59.7546 22.1153C60.237 21.9989 60.6907 21.7855 61.0879 21.4879L76.369 10.0284C78.2772 8.59866 80.9566 10.2058 80.5938 12.56L75.6891 44.4392H4.93797ZM71.9992 62.1283H8.6279C8.14334 62.1283 7.66351 62.0328 7.21583 61.8474C6.76814 61.662 6.36137 61.3902 6.01872 61.0475C5.32673 60.3555 4.93797 59.417 4.93797 58.4383V50.3355H75.6891V58.4383C75.6891 60.4755 74.0363 62.1283 71.9992 62.1283Z" fill="#9CA3AF" />
+              </svg>
+            )}
+            <p className={`text-sm font-medium ${!isPremium ? "text-gray-400" : ""}`}>
+              {t('home.weakSpotTracker.title')}
+            </p>
+          </div>
+          <IoArrowForwardSharp className={`text-lg -rotate-45 ${!isPremium ? "text-gray-400" : ""}`} />
         </div>
       </div>
+
+      {/* UPGRADE MODAL */}
+      <Modal
+        open={showUpgradeModal}
+        onCancel={() => setShowUpgradeModal(false)}
+        footer={null}
+        centered
+        width={400}
+      >
+        <div className="flex flex-col items-center gap-4 py-4">
+          <div className="w-16 h-16 flex items-center justify-center">
+            <svg width="81" height="63" viewBox="0 0 81 63" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4.93797 44.4392L0.0332797 12.56C-0.329533 10.2058 2.35259 8.59866 4.25803 10.0284L19.5392 21.4879C19.9364 21.7855 20.39 21.9989 20.8725 22.1153C21.355 22.2317 21.8561 22.2485 22.3452 22.1648C22.8344 22.081 23.3014 21.8984 23.7177 21.6282C24.1339 21.358 24.4908 21.0057 24.7663 20.593L37.489 1.51172C38.8327 -0.503906 41.7943 -0.503906 43.1381 1.51172L55.8607 20.593C56.1363 21.0057 56.4931 21.358 56.9094 21.6282C57.3257 21.8984 57.7926 22.081 58.2818 22.1648C58.771 22.2485 59.2721 22.2317 59.7546 22.1153C60.237 21.9989 60.6907 21.7855 61.0879 21.4879L76.369 10.0284C78.2772 8.59866 80.9566 10.2058 80.5938 12.56L75.6891 44.4392H4.93797ZM71.9992 62.1283H8.6279C8.14334 62.1283 7.66351 62.0328 7.21583 61.8474C6.76814 61.662 6.36137 61.3902 6.01872 61.0475C5.32673 60.3555 4.93797 59.417 4.93797 58.4383V50.3355H75.6891V58.4383C75.6891 60.4755 74.0363 62.1283 71.9992 62.1283Z" fill="#1B2A4A" />
+            </svg>
+          </div>
+          <h3 className="text-[20px] font-bold text-gray-900 text-center">
+            Premium Feature
+          </h3>
+          <p className="text-[14px] text-secondary text-center">
+            Weak Spot Tracker is a premium feature. Upgrade your plan to get advanced analytics and track your weak spots.
+          </p>
+          <button
+            onClick={() => {
+              setShowUpgradeModal(false);
+              useRedirect("/profile?open=subscription");
+            }}
+            className="w-full h-[48px] bg-primary text-white rounded-[12px] text-[15px] font-semibold hover:opacity-90 transition-opacity"
+          >
+            Upgrade To Premium
+          </button>
+          <button
+            onClick={() => setShowUpgradeModal(false)}
+            className="text-[14px] text-secondary hover:text-gray-700 transition-colors"
+          >
+            Maybe later
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 };

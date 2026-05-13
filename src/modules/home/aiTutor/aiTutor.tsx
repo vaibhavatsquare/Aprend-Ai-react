@@ -4,7 +4,7 @@ import IconSparkel from "@/src/components/icons/iconSparkel";
 import { setSearchParam, useBack, useRedirect } from "@/src/hooks/router.hooks";
 import { useAudioRecorder } from "@/src/hooks/useAudioRecorder";
 import dynamic from "next/dynamic";
-import { Image as AntImage, message as antMessage } from "antd";
+import { Image as AntImage, message as antMessage, Modal } from "antd";
 import Image from "next/image";
 import { useRef, useState, useEffect, useCallback } from "react";
 import { AiOutlineFire } from "react-icons/ai";
@@ -50,6 +50,7 @@ const AiTutor = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [isSavingNote, setIsSavingNote] = useState(false);
   const [isGeneratingFlashcard, setIsGeneratingFlashcard] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const searchParams = useSearchParams();
   const hasTriggeredUpload = useRef(false);
 
@@ -605,13 +606,65 @@ const AiTutor = () => {
         </div>
 
         <div
-          className="flex gap-2 items-center justify-between p-4 rounded-xl border border-[#DADADA] cursor-pointer hover:bg-gray-50 transition-colors"
-          onClick={() => useRedirect("/home/weak-spot-tracker")}
+          onClick={() => {
+            const user = JSON.parse(localStorage.getItem("user") || "{}");
+            const isPremium = user?.isPremium === true || user?.subscriptions?.some((s: any) => s.subscriptionStatus === "ACTIVE");
+            if (!isPremium) {
+              setShowUpgradeModal(true);
+              return;
+            }
+            useRedirect("/home/weak-spot-tracker");
+          }}
+          className={`flex gap-2 items-center justify-between p-4 rounded-xl border border-[#DADADA] cursor-pointer transition-colors ${JSON.parse(localStorage.getItem("user") || "{}").isPremium
+            ? "hover:bg-gray-50"
+            : "opacity-40"
+            }`}
         >
-          <p className="text-sm font-medium">{t('home.weakSpotTracker.title')}</p>
+          <div className="flex items-center gap-2">
+            {!JSON.parse(localStorage.getItem("user") || "{}").isPremium && (
+              <svg width="16" height="13" viewBox="0 0 81 63" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4.93797 44.4392L0.0332797 12.56C-0.329533 10.2058 2.35259 8.59866 4.25803 10.0284L19.5392 21.4879C19.9364 21.7855 20.39 21.9989 20.8725 22.1153C21.355 22.2317 21.8561 22.2485 22.3452 22.1648C22.8344 22.081 23.3014 21.8984 23.7177 21.6282C24.1339 21.358 24.4908 21.0057 24.7663 20.593L37.489 1.51172C38.8327 -0.503906 41.7943 -0.503906 43.1381 1.51172L55.8607 20.593C56.1363 21.0057 56.4931 21.358 56.9094 21.6282C57.3257 21.8984 57.7926 22.081 58.2818 22.1648C58.771 22.2485 59.2721 22.2317 59.7546 22.1153C60.237 21.9989 60.6907 21.7855 61.0879 21.4879L76.369 10.0284C78.2772 8.59866 80.9566 10.2058 80.5938 12.56L75.6891 44.4392H4.93797ZM71.9992 62.1283H8.6279C8.14334 62.1283 7.66351 62.0328 7.21583 61.8474C6.76814 61.662 6.36137 61.3902 6.01872 61.0475C5.32673 60.3555 4.93797 59.417 4.93797 58.4383V50.3355H75.6891V58.4383C75.6891 60.4755 74.0363 62.1283 71.9992 62.1283Z" fill="#9CA3AF" />
+              </svg>
+            )}
+            <p className="text-sm font-medium">{t('home.weakSpotTracker.title')}</p>
+          </div>
           <IoArrowForwardSharp className="text-lg -rotate-45 cursor-pointer" />
         </div>
       </div>
+      <Modal
+        open={showUpgradeModal}
+        onCancel={() => setShowUpgradeModal(false)}
+        footer={null}
+        centered
+        width={400}
+      >
+        <div className="flex flex-col items-center gap-4 py-4">
+          <div className="w-16 h-16 flex items-center justify-center">
+            <svg width="81" height="63" viewBox="0 0 81 63" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4.93797 44.4392L0.0332797 12.56C-0.329533 10.2058 2.35259 8.59866 4.25803 10.0284L19.5392 21.4879C19.9364 21.7855 20.39 21.9989 20.8725 22.1153C21.355 22.2317 21.8561 22.2485 22.3452 22.1648C22.8344 22.081 23.3014 21.8984 23.7177 21.6282C24.1339 21.358 24.4908 21.0057 24.7663 20.593L37.489 1.51172C38.8327 -0.503906 41.7943 -0.503906 43.1381 1.51172L55.8607 20.593C56.1363 21.0057 56.4931 21.358 56.9094 21.6282C57.3257 21.8984 57.7926 22.081 58.2818 22.1648C58.771 22.2485 59.2721 22.2317 59.7546 22.1153C60.237 21.9989 60.6907 21.7855 61.0879 21.4879L76.369 10.0284C78.2772 8.59866 80.9566 10.2058 80.5938 12.56L75.6891 44.4392H4.93797ZM71.9992 62.1283H8.6279C8.14334 62.1283 7.66351 62.0328 7.21583 61.8474C6.76814 61.662 6.36137 61.3902 6.01872 61.0475C5.32673 60.3555 4.93797 59.417 4.93797 58.4383V50.3355H75.6891V58.4383C75.6891 60.4755 74.0363 62.1283 71.9992 62.1283Z" fill="#1B2A4A" />
+            </svg>
+          </div>
+          <h3 className="text-[20px] font-bold text-gray-900 text-center">Premium Feature</h3>
+          <p className="text-[14px] text-secondary text-center">
+            Weak Spot Tracker is a premium feature. Upgrade your plan to get advanced analytics and track your weak spots.
+          </p>
+          <button
+            onClick={() => {
+              setShowUpgradeModal(false);
+              useRedirect("/profile?open=subscription");
+            }}
+            className="w-full h-[48px] bg-primary text-white rounded-[12px] text-[15px] font-semibold hover:opacity-90 transition-opacity"
+          >
+            Upgrade To Premium
+          </button>
+          <button
+            onClick={() => setShowUpgradeModal(false)}
+            className="text-[14px] text-secondary hover:text-gray-700 transition-colors"
+          >
+            Maybe later
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 };
