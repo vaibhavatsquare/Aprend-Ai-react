@@ -82,7 +82,7 @@ const Navbar = () => {
       <div className="flex flex-col gap-1">
         <h1 className="text-[18px] font-medium">
           {greeting}
-          {displayName === "" ? "" : "," + displayName + "!"} 👋
+          {displayName === "" ? "" : ", " + displayName + "!"} 👋
         </h1>
         <p className="text-xs text-secondary">
           {t("home.readyToStart")}

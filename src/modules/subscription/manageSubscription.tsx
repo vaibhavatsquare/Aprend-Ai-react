@@ -9,6 +9,7 @@ const ManageSubscriptionPage = () => {
     const [subscription, setSubscription] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [cancelling, setCancelling] = useState(false);
+    // const redirect = useRedirect();
 
     const loadSubscription = async () => {
         try {
@@ -25,6 +26,16 @@ const ManageSubscriptionPage = () => {
     useEffect(() => {
         loadSubscription();
     }, []);
+    
+    useEffect(() => {
+    const handlePageShow = (e: PageTransitionEvent) => {
+        if (e.persisted) {
+            setLoading(false);
+        }
+    };
+    window.addEventListener("pageshow", handlePageShow);
+    return () => window.removeEventListener("pageshow", handlePageShow);
+}, []);
 
     const handleCancel = async () => {
         if (cancelling) return;

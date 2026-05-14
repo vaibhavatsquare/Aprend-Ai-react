@@ -96,7 +96,7 @@ const Login = () => {
       const { user, idToken } = result;
 
       setCookie("idToken", idToken, 7);
-      await authenticateWithAPI(fcmToken);
+      // await authenticateWithAPI(fcmToken);
       message.success("Signed in with Google");
       const res = await authenticateWithAPI(fcmToken);
       handlePostLoginRedirect(res.user);

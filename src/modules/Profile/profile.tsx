@@ -685,10 +685,16 @@ const UserProfile = () => {
 
     // Handle Stripe redirect back to profile
     useEffect(() => {
-        const sub = searchParams.get("subscription");
-        const open = searchParams.get("open");
+    const sub = searchParams.get("subscription");
+    const open = searchParams.get("open");
 
-        if (sub === "success") {
+    // ✅ User came back from Stripe via browser Back button
+    if (sessionStorage.getItem("stripeRedirect")) {
+        sessionStorage.removeItem("stripeRedirect");
+        setSelected("subscription");
+    }
+
+    if (sub === "success") {
             setSelected("subscription");
             getUserProfile().then((profileRes) => {
                 localStorage.setItem("user", JSON.stringify(profileRes));
@@ -1004,8 +1010,13 @@ const SubscriptionSection = () => {
     // }, []);
 
     useEffect(() => {
-        const user = JSON.parse(localStorage.getItem("user") || "{}");
-        const isPremiumUser = user?.isPremium === true;
+    // ✅ Reset upgrading spinner if user came back from Stripe
+    if (sessionStorage.getItem("stripeRedirect")) {
+        setUpgrading(false);
+    }
+
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const isPremiumUser = user?.isPremium === true;
 
         if (isPremiumUser) {
             // Get active subscription from user's subscriptions array
@@ -1021,6 +1032,16 @@ const SubscriptionSection = () => {
         }
         setLoadingSubscription(false);
     }, []);
+
+    useEffect(() => {
+    const handlePageShow = (e: PageTransitionEvent) => {
+        if (e.persisted) {
+            setUpgrading(false);
+        }
+    };
+    window.addEventListener("pageshow", handlePageShow);
+    return () => window.removeEventListener("pageshow", handlePageShow);
+}, []);
 
     const isActive = subscription?.subscriptionStatus === "ACTIVE";
 
@@ -1043,28 +1064,54 @@ const SubscriptionSection = () => {
         }
     };
 
+    // const handleUpgrade = async () => {
+    //     if (upgrading) return;
+    //     setUpgrading(true);
+    //     try {
+    //         const res = await createCheckoutSession({
+    //             plan: selectedPlan.toUpperCase() as "MONTHLY" | "YEARLY",
+    //             planType: selectedPlan.toUpperCase() as "MONTHLY" | "YEARLY",
+    //             countryCode: "BR",
+    //             successUrl: `${window.location.origin}/profile?subscription=success`,
+    //             cancelUrl: `${window.location.origin}/profile?subscription=cancel`,
+    //         });
+    //         if (res?.url) {
+    //             window.location.href = res.url;
+    //         } else {
+    //             message.error("Failed to create checkout session.");
+    //         }
+    //     } catch {
+    //         message.error("Failed to start checkout. Please try again.");
+    //     } finally {
+    //         setUpgrading(false);
+    //     }
+    // };
+
     const handleUpgrade = async () => {
-        if (upgrading) return;
-        setUpgrading(true);
-        try {
-            const res = await createCheckoutSession({
-                plan: selectedPlan.toUpperCase() as "MONTHLY" | "YEARLY",
-                planType: selectedPlan.toUpperCase() as "MONTHLY" | "YEARLY",
-                countryCode: "BR",
-                successUrl: `${window.location.origin}/profile?subscription=success`,
-                cancelUrl: `${window.location.origin}/profile?subscription=cancel`,
-            });
-            if (res?.url) {
-                window.location.href = res.url;
-            } else {
-                message.error("Failed to create checkout session.");
-            }
-        } catch {
-            message.error("Failed to start checkout. Please try again.");
-        } finally {
+    if (upgrading) return;
+    setUpgrading(true);
+    try {
+        const res = await createCheckoutSession({
+            plan: selectedPlan.toUpperCase() as "MONTHLY" | "YEARLY",
+            planType: selectedPlan.toUpperCase() as "MONTHLY" | "YEARLY",
+            countryCode: "BR",
+            successUrl: `${window.location.origin}/profile?subscription=success`,
+            cancelUrl: `${window.location.origin}/profile?subscription=cancel`,
+        });
+        // console.log(window.location.origin);
+        if (res?.url) {
+            // ✅ Save flag before leaving
+            sessionStorage.setItem("stripeRedirect", "true");
+            window.location.href = res.url;
+        } else {
+            message.error("Failed to create checkout session.");
             setUpgrading(false);
         }
-    };
+    } catch {
+        message.error("Failed to start checkout. Please try again.");
+        setUpgrading(false);
+    }
+};
 
     // ── Loading state ─────────────────────────────────────────────────────────
     if (loadingSubscription) {
@@ -1140,7 +1187,7 @@ const SubscriptionSection = () => {
         <div className="flex flex-col h-full overflow-y-auto scrollbar">
             <div className="flex justify-end mb-2">
                 <button className="text-[14px] text-primary underline">
-                    Restore.
+                    {/* Restore. */}
                 </button>
             </div>
 
@@ -1158,7 +1205,8 @@ const SubscriptionSection = () => {
                 <div
                     className={`border rounded-[12px] overflow-hidden cursor-pointer transition-all ${selectedPlan === "free" ? "border-primary" : "border-gray-200"}`}
                     style={{ backgroundColor: "#F7F7F8" }}
-                    onClick={() => { setSelectedPlan("free"); setExpandedFree((p) => !p); }}
+                    // onClick={() => { setSelectedPlan("free"); setExpandedFree((p) => !p); }}
+                    onClick={() => { setSelectedPlan("free"); setExpandedFree((p) => !p); setExpandedMonthly(false); setExpandedYearly(false); }}
                 >
                     <div className="w-full flex items-center justify-between px-4 py-3">
                         <span className="text-[15px] font-semibold text-gray-900">FREE</span>
@@ -1183,7 +1231,8 @@ const SubscriptionSection = () => {
                 <div
                     className={`border rounded-[12px] overflow-hidden cursor-pointer transition-all ${selectedPlan === "monthly" ? "border-primary" : "border-gray-200"}`}
                     style={{ backgroundColor: "#F7F7F8" }}
-                    onClick={() => { setSelectedPlan("monthly"); setExpandedMonthly((p) => !p); }}
+                    // onClick={() => { setSelectedPlan("monthly"); setExpandedMonthly((p) => !p); }}
+                    onClick={() => { setSelectedPlan("monthly"); setExpandedMonthly((p) => !p); setExpandedFree(false); setExpandedYearly(false); }}
                 >
                     <div className="flex items-center justify-between px-4 py-3">
                         <div>
@@ -1213,7 +1262,8 @@ const SubscriptionSection = () => {
                 <div
                     className={`border rounded-[12px] overflow-hidden cursor-pointer transition-all ${selectedPlan === "yearly" ? "border-primary" : "border-gray-200"}`}
                     style={{ backgroundColor: "#F7F7F8" }}
-                    onClick={() => { setSelectedPlan("yearly"); setExpandedYearly((p) => !p); }}
+                    // onClick={() => { setSelectedPlan("yearly"); setExpandedYearly((p) => !p); }}
+                    onClick={() => { setSelectedPlan("yearly"); setExpandedYearly((p) => !p); setExpandedFree(false); setExpandedMonthly(false); }}
                 >
                     <div className="flex items-center justify-between px-4 py-3">
                         <div>

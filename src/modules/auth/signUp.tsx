@@ -12,6 +12,8 @@ import { setCookie } from "@/src/services/coockies/coockie.service";
 import { authenticateWithAPI, resendOtp, sendOtp, verifyOtp } from "@/src/services/api/auth.api";
 import { getFCMToken } from "@/src/configs/firebase.config";
 import MiniLoader from "@/src/components/loaders/MiniLoader";
+import { signOut } from "firebase/auth";
+import { auth } from "@/src/configs/firebase.config";
 
 interface SignUpFormData {
   email: string;
@@ -116,6 +118,11 @@ const SignUp = () => {
       await sendOtp(data.email, false)
       setIsOtpSent(true);
       startResendTimer();
+      await signOut(auth);
+document.cookie = "idToken=; max-age=0";
+localStorage.clear();
+
+      useRedirect("/login", true);
 
       message.success("OTP sent to your email");
     } catch (error: any) {
@@ -138,7 +145,8 @@ const SignUp = () => {
       setCookie("idToken", idToken, 7);
       await authenticateWithAPI(fcmToken);
       message.success("Signed in with Google");
-      useRedirect("/home", true);
+      useRedirect("/login", true);
+
     } catch (error: any) {
       message.error(error.message || "Google sign-in failed");
     } finally {

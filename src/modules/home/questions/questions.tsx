@@ -6,7 +6,6 @@ import { useBack, useRedirect } from "@/src/hooks/router.hooks";
 import ChooseSubjects from "./chooseSubjects";
 import { useTranslation } from "@/src/libs/i18n";
 import { Modal } from "antd";
-// import { getSubscription } from "@/src/services/api/subscription.api";
 import { useState } from "react";
 import { Question } from "@/src/libs/types/dashboard.types";
 import QuestionsBank from "./questionsBank";
@@ -15,12 +14,11 @@ import { getUserProfile } from "@/src/services/api/user.api";
 
 const Questions = () => {
     const { t } = useTranslation();
-    // const [isPremium, setIsPremium] = useState(false);
     const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+    const [modalMessage, setModalMessage] = useState(""); // ✅ dynamic modal message
     const [step, setStep] = useState<
         "question" | "chooseSubject" | "questionsBank"
     >("question");
-
 
     const [activeTask, setActiveTask] = useState<{
         id: string;
@@ -29,13 +27,20 @@ const Questions = () => {
     const [source, setSource] = useState<QuestionSource>(QuestionSource.EXPLORE_QUESTION);
 
     const ChooseSubject = async () => {
-        setStep("chooseSubject")
+        setStep("chooseSubject");
+    };
+
+    // ✅ Helper to get user and premium status from localStorage
+    const getUserData = () => {
+        const user = JSON.parse(localStorage.getItem("user") || "{}");
+        const isPremium = user?.isPremium === true ||
+            user?.subscriptions?.some((s: any) => s.subscriptionStatus === "ACTIVE");
+        return { user, isPremium };
     };
 
     return (
         <>
             {step === "question" && (
-                // your 
                 <div className="px-4">
                     <div
                         className="h-[calc(100vh-100px)] mt-1 mb-4 py-4 rounded-[32px] col-span-2 flex flex-col gap-4"
@@ -51,7 +56,6 @@ const Questions = () => {
                             />
                         </div>
 
-                        {/* Main Container */}
                         {/* Title */}
                         <h1 className="text-[32px] font-semibold text-[#121212] text-center mt-16">
                             {t('questions.chooseHowToPractice')} ✍️
@@ -62,12 +66,8 @@ const Questions = () => {
                             {t('questions.selectModeToContinue')}
                         </p>
 
-                        {/* Cards */}
-
-
                         <div className="w-full flex justify-center mt-14">
                             <div className="grid grid-cols-2 gap-16 w-full max-w-[900px]">
-
 
                                 {/* Question Bank */}
                                 <div
@@ -78,7 +78,6 @@ const Questions = () => {
                                 >
                                     <div className="p-4 flex flex-col items-start">
 
-                                        {/* ICON */}
                                         <div className="w-[90px] h-[90px] mb-4">
                                             <Image
                                                 src="/images/home/questionBank.svg"
@@ -88,30 +87,34 @@ const Questions = () => {
                                             />
                                         </div>
 
-                                        {/* Title */}
                                         <h3 className="text-[26px] font-medium text-[#121212] mb-1">
                                             {t('questions.questionBank')}
                                         </h3>
 
-                                        {/* Subtitle */}
                                         <p className="text-[21px] text-[#555555] mb-6">
                                             {t('questions.practiceTopicWise')}
                                         </p>
 
-                                        {/* Button */}
                                         <button
                                             onClick={() => {
+                                                // ✅ Check if free user has questions remaining
+                                                const { user, isPremium } = getUserData();
+                                                const canAskQuestion = user?.freePlan?.canAskQuestion;
+
+                                                if (!isPremium && !canAskQuestion) {
+                                                    setModalMessage("You've used all 20 daily questions. Upgrade to Premium for unlimited questions.");
+                                                    setShowUpgradeModal(true);
+                                                    return;
+                                                }
+
                                                 ChooseSubject();
                                                 setSource(QuestionSource.EXPLORE_QUESTION);
                                             }}
                                             className="w-full h-[50px] bg-primary rounded-[16px] flex items-center justify-center cursor-pointer"
                                         >
-                                            {/* Text */}
                                             <span className="text-white text-[18px] font-semibold">
                                                 {t('questions.exploreQuestions')}
                                             </span>
-
-                                            {/* Arrow */}
                                             <GoArrowRight className="text-white text-[26px] ml-4" />
                                         </button>
                                     </div>
@@ -126,7 +129,6 @@ const Questions = () => {
                                 >
                                     <div className="p-4 flex flex-col items-start">
 
-                                        {/* ICON */}
                                         <div className="w-[90px] h-[90px] mb-4">
                                             <Image
                                                 src="/images/home/simulados.svg"
@@ -136,24 +138,22 @@ const Questions = () => {
                                             />
                                         </div>
 
-                                        {/* Title */}
                                         <h3 className="text-[26px] font-medium text-[#121212] mb-1">
                                             {t('questions.createSimulados')}
                                         </h3>
 
-                                        {/* Subtitle */}
                                         <p className="text-[21px] text-[#555555] mb-6">
                                             {t('questions.buildCustomMockTest')}
                                         </p>
 
                                         <button
                                             onClick={() => {
-                                                const user = JSON.parse(localStorage.getItem("user") || "{}");
-                                                const isPremium = user?.isPremium === true ||
-                                                    user?.subscriptions?.some((s: any) => s.subscriptionStatus === "ACTIVE");
+                                                const { user, isPremium } = getUserData();
                                                 const canCreate = user?.freePlan?.canCreateMockExam;
 
                                                 if (!isPremium && !canCreate) {
+                                                    // ✅ Set simulados specific message
+                                                    setModalMessage("Simulados (Mock Exam) is a premium feature. Upgrade your plan to create custom mock tests.");
                                                     setShowUpgradeModal(true);
                                                     return;
                                                 }
@@ -163,12 +163,9 @@ const Questions = () => {
                                             }}
                                             className="w-full h-[50px] bg-primary rounded-[16px] flex items-center justify-center cursor-pointer"
                                         >
-                                            {/* Text */}
                                             <span className="text-white text-[18px] font-semibold">
                                                 {t('home.simulados.createSimulados')}
                                             </span>
-
-                                            {/* Arrow */}
                                             <GoArrowRight className="text-white text-[26px] ml-4" />
                                         </button>
 
@@ -186,7 +183,6 @@ const Questions = () => {
                     <div className="h-[calc(100vh-100px)] mt-1 mb-4 py-4 rounded-xl flex flex-col gap-4"
                         style={{ boxShadow: "0px 0px 4px 0px #00000040" }}
                     >
-                        {/* Back */}
                         <div className="mx-4 flex relative justify-center">
                             <GoArrowLeft
                                 className="text-xl absolute left-0 cursor-pointer"
@@ -200,6 +196,11 @@ const Questions = () => {
                                 setActiveTask(task);
                                 setStep("questionsBank");
                             }}
+                            // ✅ Pass remainingQuestions — premium gets 40, free gets their remaining count
+                            remainingQuestions={(() => {
+                                const { user, isPremium } = getUserData();
+                                return isPremium ? 40 : (user?.freePlan?.remainingQuestionsToday ?? 20);
+                            })()}
                         />
                     </div>
                 </div>
@@ -220,6 +221,8 @@ const Questions = () => {
                     }}
                 />
             )}
+
+            {/* ✅ Upgrade Modal — message changes based on what triggered it */}
             <Modal
                 open={showUpgradeModal}
                 onCancel={() => setShowUpgradeModal(false)}
@@ -236,8 +239,9 @@ const Questions = () => {
                     <h3 className="text-[20px] font-bold text-gray-900 text-center">
                         Premium Feature
                     </h3>
+                    {/* ✅ Dynamic message based on what triggered the modal */}
                     <p className="text-[14px] text-secondary text-center">
-                        Simulados (Mock Exam) is a premium feature. Upgrade your plan to create custom mock tests.
+                        {modalMessage}
                     </p>
                     <button
                         onClick={() => {

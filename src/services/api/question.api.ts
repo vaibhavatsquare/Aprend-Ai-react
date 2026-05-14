@@ -109,7 +109,7 @@ export const questionBankSimuladoQuestions = async (
       subject: payload.subject.join(","),
       difficulty: payload.difficulty,
       skip: 0,
-      take: 50,
+      take: payload.numberOfQuestions, // ✅ fixed: was hardcoded 50, now uses selected value
     }
   });
 

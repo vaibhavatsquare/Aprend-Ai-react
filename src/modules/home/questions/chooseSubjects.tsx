@@ -4,7 +4,6 @@ import { useState } from "react";
 import { GoArrowLeft } from "react-icons/go";
 import { useTranslation } from "@/src/libs/i18n";
 import { generateSimuladoQuestions, questionBankSimuladoQuestions } from "@/src/services/api/question.api";
-import QuestionsBank from "./questionsBank";
 import { useRedirect } from "@/src/hooks/router.hooks";
 import { Question } from "@/src/libs/types/dashboard.types";
 import { difficulties, QuestionSource, subjects } from "@/src/libs/helpers";
@@ -14,13 +13,16 @@ const ChooseSubjects = ({
   onBack,
   onStartQuestions,
   source,
+  remainingQuestions = 40, // ✅ default 40 for premium, passed from parent for free users
 }: {
   onBack?: () => void;
   onStartQuestions?: (task: { id: string; questions: Question[] }) => void;
   source: QuestionSource;
+  remainingQuestions?: number;
 }) => {
-  const [value, setValue] = useState(12);
-const { t } = useTranslation();
+  // ✅ Initial slider value should not exceed remainingQuestions
+  const [value, setValue] = useState(Math.min(12, remainingQuestions));
+  const { t } = useTranslation();
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -168,24 +170,24 @@ const { t } = useTranslation();
               <input
                 type="range"
                 min={1}
-                max={40}
+                max={remainingQuestions} // ✅ limited to remainingQuestions for free users
                 value={value}
                 onChange={(e) => setValue(Number(e.target.value))}
                 className="w-full accent-[#0F3057]"
               />
 
               {/* VALUE UNDER THUMB */}
+              {/* ✅ position calculation now uses remainingQuestions instead of hardcoded 40 */}
               <div
                 className="absolute top-6 text-[16px] text-[#121212] -translate-x-1/2"
                 style={{
-                  left: `calc(${(value - 0.5) / 40 * 100}%)`,
+                  left: `calc(${(value - 0.5) / remainingQuestions * 100}%)`,
                 }}
               >
                 {value}
               </div>
             </div>
           </div>
-
 
           {/* SPACING */}
           <div className="h-[52px]" />
@@ -238,12 +240,6 @@ const { t } = useTranslation();
         </>
       )}
 
-      {/* {isExplore && (
-        <>
-          <div className="h-[300px]" />
-        </>
-      )} */}
-
       {/* BUTTONS */}
       <div className="flex justify-center gap-6 mt-20">
 
@@ -253,11 +249,9 @@ const { t } = useTranslation();
           className="w-40 h-[50px] px-10 border border-[#DADADA] rounded-[12px] flex items-center justify-center cursor-pointer"
         >
           <GoArrowLeft className="text-[#121212] text-[20px]" />
-          {/* Text */}
           <span className="text-[#121212] text-[16px] ml-2">
             Back
           </span>
-
         </button>
 
         {/* CONTINUE */}
