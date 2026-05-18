@@ -14,15 +14,23 @@ const withAuth = <P extends object>(
     const router = useRouter();
     const [loading, setLoading] = useState(true);
 
-   const checkAuthState = () => {
+const checkAuthState = () => {
     const idToken = getCookie("idToken");
 
-    // If already authenticated, skip loader
+    // ✅ No cookie at all — redirect immediately without waiting for Firebase
+    if (!idToken) {
+        clearData();
+        router.replace("/login");
+        return;
+    }
+
+    // ✅ Firebase already has user — skip waiting
     if (auth.currentUser && idToken) {
         setLoading(false);
         return;
     }
 
+    // ✅ Wait for Firebase to restore session
     waitForAuthState().then((user) => {
         if (!user || !idToken) {
             clearData();
@@ -33,9 +41,20 @@ const withAuth = <P extends object>(
     });
 };
 
-    useEffect(() => {
-      checkAuthState();
-    }, [router]);
+useEffect(() => {
+    checkAuthState();
+
+    // ✅ When user comes back from Stripe via browser Back (bfcache restore)
+    const handlePageShow = (e: PageTransitionEvent) => {
+        if (e.persisted) {
+            // Page restored from bfcache — re-check auth state
+            checkAuthState();
+        }
+    };
+
+    window.addEventListener("pageshow", handlePageShow);
+    return () => window.removeEventListener("pageshow", handlePageShow);
+}, [router]);
 
     if (loading) return <FullScreenLoader />;
     return <WrappedComponent {...props} />;

@@ -82,12 +82,19 @@ export const signInWithGoogle = async (): Promise<{
 
 /* LOGOUT */
 export const signOutUser = async (): Promise<void> => {
-  
   const sessionId = localStorage.getItem("sessionId");
-  if (!sessionId) return;
-  await logoutUser();
+
+  // ✅ Try backend logout if sessionId exists, but don't block signout if it doesn't
+  if (sessionId) {
+    try {
+      await logoutUser();
+    } catch {
+      console.warn("Backend logout failed, continuing...");
+    }
+  }
+
+  // ✅ Always clear everything regardless of sessionId
   await signOut(auth);
-  console.log("🟣 logout");
   localStorage.clear();
   document.cookie = "idToken=; max-age=0";
   setCookie("idToken", "");

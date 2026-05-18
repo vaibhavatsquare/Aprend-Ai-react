@@ -2,13 +2,14 @@ import { fetch } from "@/src/libs/helpers";
 import { UserDetail, UserSession } from "@/src/libs/types";
 
 export const backendLogin = async (notificationToken?: string) => {
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   return await fetch<{
     user: UserDetail;
     userSessions: UserSession;
   }>({
     url: "/auth",
     method: "POST",
-    data: { notificationToken },
+    data: { notificationToken,timezone },
   });
 };
 

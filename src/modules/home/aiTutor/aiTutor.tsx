@@ -21,6 +21,7 @@ import { generateFlashcards } from "@/src/services/api/flashcards.api";
 import { getStoredUser } from "@/src/libs/helpers";
 import { useTranslation } from "@/src/libs/i18n";
 import { useSearchParams } from "next/navigation";
+import { getUserProfile } from "@/src/services/api/user.api";
 
 const AudioWaveform = dynamic(
   () => import("@/src/components/AudioWaveform/AudioWaveform"),
@@ -51,6 +52,7 @@ const AiTutor = () => {
   const [isSavingNote, setIsSavingNote] = useState(false);
   const [isGeneratingFlashcard, setIsGeneratingFlashcard] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
   const searchParams = useSearchParams();
   const hasTriggeredUpload = useRef(false);
 
@@ -278,24 +280,64 @@ const AiTutor = () => {
     }
   };
 
-  const handleGenerateFlashcard = async () => {
+  // const handleGenerateFlashcard = async () => {
+  //   if (!conversationId) return;
+
+  //   try {
+  //     setIsGeneratingFlashcard(true);
+
+  //     const res = await generateFlashcards(conversationId);
+
+  //     console.log("Flashcards generated:", res);
+
+  //   } catch (err) {
+  //     console.error("Flashcard generation failed", err);
+  //   } finally {
+  //     setIsGeneratingFlashcard(false);
+  //     antMessage.success(t('success.saved'));
+  //   }
+  // };
+
+const handleGenerateFlashcard = async () => {
     if (!conversationId) return;
 
-    try {
-      setIsGeneratingFlashcard(true);
+    // ✅ Check 1 - BEFORE API call, read from localStorage
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const isPremium = user?.isPremium === true ||
+        user?.subscriptions?.some((s: any) => s.subscriptionStatus === "ACTIVE");
+    const canCreateFlashcards = user?.freePlan?.canCreateFlashcards;
+    const remainingFlashcardsToday = user?.freePlan?.remainingFlashcardsToday;
 
-      const res = await generateFlashcards(conversationId);
-
-      console.log("Flashcards generated:", res);
-
-    } catch (err) {
-      console.error("Flashcard generation failed", err);
-    } finally {
-      setIsGeneratingFlashcard(false);
-      antMessage.success(t('success.saved'));
+    if (!isPremium && (!canCreateFlashcards || remainingFlashcardsToday <= 0)) {
+        setModalMessage("You've used all 12 daily flashcards. Upgrade to Premium for unlimited flashcards.");
+        setShowUpgradeModal(true);
+        return;
     }
-  };
 
+    try {
+        setIsGeneratingFlashcard(true);
+        const res = await generateFlashcards(conversationId);
+        antMessage.success(t('success.saved'));
+
+        // ✅ Refresh user profile so counts update in localStorage
+        const updatedUser = await getUserProfile();
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+
+    } catch (err: any) {
+        const errorMessage = err?.message || "";
+
+        // ✅ Check 2 - AFTER API call, in case localStorage was stale
+        if (errorMessage.toLowerCase().includes("limit reached") ||
+            errorMessage.toLowerCase().includes("daily free")) {
+            setModalMessage("You've used all 12 daily flashcards. Upgrade to Premium for unlimited flashcards.");
+            setShowUpgradeModal(true);
+        } else {
+            antMessage.error("Failed to generate flashcards. Please try again.");
+        }
+    } finally {
+        setIsGeneratingFlashcard(false);
+    }
+};
   const streak = Number(localStorage.getItem("streak")) || 0;
 
   const streakTitle =
@@ -610,9 +652,10 @@ const AiTutor = () => {
             const user = JSON.parse(localStorage.getItem("user") || "{}");
             const isPremium = user?.isPremium === true || user?.subscriptions?.some((s: any) => s.subscriptionStatus === "ACTIVE");
             if (!isPremium) {
-              setShowUpgradeModal(true);
-              return;
-            }
+    setModalMessage("Weak Spot Tracker is a premium feature. Upgrade your plan to get advanced analytics and track your weak spots.");
+    setShowUpgradeModal(true);
+    return;
+}
             useRedirect("/home/weak-spot-tracker");
           }}
           className={`flex gap-2 items-center justify-between p-4 rounded-xl border border-[#DADADA] cursor-pointer transition-colors ${JSON.parse(localStorage.getItem("user") || "{}").isPremium
@@ -646,7 +689,7 @@ const AiTutor = () => {
           </div>
           <h3 className="text-[20px] font-bold text-gray-900 text-center">Premium Feature</h3>
           <p className="text-[14px] text-secondary text-center">
-            Weak Spot Tracker is a premium feature. Upgrade your plan to get advanced analytics and track your weak spots.
+            {modalMessage}
           </p>
           <button
             onClick={() => {
