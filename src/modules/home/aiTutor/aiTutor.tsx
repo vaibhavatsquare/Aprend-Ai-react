@@ -53,8 +53,11 @@ const AiTutor = () => {
   const [isGeneratingFlashcard, setIsGeneratingFlashcard] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
+  const [showUploadImageModal, setShowUploadImageModal] = useState(false);
   const searchParams = useSearchParams();
   const hasTriggeredUpload = useRef(false);
+
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const adjustTextareaHeight = () => {
     const el = textareaRef.current;
@@ -114,15 +117,10 @@ const AiTutor = () => {
 
   useEffect(() => {
     const shouldUpload = searchParams.get("upload");
-
     if (shouldUpload === "true" && !hasTriggeredUpload.current) {
       hasTriggeredUpload.current = true;
-
       setTimeout(() => {
-        if (!uploadedImageUrl) {
-          inputRef.current?.click();
-        }
-
+        setShowUploadImageModal(true);
         setSearchParam("upload", null);
       }, 300);
     }
@@ -298,46 +296,46 @@ const AiTutor = () => {
   //   }
   // };
 
-const handleGenerateFlashcard = async () => {
+  const handleGenerateFlashcard = async () => {
     if (!conversationId) return;
 
     // ✅ Check 1 - BEFORE API call, read from localStorage
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const isPremium = user?.isPremium === true ||
-        user?.subscriptions?.some((s: any) => s.subscriptionStatus === "ACTIVE");
+      user?.subscriptions?.some((s: any) => s.subscriptionStatus === "ACTIVE");
     const canCreateFlashcards = user?.freePlan?.canCreateFlashcards;
     const remainingFlashcardsToday = user?.freePlan?.remainingFlashcardsToday;
 
     if (!isPremium && (!canCreateFlashcards || remainingFlashcardsToday <= 0)) {
-        setModalMessage("You've used all 12 daily flashcards. Upgrade to Premium for unlimited flashcards.");
-        setShowUpgradeModal(true);
-        return;
+      setModalMessage("You've used all 12 daily flashcards. Upgrade to Premium for unlimited flashcards.");
+      setShowUpgradeModal(true);
+      return;
     }
 
     try {
-        setIsGeneratingFlashcard(true);
-        const res = await generateFlashcards(conversationId);
-        antMessage.success(t('success.saved'));
+      setIsGeneratingFlashcard(true);
+      const res = await generateFlashcards(conversationId);
+      antMessage.success(t('success.saved'));
 
-        // ✅ Refresh user profile so counts update in localStorage
-        const updatedUser = await getUserProfile();
-        localStorage.setItem("user", JSON.stringify(updatedUser));
+      // ✅ Refresh user profile so counts update in localStorage
+      const updatedUser = await getUserProfile();
+      localStorage.setItem("user", JSON.stringify(updatedUser));
 
     } catch (err: any) {
-        const errorMessage = err?.message || "";
+      const errorMessage = err?.message || "";
 
-        // ✅ Check 2 - AFTER API call, in case localStorage was stale
-        if (errorMessage.toLowerCase().includes("limit reached") ||
-            errorMessage.toLowerCase().includes("daily free")) {
-            setModalMessage("You've used all 12 daily flashcards. Upgrade to Premium for unlimited flashcards.");
-            setShowUpgradeModal(true);
-        } else {
-            antMessage.error("Failed to generate flashcards. Please try again.");
-        }
+      // ✅ Check 2 - AFTER API call, in case localStorage was stale
+      if (errorMessage.toLowerCase().includes("limit reached") ||
+        errorMessage.toLowerCase().includes("daily free")) {
+        setModalMessage("You've used all 12 daily flashcards. Upgrade to Premium for unlimited flashcards.");
+        setShowUpgradeModal(true);
+      } else {
+        antMessage.error("Failed to generate flashcards. Please try again.");
+      }
     } finally {
-        setIsGeneratingFlashcard(false);
+      setIsGeneratingFlashcard(false);
     }
-};
+  };
   const streak = Number(localStorage.getItem("streak")) || 0;
 
   const streakTitle =
@@ -534,6 +532,14 @@ const handleGenerateFlashcard = async () => {
                       disabled={!!uploadedImageUrl}
                       className="hidden"
                     />
+                    <input
+                      ref={cameraInputRef}
+                      onChange={handleImage}
+                      type="file"
+                      accept="image/*"
+                      capture="environment"
+                      className="hidden"
+                    />
                   </div>
                   {isRecording && (
                     <div className="flex items-center gap-2 text-sm text-red-500 px-1">
@@ -652,10 +658,10 @@ const handleGenerateFlashcard = async () => {
             const user = JSON.parse(localStorage.getItem("user") || "{}");
             const isPremium = user?.isPremium === true || user?.subscriptions?.some((s: any) => s.subscriptionStatus === "ACTIVE");
             if (!isPremium) {
-    setModalMessage("Weak Spot Tracker is a premium feature. Upgrade your plan to get advanced analytics and track your weak spots.");
-    setShowUpgradeModal(true);
-    return;
-}
+              setModalMessage("Weak Spot Tracker is a premium feature. Upgrade your plan to get advanced analytics and track your weak spots.");
+              setShowUpgradeModal(true);
+              return;
+            }
             useRedirect("/home/weak-spot-tracker");
           }}
           className={`flex gap-2 items-center justify-between p-4 rounded-xl border border-[#DADADA] cursor-pointer transition-colors ${JSON.parse(localStorage.getItem("user") || "{}").isPremium
@@ -706,6 +712,57 @@ const handleGenerateFlashcard = async () => {
           >
             Maybe later
           </button>
+        </div>
+      </Modal>
+      {/* UPLOAD IMAGE MODAL */}
+      <Modal
+        open={showUploadImageModal}
+        onCancel={() => setShowUploadImageModal(false)}
+        footer={null}
+        centered
+        width={380}
+      >
+        <div className="flex flex-col items-center gap-8 py-4">
+          <h3 className="text-[20px] font-bold text-gray-900">Upload image</h3>
+
+          <div className="flex gap-10 justify-center">
+            {/* Camera */}
+            <div
+              className="flex flex-col items-center gap-3 cursor-pointer"
+              onClick={() => {
+                setShowUploadImageModal(false);
+                setTimeout(() => {          // ✅ wait for modal to fully close
+                  cameraInputRef.current?.click();
+                }, 300);
+              }}
+            >
+              <div className="w-[100px] h-[100px] rounded-full bg-primary flex items-center justify-center">
+                <svg width="42" height="42" fill="none" viewBox="0 0 24 24" stroke="white" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
+                </svg>
+              </div>
+              <p className="text-[16px] font-medium text-primary">Camera</p>
+            </div>
+
+            {/* Gallery */}
+            <div
+              className="flex flex-col items-center gap-3 cursor-pointer"
+              onClick={() => {
+                setShowUploadImageModal(false);
+                setTimeout(() => {          // ✅ wait for modal to fully close
+                  inputRef.current?.click();
+                }, 300);
+              }}
+            >
+              <div className="w-[100px] h-[100px] rounded-full bg-[#1B2A4A] flex items-center justify-center">
+                <svg width="42" height="42" fill="none" viewBox="0 0 24 24" stroke="white" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 18h16.5M3.75 6h16.5A1.5 1.5 0 0121.75 7.5v9a1.5 1.5 0 01-1.5 1.5H3.75a1.5 1.5 0 01-1.5-1.5v-9A1.5 1.5 0 013.75 6z" />
+                </svg>
+              </div>
+              <p className="text-[16px] font-medium text-primary">Gallery</p>
+            </div>
+          </div>
         </div>
       </Modal>
     </div>

@@ -120,3 +120,49 @@ body {
   padding: 14px !important;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
 }
+/* ── Primary Button ── */
+.btn-primary,
+.btn-primary.ant-btn,
+.btn-primary.ant-btn:hover,
+.btn-primary.ant-btn:focus,
+.btn-primary.ant-btn:active,
+.btn-primary.ant-btn:not(:disabled):hover,
+.btn-primary.ant-btn:not(:disabled):active {
+  background-image: url('/images/buttonBg.png') !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  border: 1px solid #FFFFFF5C !important;
+  box-shadow: 0px 0px 20px 0px #1953CB80 !important;
+  color: white !important;
+  border-radius: 12px !important;
+  width: 100% !important;
+  outline: none !important;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-primary:focus-visible {
+  outline: none !important;
+}
+
+.btn-primary span {
+  position: relative;
+  z-index: 1;
+  color: white !important;
+}
+
+/* ── Ant Design Modal padding fix ── */
+.ant-modal .ant-modal-content {
+  padding: 24px !important;
+}
+
+.premium-modal .ant-modal-content {
+  padding: 24px 0 20px 0 !important;
+  overflow: hidden;
+}
+
+.premium-modal .ant-modal-close {
+  top: 16px !important;
+  right: 16px !important;
+}

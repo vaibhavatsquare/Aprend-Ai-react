@@ -27,7 +27,7 @@ import { LuChevronDown, LuChevronUp } from "react-icons/lu";
 import { TbCards } from "react-icons/tb";
 import { PiMagicWandLight, PiExamLight, PiBookOpenTextLight } from "react-icons/pi";
 import { BsFilePdf, BsEmojiSmile, BsGraphUp } from "react-icons/bs";
-import { createCheckoutSession, cancelSubscription } from "@/src/services/api/subscription.api";
+import { getSubscription,createCheckoutSession, cancelSubscription } from "@/src/services/api/subscription.api";
 import { useSearchParams } from "next/navigation";
 
 // ─── Main Component ───────────────────────────────────────────────────────────
@@ -49,16 +49,16 @@ const UserProfile = () => {
 
     // Handle Stripe redirect back to profile
     useEffect(() => {
-    const sub = searchParams.get("subscription");
-    const open = searchParams.get("open");
+        const sub = searchParams.get("subscription");
+        const open = searchParams.get("open");
 
-    // ✅ User came back from Stripe via browser Back button
-    if (sessionStorage.getItem("stripeRedirect")) {
-        sessionStorage.removeItem("stripeRedirect");
-        setSelected("subscription");
-    }
+        // ✅ User came back from Stripe via browser Back button
+        if (sessionStorage.getItem("stripeRedirect")) {
+            sessionStorage.removeItem("stripeRedirect");
+            setSelected("subscription");
+        }
 
-    if (sub === "success") {
+        if (sub === "success") {
             setSelected("subscription");
             getUserProfile().then((profileRes) => {
                 localStorage.setItem("user", JSON.stringify(profileRes));
@@ -113,15 +113,15 @@ const UserProfile = () => {
     };
 
     const handleDeleteAccount = async () => {
-    try {
-        await backendDeleteUser();        // delete from backend
-        await signOutUser();              // sign out Firebase + clear localStorage + cookie
-        message.success("Account deleted successfully.");
-        router.replace("/login");
-    } catch {
-        message.error("Failed to delete account. Please try again.");
-    }
-};
+        try {
+            await backendDeleteUser();        // delete from backend
+            await signOutUser();              // sign out Firebase + clear localStorage + cookie
+            message.success("Account deleted successfully.");
+            router.replace("/login");
+        } catch {
+            message.error("Failed to delete account. Please try again.");
+        }
+    };
 
     const handleNotificationToggle = async (value: boolean) => {
         const notificationToken = localStorage.getItem("notificationToken");
@@ -372,6 +372,32 @@ const SubscriptionSection = () => {
     const [subscription, setSubscription] = useState<any>(null);
     const [loadingSubscription, setLoadingSubscription] = useState(true);
     const [cancelling, setCancelling] = useState(false);
+    const [restoring, setRestoring] = useState(false);
+
+const handleRestore = async () => {
+    if (restoring) return;
+    setRestoring(true);
+    try {
+        const res = await getSubscription();
+        if (res?.subscriptionStatus === "ACTIVE") {
+            // User has active subscription — show plan details
+            setSubscription(res);
+            const plan = res.planType?.toLowerCase();
+            if (plan === "monthly" || plan === "premium") setSelectedPlan("monthly");
+            else if (plan === "yearly") setSelectedPlan("yearly");
+        } else {
+            // No active subscription — show message
+            message.info("No active subscription found. Please upgrade to a premium plan.");
+            setSubscription(null);
+            setSelectedPlan("free");
+            setExpandedFree(true);
+        }
+    } catch {
+        message.error("Failed to check subscription. Please try again.");
+    } finally {
+        setRestoring(false);
+    }
+};
 
     // useEffect(() => {
     //     getSubscription().then((res) => {
@@ -384,42 +410,37 @@ const SubscriptionSection = () => {
     //     }).finally(() => setLoadingSubscription(false));
     // }, []);
 
-    useEffect(() => {
-    // ✅ Reset upgrading spinner if user came back from Stripe
-    if (sessionStorage.getItem("stripeRedirect")) {
-        setUpgrading(false);
-    }
-
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
-    const isPremiumUser = user?.isPremium === true;
-
-        if (isPremiumUser) {
-            // Get active subscription from user's subscriptions array
-            const activeSub = user?.subscription?.subscriptionStatus === "ACTIVE"
-    ? user.subscription
-    : user?.subscriptions?.find((s: any) => s.subscriptionStatus === "ACTIVE");
-        
-            if (activeSub) {
-                setSubscription(activeSub);
-                const plan = activeSub.planType?.toLowerCase();
+   useEffect(() => {
+    const load = async () => {
+        try {
+            const res = await getSubscription();
+            if (res?.subscriptionStatus === "ACTIVE" || res?.subscriptionStatus === "CANCELLED") {
+                setSubscription(res);
+                const plan = res.planType?.toLowerCase();
                 if (plan === "monthly" || plan === "premium") setSelectedPlan("monthly");
                 else if (plan === "yearly") setSelectedPlan("yearly");
             }
-        }
-        setLoadingSubscription(false);
-    }, []);
-
-    useEffect(() => {
-    const handlePageShow = (e: PageTransitionEvent) => {
-        if (e.persisted) {
-            setUpgrading(false);
+        } catch {
+            // no subscription
+        } finally {
+            setLoadingSubscription(false);
         }
     };
-    window.addEventListener("pageshow", handlePageShow);
-    return () => window.removeEventListener("pageshow", handlePageShow);
+    load();
 }, []);
 
-    const isActive = subscription?.subscriptionStatus === "ACTIVE";
+    useEffect(() => {
+        const handlePageShow = (e: PageTransitionEvent) => {
+            if (e.persisted) {
+                setUpgrading(false);
+            }
+        };
+        window.addEventListener("pageshow", handlePageShow);
+        return () => window.removeEventListener("pageshow", handlePageShow);
+    }, []);
+
+    const isActive = subscription?.subscriptionStatus === "ACTIVE" ||
+        subscription?.subscriptionStatus === "CANCELLED";
 
     const formatDate = (dateStr: string) => new Date(dateStr).toLocaleDateString("en-GB", {
         day: "numeric", month: "short", year: "numeric",
@@ -430,9 +451,10 @@ const SubscriptionSection = () => {
         setCancelling(true);
         try {
             await cancelSubscription();
-            message.success("Subscription cancelled successfully.");
-            setSubscription(null);
-            setSelectedPlan("free");
+            message.success(`Subscription cancelled. You will have access until ${formatDate(subscription.endsAt)}.`);
+            // Don't remove subscription — user still has access until endsAt
+            // Just update the status to show cancelled state
+            setSubscription((prev: any) => ({ ...prev, subscriptionStatus: "CANCELLED" }));
         } catch {
             message.error("Failed to cancel. Please try again.");
         } finally {
@@ -464,30 +486,30 @@ const SubscriptionSection = () => {
     // };
 
     const handleUpgrade = async () => {
-    if (upgrading) return;
-    setUpgrading(true);
-    try {
-        const res = await createCheckoutSession({
-            plan: selectedPlan.toUpperCase() as "MONTHLY" | "YEARLY",
-            planType: selectedPlan.toUpperCase() as "MONTHLY" | "YEARLY",
-            countryCode: "BR",
-            successUrl: `${window.location.origin}/profile?subscription=success`,
-            cancelUrl: `${window.location.origin}/profile?subscription=cancel`,
-        });
-        // console.log(window.location.origin);
-        if (res?.url) {
-            // ✅ Save flag before leaving
-            sessionStorage.setItem("stripeRedirect", "true");
-            window.location.href = res.url;
-        } else {
-            message.error("Failed to create checkout session.");
+        if (upgrading) return;
+        setUpgrading(true);
+        try {
+            const res = await createCheckoutSession({
+                plan: selectedPlan.toUpperCase() as "MONTHLY" | "YEARLY",
+                planType: selectedPlan.toUpperCase() as "MONTHLY" | "YEARLY",
+                countryCode: "BR",
+                successUrl: `${window.location.origin}/profile?subscription=success`,
+                cancelUrl: `${window.location.origin}/profile?subscription=cancel`,
+            });
+            // console.log(window.location.origin);
+            if (res?.url) {
+                // ✅ Save flag before leaving
+                sessionStorage.setItem("stripeRedirect", "true");
+                window.location.href = res.url;
+            } else {
+                message.error("Failed to create checkout session.");
+                setUpgrading(false);
+            }
+        } catch {
+            message.error("Failed to start checkout. Please try again.");
             setUpgrading(false);
         }
-    } catch {
-        message.error("Failed to start checkout. Please try again.");
-        setUpgrading(false);
-    }
-};
+    };
 
     // ── Loading state ─────────────────────────────────────────────────────────
     if (loadingSubscription) {
@@ -562,9 +584,13 @@ const SubscriptionSection = () => {
     return (
         <div className="flex flex-col h-full overflow-y-auto scrollbar">
             <div className="flex justify-end mb-2">
-                <button className="text-[14px] text-primary underline">
-                    {/* Restore. */}
-                </button>
+                <button 
+    onClick={handleRestore}
+    disabled={restoring}
+    className="text-[14px] text-primary underline disabled:opacity-50"
+>
+    {restoring ? "Checking..." : "Restore."}
+</button>
             </div>
 
             <div className="text-center mb-6">

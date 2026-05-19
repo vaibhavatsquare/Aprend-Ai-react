@@ -82,5 +82,6 @@ export const cancelSubscription = async (): Promise<void> => {
   return fetch({
     url: "/subscription/cancel",
     method: "POST",
+    data: { immediate: false },
   });
 };

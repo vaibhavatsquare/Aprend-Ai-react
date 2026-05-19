@@ -399,7 +399,7 @@ import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { GoArrowLeft } from "react-icons/go";
-import { signUpWithFirebase, signInWithGoogle } from "@/src/services/auth/auth.firebase.service";
+import { signUpWithFirebase, signInWithGoogle, signInWithApple } from "@/src/services/auth/auth.firebase.service";
 import { setCookie } from "@/src/services/coockies/coockie.service";
 import { authenticateWithAPI } from "@/src/services/api/auth.api";
 import { getFCMToken } from "@/src/configs/firebase.config";
@@ -407,6 +407,7 @@ import MiniLoader from "@/src/components/loaders/MiniLoader";
 import { signOut } from "firebase/auth";
 import { auth } from "@/src/configs/firebase.config";
 import { handlePostLoginRedirect } from "@/src/utils/redirect";
+
 
 interface SignUpFormData {
   email: string;
@@ -508,8 +509,8 @@ const SignUp = () => {
       // message.success("Account created. Please login.");
       // useRedirect("/login", true);
       const res = await authenticateWithAPI(fcmToken);
-message.success("Account created successfully.");
-handlePostLoginRedirect(res.user);
+      message.success("Account created successfully.");
+      handlePostLoginRedirect(res.user);
     } catch (error: any) {
       message.error(error.message || "Google sign-in failed");
     } finally {
@@ -517,6 +518,24 @@ handlePostLoginRedirect(res.user);
     }
   };
 
+  const handleAppleSignIn = async () => {
+  if (isLoading) return;
+  try {
+    setIsLoading(true);
+    const result = await signInWithApple();
+    if (!result) return;
+
+    const { idToken } = result;
+    setCookie("idToken", idToken, 7);
+    const res = await authenticateWithAPI(fcmToken);
+    message.success("Signed in with Apple.");
+    handlePostLoginRedirect(res.user); // ✅ goes to /onboarding or /home based on user status
+  } catch (error: any) {
+    message.error(error.message || "Apple sign-in failed");
+  } finally {
+    setIsLoading(false);
+  }
+};
   return (
     <div className="w-full h-full bg-primary flex">
       {isLoading && <MiniLoader />}
@@ -627,7 +646,10 @@ handlePostLoginRedirect(res.user);
                 />
                 <p className="text-secondary">Google</p>
               </div>
-              <div className="w-[150px] border-gray-300 flex gap-2 items-center justify-center cursor-pointer">
+              <div
+                onClick={handleAppleSignIn}
+                className="w-[150px] border-gray-300 flex gap-2 items-center justify-center cursor-pointer"
+              >
                 <Image
                   src="/images/auth/logoApple.svg"
                   alt="Apple login"

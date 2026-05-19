@@ -14,6 +14,7 @@ import { getMessaging, getToken } from "firebase/messaging";
 import { auth } from "../../configs/firebase.config";
 import { setCookie } from "@/src/services/coockies/coockie.service";
 import { logoutUser } from "@/src/services/api/auth.api";
+import { OAuthProvider } from "firebase/auth"; 
 
 const googleProvider = new GoogleAuthProvider();
 
@@ -116,3 +117,28 @@ export const onAuthStateChangedListener = (
 
 /* CURRENT USER */
 export const getCurrentUser = (): User | null => auth.currentUser;
+
+export const signInWithApple = async (): Promise<{
+  user: User;
+  idToken: string;
+} | null> => {
+  try {
+    const provider = new OAuthProvider("apple.com");
+    provider.addScope("email");
+    provider.addScope("name");
+
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+    const idToken = await getIdToken(user, true);
+
+    return { user, idToken };
+  } catch (error: any) {
+    if (error?.code === "auth/cancelled-popup-request") {
+      return null; // user closed popup
+    }
+    if (error?.code === "auth/popup-blocked") {
+      throw new Error("Popup was blocked. Please allow popups and try again.");
+    }
+    throw error;
+  }
+};
