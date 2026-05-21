@@ -102,6 +102,14 @@ const Navbar = () => {
           unCheckedChildren={
             <p className="font-semibold text-black">OFF</p>
           }
+          style={focusMode ? {
+              backgroundImage: "url('/images/buttonBg.svg')",
+              backgroundSize: '500% 400%',
+              backgroundPosition: 'center',
+              boxShadow: '0px 0px 20px 0px #1953CB40',
+            } : {
+              backgroundColor: '#E5E7EB',
+            }}
         />
 
         {/* BELL */}
@@ -138,7 +146,15 @@ const Navbar = () => {
               setShowUpgradeModal(false);
                useRedirect("/profile?open=subscription");
             }}
-            className="w-full h-[48px] bg-primary text-white rounded-[12px] text-[15px] font-semibold hover:opacity-90 transition-opacity"
+            // className="w-full h-[48px] bg-primary text-white rounded-[12px] text-[15px] font-semibold hover:opacity-90 transition-opacity"
+            className="w-full h-[48px] text-white rounded-[12px] text-[15px] font-semibold hover:opacity-90 transition-opacity"
+            style={{
+              backgroundImage: "url('/images/buttonBg.svg')",
+              backgroundSize: '175% 700%',
+              backgroundPosition: 'center',
+              boxShadow: '0px 0px 50px 0px #1953CB40',
+              border: '1px solid rgba(255,255,255,0.35)',
+            }}
           >
             Upgrade To Premium
           </button>

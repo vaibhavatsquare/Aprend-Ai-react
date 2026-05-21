@@ -47,20 +47,23 @@ const Step1 = ({
           <div
             key={level.value}
             className={`w-full h-11 px-3 border rounded-xl flex justify-between items-center gap-3 cursor-pointer transition-all ${quiz.subjects.includes(level.value)
-              ? "border-primary"
-              : "border-[#DADADA] hover:border-gray-400"
+              ? "border-[#2563EB] bg-[#2563EB]"
+                : "border-[#DADADA] hover:border-gray-400"
               }`}
             onClick={() => toggle(level.value)}
           >
-            <p className="text-sm">{level.label}</p>
+            {/* <p className="text-sm">{level.label}</p> */}
+            <p className={`text-sm ${quiz.subjects.includes(level.value) ? "text-white" : "text-[#121212]"}`}>{level.label}</p>
             <div
-              className={`w-4 h-4 flex justify-center items-center border-2 rounded-full transition-all ${quiz.subjects.includes(level.value)
-                ? "border-primary"
-                : "border-[#DADADA] hover:border-primary"
+              className={`w-4 h-4 flex justify-center items-center border-2 rounded-[4px] transition-all ${quiz.subjects.includes(level.value)
+                ? "border-white bg-white"
+                : "border-[#DADADA]"
                 }`}
             >
               {quiz.subjects.includes(level.value) && (
-                <div className="w-2 h-2 bg-primary rounded-full" />
+                <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                  <path d="M1 4L3.5 6.5L9 1" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               )}
             </div>
           </div>
@@ -87,7 +90,14 @@ const Step1 = ({
         <Button
           disabled={quiz.subjects.length === 0}
           onClick={handleContinue}
-          className="w-[180px] h-10! rounded-xl! text-white! bg-primary! mt-4"
+          // className="w-[180px] h-10! rounded-xl! text-white! bg-primary! mt-4"
+          className="w-[180px] h-10! rounded-xl! text-white! mt-4"
+          style={{
+            backgroundImage: "url('/images/buttonBg.svg')",
+            backgroundSize: '350% 700%', backgroundPosition: 'center',
+            boxShadow: '0px 0px 50px 0px #1953CB40',
+            border: '1px solid rgba(255,255,255,0.35)',
+          }}
         >
           Continue
         </Button>

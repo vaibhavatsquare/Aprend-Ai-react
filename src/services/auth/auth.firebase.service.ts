@@ -10,11 +10,10 @@ import {
   updateProfile,
   getIdToken,
 } from "firebase/auth";
-import { getMessaging, getToken } from "firebase/messaging";
 import { auth } from "../../configs/firebase.config";
 import { setCookie } from "@/src/services/coockies/coockie.service";
 import { logoutUser } from "@/src/services/api/auth.api";
-import { OAuthProvider } from "firebase/auth"; 
+import { OAuthProvider } from "firebase/auth";
 
 const googleProvider = new GoogleAuthProvider();
 
@@ -23,15 +22,9 @@ export const signInWithFirebase = async (
   email: string,
   password: string
 ): Promise<{ user: User; idToken: string }> => {
-  const userCredential = await signInWithEmailAndPassword(
-    auth,
-    email,
-    password
-  );
-
+  const userCredential = await signInWithEmailAndPassword(auth, email, password);
   const user = userCredential.user;
   const idToken = await getIdToken(user, true);
-
   return { user, idToken };
 };
 
@@ -41,16 +34,10 @@ export const signUpWithFirebase = async (
   password: string,
   displayName?: string
 ): Promise<User> => {
-  const userCredential = await createUserWithEmailAndPassword(
-    auth,
-    email,
-    password
-  );
-
+  const userCredential = await createUserWithEmailAndPassword(auth, email, password);
   if (displayName && auth.currentUser) {
     await updateProfile(auth.currentUser, { displayName });
   }
-
   return userCredential.user;
 };
 
@@ -63,20 +50,34 @@ export const signInWithGoogle = async (): Promise<{
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
     const idToken = await getIdToken(user, true);
-
     return { user, idToken };
   } catch (error: any) {
-    // ✅ USER closed popup or multiple popup triggered
-    if (error?.code === "auth/cancelled-popup-request") {
-      return null; // silently ignore
-    }
-
-    // ✅ Popup blocked by browser
+    if (error?.code === "auth/cancelled-popup-request") return null;
     if (error?.code === "auth/popup-blocked") {
       throw new Error("Popup was blocked. Please allow popups and try again.");
     }
+    throw error;
+  }
+};
 
-    // ❌ Real error
+/* APPLE SIGN IN */
+export const signInWithApple = async (): Promise<{
+  user: User;
+  idToken: string;
+} | null> => {
+  try {
+    const provider = new OAuthProvider("apple.com");
+    provider.addScope("email");
+    provider.addScope("name");
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+    const idToken = await getIdToken(user, true);
+    return { user, idToken };
+  } catch (error: any) {
+    if (error?.code === "auth/cancelled-popup-request") return null;
+    if (error?.code === "auth/popup-blocked") {
+      throw new Error("Popup was blocked. Please allow popups and try again.");
+    }
     throw error;
   }
 };
@@ -117,28 +118,3 @@ export const onAuthStateChangedListener = (
 
 /* CURRENT USER */
 export const getCurrentUser = (): User | null => auth.currentUser;
-
-export const signInWithApple = async (): Promise<{
-  user: User;
-  idToken: string;
-} | null> => {
-  try {
-    const provider = new OAuthProvider("apple.com");
-    provider.addScope("email");
-    provider.addScope("name");
-
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
-    const idToken = await getIdToken(user, true);
-
-    return { user, idToken };
-  } catch (error: any) {
-    if (error?.code === "auth/cancelled-popup-request") {
-      return null; // user closed popup
-    }
-    if (error?.code === "auth/popup-blocked") {
-      throw new Error("Popup was blocked. Please allow popups and try again.");
-    }
-    throw error;
-  }
-};

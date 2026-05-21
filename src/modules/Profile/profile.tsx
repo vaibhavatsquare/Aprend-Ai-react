@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { FiEdit2 } from "react-icons/fi";
 import { IoChevronForward } from "react-icons/io5";
-import { Image as AntImage, Spin, message } from "antd";
+import { Image as AntImage, Spin, Switch, message } from "antd";
 import { signOutUser } from "@/src/services/auth/auth.firebase.service";
 import { backendDeleteUser } from "@/src/services/api/auth.api";
 import ConfirmModal from "./confirmModal";
@@ -27,7 +27,7 @@ import { LuChevronDown, LuChevronUp } from "react-icons/lu";
 import { TbCards } from "react-icons/tb";
 import { PiMagicWandLight, PiExamLight, PiBookOpenTextLight } from "react-icons/pi";
 import { BsFilePdf, BsEmojiSmile, BsGraphUp } from "react-icons/bs";
-import { getSubscription,createCheckoutSession, cancelSubscription } from "@/src/services/api/subscription.api";
+import { getSubscription, createCheckoutSession, cancelSubscription } from "@/src/services/api/subscription.api";
 import { useSearchParams } from "next/navigation";
 
 // ─── Main Component ───────────────────────────────────────────────────────────
@@ -219,13 +219,33 @@ const UserProfile = () => {
                                     }
                                 />
 
-                                <ProfileItem
+                                {/* <ProfileItem
                                     title={t('profile.notificationPreference')}
                                     rightContent={
                                         <CustomSwitch
                                             checked={notifications}
                                             loading={notificationLoading}
                                             onChange={handleNotificationToggle}
+                                        />
+                                    }
+                                /> */}
+                                <ProfileItem
+                                    title={t('profile.notificationPreference')}
+                                    rightContent={
+                                        <Switch
+                                            checked={notifications}
+                                            loading={notificationLoading}
+                                            onChange={handleNotificationToggle}
+                                            checkedChildren={<p className="font-semibold text-white">ON</p>}
+                                            unCheckedChildren={<p className="font-semibold text-black">OFF</p>}
+                                            style={notifications ? {
+                                                backgroundImage: "url('/images/buttonBg.svg')",
+                                                backgroundSize: '500% 400%',
+                                                backgroundPosition: 'center',
+                                                boxShadow: '0px 0px 20px 0px #1953CB40',
+                                            } : {
+                                                backgroundColor: '#E5E7EB',
+                                            }}
                                         />
                                     }
                                 />
@@ -374,30 +394,30 @@ const SubscriptionSection = () => {
     const [cancelling, setCancelling] = useState(false);
     const [restoring, setRestoring] = useState(false);
 
-const handleRestore = async () => {
-    if (restoring) return;
-    setRestoring(true);
-    try {
-        const res = await getSubscription();
-        if (res?.subscriptionStatus === "ACTIVE") {
-            // User has active subscription — show plan details
-            setSubscription(res);
-            const plan = res.planType?.toLowerCase();
-            if (plan === "monthly" || plan === "premium") setSelectedPlan("monthly");
-            else if (plan === "yearly") setSelectedPlan("yearly");
-        } else {
-            // No active subscription — show message
-            message.info("No active subscription found. Please upgrade to a premium plan.");
-            setSubscription(null);
-            setSelectedPlan("free");
-            setExpandedFree(true);
+    const handleRestore = async () => {
+        if (restoring) return;
+        setRestoring(true);
+        try {
+            const res = await getSubscription();
+            if (res?.subscriptionStatus === "ACTIVE" || res?.subscriptionStatus === "TRIAL") {
+                // User has active subscription — show plan details
+                setSubscription(res);
+                const plan = res.planType?.toLowerCase();
+                if (plan === "monthly" || plan === "premium") setSelectedPlan("monthly");
+                else if (plan === "yearly") setSelectedPlan("yearly");
+            } else {
+                // No active subscription — show message
+                message.info("No active subscription found. Please upgrade to a premium plan.");
+                setSubscription(null);
+                setSelectedPlan("free");
+                setExpandedFree(true);
+            }
+        } catch {
+            message.error("Failed to check subscription. Please try again.");
+        } finally {
+            setRestoring(false);
         }
-    } catch {
-        message.error("Failed to check subscription. Please try again.");
-    } finally {
-        setRestoring(false);
-    }
-};
+    };
 
     // useEffect(() => {
     //     getSubscription().then((res) => {
@@ -410,24 +430,24 @@ const handleRestore = async () => {
     //     }).finally(() => setLoadingSubscription(false));
     // }, []);
 
-   useEffect(() => {
-    const load = async () => {
-        try {
-            const res = await getSubscription();
-            if (res?.subscriptionStatus === "ACTIVE" || res?.subscriptionStatus === "CANCELLED") {
-                setSubscription(res);
-                const plan = res.planType?.toLowerCase();
-                if (plan === "monthly" || plan === "premium") setSelectedPlan("monthly");
-                else if (plan === "yearly") setSelectedPlan("yearly");
+    useEffect(() => {
+        const load = async () => {
+            try {
+                const res = await getSubscription();
+                if (res?.subscriptionStatus === "ACTIVE" || res?.subscriptionStatus === "CANCELLED" || res?.subscriptionStatus === "TRIAL") {
+                    setSubscription(res);
+                    const plan = res.planType?.toLowerCase();
+                    if (plan === "monthly" || plan === "premium") setSelectedPlan("monthly");
+                    else if (plan === "yearly") setSelectedPlan("yearly");
+                }
+            } catch {
+                // no subscription
+            } finally {
+                setLoadingSubscription(false);
             }
-        } catch {
-            // no subscription
-        } finally {
-            setLoadingSubscription(false);
-        }
-    };
-    load();
-}, []);
+        };
+        load();
+    }, []);
 
     useEffect(() => {
         const handlePageShow = (e: PageTransitionEvent) => {
@@ -440,7 +460,10 @@ const handleRestore = async () => {
     }, []);
 
     const isActive = subscription?.subscriptionStatus === "ACTIVE" ||
-        subscription?.subscriptionStatus === "CANCELLED";
+        subscription?.subscriptionStatus === "CANCELLED" ||
+        subscription?.subscriptionStatus === "TRIAL";
+
+    const isTrial = subscription?.subscriptionStatus === "TRIAL";
 
     const formatDate = (dateStr: string) => new Date(dateStr).toLocaleDateString("en-GB", {
         day: "numeric", month: "short", year: "numeric",
@@ -528,12 +551,17 @@ const handleRestore = async () => {
                     <div className="bg-white rounded-[20px] p-6 flex flex-col gap-4 border border-gray-200" style={{ minHeight: 300 }}>
                         <p className="text-[14px] text-secondary">Check Your Plan Overview :</p>
                         <h2 className="text-[22px] font-bold text-gray-900">
-                            Your {subscription.planType?.charAt(0).toUpperCase() + subscription.planType?.slice(1).toLowerCase()} Plan
+                            Your {subscription.price >= 100 ? "Yearly" : "Monthly"} Plan
+                            {isTrial && (
+                                <span className="ml-2 text-[12px] bg-blue-600 text-white px-2 py-0.5 rounded-full align-middle">
+                                    Free Trial
+                                </span>
+                            )}
                         </h2>
                         <div className="flex flex-col gap-0">
                             <div className="flex items-start gap-3">
                                 <div className="flex flex-col items-center">
-                                    <div className="w-7 h-7 rounded-full bg-gray-900 flex items-center justify-center shrink-0">
+                                    <div className="w-7 h-7 rounded-full bg-[#2563EB] flex items-center justify-center shrink-0">
                                         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                                             <path d="M2.5 7L5.5 10L11.5 4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                         </svg>
@@ -541,29 +569,42 @@ const handleRestore = async () => {
                                     <div className="w-px h-8 border-l-2 border-dashed border-gray-300 mt-1" />
                                 </div>
                                 <p className="text-[14px] text-gray-700 mt-0.5">
-                                    Active From <span className="font-bold">{formatDate(subscription.purchasedAt)}</span>
+                                    {/* Active From <span className="font-bold">{formatDate(subscription.purchasedAt)}</span> */}
+                                    {isTrial ? "Trial Started" : "Active From"} <span className="font-bold">{formatDate(subscription.purchasedAt)}</span>
                                 </p>
                             </div>
                             <div className="flex items-start gap-3">
-                                <div className="w-7 h-7 rounded-full bg-gray-900 flex items-center justify-center shrink-0">
+                                <div className="w-7 h-7 rounded-full bg-[#2563EB] flex items-center justify-center shrink-0">
                                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                                         <path d="M2.5 7L5.5 10L11.5 4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                     </svg>
                                 </div>
                                 <p className="text-[14px] text-gray-700 mt-0.5">
-                                    Expire on <span className="font-bold">{formatDate(subscription.endsAt)}</span>
+                                    {/* Expire on <span className="font-bold">{formatDate(subscription.endsAt)}</span> */}
+                                    {isTrial ? "Trial Ends" : "Expire on"} <span className="font-bold">{formatDate(subscription.endsAt)}</span>
                                 </p>
                             </div>
                         </div>
                         <p className="text-[13px] text-gray-600">
                             <span className="font-semibold underline">Status:</span>{" "}
-                            You can explore all features and content without limits.
+                            {/* You can explore all features and content without limits. */}
+                            {isTrial
+                                ? "You are on a free trial. You will be charged after the trial ends."
+                                : "You can explore all features and content without limits."
+                            }
                         </p>
                     </div>
 
                     <button
                         onClick={() => window.location.href = "/home"}
-                        className="w-full h-[52px] bg-gray-900 text-white rounded-[14px] text-[16px] font-semibold hover:opacity-90 transition-opacity"
+                        // className="w-full h-[52px] bg-gray-900 text-white rounded-[14px] text-[16px] font-semibold hover:opacity-90 transition-opacity"
+                        className="w-full h-[52px] text-white rounded-[14px] text-[16px] font-semibold hover:opacity-90 transition-opacity"
+                        style={{
+                            backgroundImage: "url('/images/buttonBg.svg')",
+                            backgroundSize: '350% 700%', backgroundPosition: 'center',
+                            boxShadow: '0px 0px 50px 0px #1953CB40',
+                            border: '1px solid rgba(255,255,255,0.35)',
+                        }}
                     >
                         Back to Home
                     </button>
@@ -584,13 +625,13 @@ const handleRestore = async () => {
     return (
         <div className="flex flex-col h-full overflow-y-auto scrollbar">
             <div className="flex justify-end mb-2">
-                <button 
-    onClick={handleRestore}
-    disabled={restoring}
-    className="text-[14px] text-primary underline disabled:opacity-50"
->
-    {restoring ? "Checking..." : "Restore."}
-</button>
+                <button
+                    onClick={handleRestore}
+                    disabled={restoring}
+                    className="text-[14px] text-primary underline disabled:opacity-50"
+                >
+                    {restoring ? "Checking..." : "Restore."}
+                </button>
             </div>
 
             <div className="text-center mb-6">
@@ -605,7 +646,7 @@ const handleRestore = async () => {
             <div className="flex flex-col gap-3 flex-1">
                 {/* FREE */}
                 <div
-                    className={`border rounded-[12px] overflow-hidden cursor-pointer transition-all ${selectedPlan === "free" ? "border-primary" : "border-gray-200"}`}
+                    className={`border rounded-[12px] overflow-hidden cursor-pointer transition-all ${selectedPlan === "free" ? "border-[#2563EB] bg-[#EFF6FF]" : "border-gray-200"}`}
                     style={{ backgroundColor: "#F7F7F8" }}
                     // onClick={() => { setSelectedPlan("free"); setExpandedFree((p) => !p); }}
                     onClick={() => { setSelectedPlan("free"); setExpandedFree((p) => !p); setExpandedMonthly(false); setExpandedYearly(false); }}
@@ -621,7 +662,7 @@ const handleRestore = async () => {
                         <div className="px-4 pb-4 space-y-2 border-t border-gray-100 pt-3">
                             {FREE_FEATURES.map((f, i) => (
                                 <div key={i} className="flex items-center gap-2 text-[13px] text-secondary">
-                                    <span className="text-gray-500">{f.icon}</span>
+                                    <span className="text-[#2563EB]">{f.icon}</span>
                                     {f.label}
                                 </div>
                             ))}
@@ -631,7 +672,7 @@ const handleRestore = async () => {
 
                 {/* MONTHLY */}
                 <div
-                    className={`border rounded-[12px] overflow-hidden cursor-pointer transition-all ${selectedPlan === "monthly" ? "border-primary" : "border-gray-200"}`}
+                    className={`border rounded-[12px] overflow-hidden cursor-pointer transition-all ${selectedPlan === "monthly" ? "border-[#2563EB] bg-[#EFF6FF]" : "border-gray-200"}`}
                     style={{ backgroundColor: "#F7F7F8" }}
                     // onClick={() => { setSelectedPlan("monthly"); setExpandedMonthly((p) => !p); }}
                     onClick={() => { setSelectedPlan("monthly"); setExpandedMonthly((p) => !p); setExpandedFree(false); setExpandedYearly(false); }}
@@ -652,7 +693,7 @@ const handleRestore = async () => {
                         <div className="px-4 pb-4 space-y-2 border-t border-gray-100 pt-3">
                             {PAID_FEATURES.map((f, i) => (
                                 <div key={i} className="flex items-center gap-2 text-[13px] text-secondary">
-                                    <span className="text-gray-500">{f.icon}</span>
+                                    <span className="text-[#2563EB]">{f.icon}</span>
                                     {f.label}
                                 </div>
                             ))}
@@ -662,7 +703,7 @@ const handleRestore = async () => {
 
                 {/* YEARLY */}
                 <div
-                    className={`border rounded-[12px] overflow-hidden cursor-pointer transition-all ${selectedPlan === "yearly" ? "border-primary" : "border-gray-200"}`}
+                    className={`border rounded-[12px] overflow-hidden cursor-pointer transition-all ${selectedPlan === "yearly" ? "border-[#2563EB] bg-[#EFF6FF]" : "border-gray-200"}`}
                     style={{ backgroundColor: "#F7F7F8" }}
                     // onClick={() => { setSelectedPlan("yearly"); setExpandedYearly((p) => !p); }}
                     onClick={() => { setSelectedPlan("yearly"); setExpandedYearly((p) => !p); setExpandedFree(false); setExpandedMonthly(false); }}
@@ -675,7 +716,8 @@ const handleRestore = async () => {
                             </p>
                         </div>
                         <div className="flex items-center gap-2">
-                            <span className="bg-primary text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">
+                            {/* <span className="bg-primary text-white text-[10px] font-semibold px-2 py-0.5 rounded-full"> */}
+                            <span className="bg-[#2563EB] text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">
                                 7-Days free trial
                             </span>
                             {expandedYearly
@@ -688,7 +730,7 @@ const handleRestore = async () => {
                         <div className="px-4 pb-4 space-y-2 border-t border-gray-100 pt-3">
                             {PAID_FEATURES.map((f, i) => (
                                 <div key={i} className="flex items-center gap-2 text-[13px] text-secondary">
-                                    <span className="text-gray-500">{f.icon}</span>
+                                    <span className="text-[#2563EB]">{f.icon}</span>
                                     {f.label}
                                 </div>
                             ))}
@@ -700,7 +742,14 @@ const handleRestore = async () => {
             <button
                 onClick={handleUpgrade}
                 disabled={upgrading}
-                className="mt-6 w-full h-[52px] bg-primary text-white rounded-[12px] text-[16px] font-semibold hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                // className="mt-6 w-full h-[52px] bg-primary text-white rounded-[12px] text-[16px] font-semibold hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="mt-6 w-full h-[52px] text-white rounded-[12px] text-[16px] font-semibold hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                style={{
+                    backgroundImage: "url('/images/buttonBg.svg')",
+                    backgroundSize: '350% 700%', backgroundPosition: 'center',
+                    boxShadow: '0px 0px 50px 0px #1953CB40',
+                    border: '1px solid rgba(255,255,255,0.35)',
+                }}
             >
                 {upgrading && <Spin size="small" />}
                 {upgrading ? "Processing..." : "Upgrade To Premium"}

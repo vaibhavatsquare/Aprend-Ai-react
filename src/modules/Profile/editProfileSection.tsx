@@ -194,15 +194,21 @@ const EditProfileSection = ({ user, onUpdated, onCancel }: Props) => {
                         Cancel
                     </button>
 
-                    <button
-                        disabled={!hasChanges || loading}
-                        onClick={handleSave}
-                        className={`w-full h-[48px] rounded-[12px] text-white flex items-center justify-center gap-2 transition
-  ${hasChanges ? "bg-[#0F3057]" : "bg-gray-300 cursor-not-allowed"}`}
-                    >
-                        {loading && <Spin size="small" className="[&_.ant-spin-dot-item]:bg-white" />}
-                        {loading ? "Saving..." : "Save"}
-                    </button>
+                   <button
+    disabled={!hasChanges || loading}
+    onClick={handleSave}
+    className="w-full h-[48px] rounded-[12px] text-white flex items-center justify-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
+    style={hasChanges ? {
+        backgroundImage: "url('/images/buttonBg.svg')",
+        backgroundSize: '350% 700%',
+        backgroundPosition: 'center',
+        boxShadow: '0px 0px 50px 0px #1953CB40',
+        border: '1px solid rgba(255,255,255,0.35)',
+    } : { backgroundColor: '#D1D5DB' }}
+>
+    {loading && <Spin size="small" className="[&_.ant-spin-dot-item]:bg-white" />}
+    {loading ? "Saving..." : "Save"}
+</button>
 
                 </div>
             </div>

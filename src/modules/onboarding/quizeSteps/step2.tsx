@@ -36,21 +36,23 @@ const Step2 = ({
             key={level.value}
             className={`w-full h-11 px-3 border rounded-xl flex justify-between items-center gap-3 cursor-pointer transition-all ${
               quiz.learningGoal === level.value
-                ? "border-primary"
+                ? "border-[#2563EB] bg-[#2563EB]"
                 : "border-[#DADADA] hover:border-gray-400"
             }`}
             onClick={() => handleSelect(level.value)}
           >
-            <p className="text-sm">{level.label}</p>
+            {/* <p className="text-sm">{level.label}</p> */}
+            <p className={`text-sm ${quiz.learningGoal === level.value ? "text-white" : "text-[#121212]"}`}>{level.label}</p>
             <div
               className={`w-4 h-4 flex justify-center items-center border-2 rounded-full transition-all ${
                 quiz.learningGoal === level.value
-                  ? "border-primary"
-                  : "border-[#DADADA] hover:border-primary"
+                  ? "border-white"
+                : "border-[#DADADA] hover:border-[#2563EB]"
               }`}
             >
               {quiz.learningGoal === level.value && (
-                <div className="w-2 h-2 bg-primary rounded-full" />
+                // <div className="w-2 h-2 bg-primary rounded-full" />
+                <div className="w-2 h-2 bg-white rounded-full" />
               )}
             </div>
           </div>
@@ -72,7 +74,14 @@ const Step2 = ({
         <Button
           disabled={!quiz.learningGoal}
           onClick={handleContinue}
-          className="w-[180px] h-10! rounded-xl! text-white! bg-primary! mt-4"
+          // className="w-[180px] h-10! rounded-xl! text-white! bg-primary! mt-4"
+          className="w-[180px] h-10! rounded-xl! text-white! mt-4"
+          style={{
+            backgroundImage: "url('/images/buttonBg.svg')",
+            backgroundSize: '350% 700%', backgroundPosition: 'center',
+            boxShadow: '0px 0px 50px 0px #1953CB40',
+            border: '1px solid rgba(255,255,255,0.35)',
+          }}
         >
           Continue
         </Button>

@@ -35,13 +35,14 @@ const ChooseLanguage = () => {
             <div
               key={language.value}
               className={`w-[280px] h-10 border rounded-xl flex justify-center items-center gap-3 cursor-pointer transition-all ${selectedLanguage === language.value
-                  ? "border-primary"
+                  ? "border-[#2563EB] bg-[#2563EB]"
                   : "border-[#DADADA] hover:border-gray-400"
                 }`}
               onClick={() => setSelectedLanguage(language.value)}
             >
               <Image src={language.flag} alt="" width={24} height={24} />
-              <p className="text-sm font-medium">{language.label}</p>
+              {/* <p className="text-sm font-medium">{language.label}</p> */}
+              <p className={`text-sm font-medium ${selectedLanguage === language.value ? "text-white" : ""}`}>{language.label}</p>
             </div>
           ))}
         </div>
@@ -49,7 +50,14 @@ const ChooseLanguage = () => {
         {selectedLanguage && (
           <Button
             onClick={handleContinue}
-            className="w-[280px] h-10! rounded-xl! text-white! bg-primary! mt-4"
+            // className="w-[280px] h-10! rounded-xl! text-white! bg-primary! mt-4"
+            className="w-[280px] h-10! rounded-xl! text-white! mt-4"
+            style={{
+              backgroundImage: "url('/images/buttonBg.svg')",
+              backgroundSize: '350% 700%', backgroundPosition: 'center',
+              boxShadow: '0px 0px 50px 0px #1953CB40',
+              border: '1px solid rgba(255,255,255,0.35)',
+            }}
           >
             Continue
           </Button>

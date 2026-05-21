@@ -102,17 +102,27 @@ const Sidebar = () => {
               title={isCollapsed ? item.label : ""}
               placement="right"
             >
+              <img src="/images/buttonBg.svg" alt="" className="hidden" aria-hidden="true" />
               <Link
                 href={item.href}
                 onClick={() => handleNavigation(item.key)}
                 className={`flex items-center cursor-pointer
                   border border-transparent hover:border-white
-                  transition-all duration-300
+                  transition-all duration-10
                   gap-2 pl-8 h-[50px] relative
-                  ${isActive ? "bg-primary" : ""}
+                  outline-none focus:outline-none
                 `}
+                style={isActive ? {
+                  backgroundImage: "url('/images/buttonBg.svg')",
+                  backgroundSize: '350% 700%',
+                  backgroundPosition: 'center',
+                  boxShadow: '0px 0px 50px 0px #1953CB40',
+                  border: '1px solid rgba(255,255,255,0.35)',
+                  WebkitTapHighlightColor: 'transparent',
+                } : { WebkitTapHighlightColor: 'transparent' }}
               >
                 <img src="/images/sidebar/curv.svg" alt="Loading" width={12} height={50} className="w-[12px] h-[50px] absolute left-0" />
+                
 
                 <Icon
                   className={`${isActive ? "text-white" : "text-secondary"} text-xl`}

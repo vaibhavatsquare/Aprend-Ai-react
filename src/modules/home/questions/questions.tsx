@@ -95,28 +95,37 @@ const Questions = () => {
                                             {t('questions.practiceTopicWise')}
                                         </p>
 
-                                        <button
-                                            onClick={() => {
-                                                // ✅ Check if free user has questions remaining
-                                                const { user, isPremium } = getUserData();
-                                                const canAskQuestion = user?.freePlan?.canAskQuestion;
-
-                                                if (!isPremium && !canAskQuestion) {
-                                                    setModalMessage("You've used all 20 daily questions. Upgrade to Premium for unlimited questions.");
-                                                    setShowUpgradeModal(true);
-                                                    return;
-                                                }
-
-                                                ChooseSubject();
-                                                setSource(QuestionSource.EXPLORE_QUESTION);
-                                            }}
-                                            className="w-full h-[50px] bg-primary rounded-[16px] flex items-center justify-center cursor-pointer"
-                                        >
-                                            <span className="text-white text-[18px] font-semibold">
-                                                {t('questions.exploreQuestions')}
-                                            </span>
-                                            <GoArrowRight className="text-white text-[26px] ml-4" />
-                                        </button>
+                                        <div style={{ borderRadius: '10px', boxShadow: '0px 0px 50px 0px #1953CB40' }}>
+                                            <div style={{
+                                                position: 'relative', width: '380px', height: '48px',
+                                                borderRadius: '12px', overflow: 'hidden',
+                                                backgroundImage: "url('/images/buttonBg.svg')",
+                                                backgroundSize: '350% 700%', backgroundPosition: 'center',
+                                            }}>
+                                                <button
+                                                    onClick={() => {
+                                                        const { user, isPremium } = getUserData();
+                                                        const canAskQuestion = user?.freePlan?.canAskQuestion;
+                                                        if (!isPremium && !canAskQuestion) {
+                                                            setModalMessage("You've used all 20 daily questions. Upgrade to Premium for unlimited questions.");
+                                                            setShowUpgradeModal(true);
+                                                            return;
+                                                        }
+                                                        ChooseSubject();
+                                                        setSource(QuestionSource.EXPLORE_QUESTION);
+                                                    }}
+                                                    style={{
+                                                        width: '100%', height: '100%', background: 'transparent',
+                                                        border: '1px solid rgba(255,255,255,0.35)', color: 'white',
+                                                        fontWeight: '600', fontSize: '18px', cursor: 'pointer',
+                                                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px'
+                                                    }}
+                                                >
+                                                    {t('questions.exploreQuestions')}
+                                                    <GoArrowRight style={{ fontSize: '26px' }} />
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -146,28 +155,37 @@ const Questions = () => {
                                             {t('questions.buildCustomMockTest')}
                                         </p>
 
-                                        <button
-                                            onClick={() => {
-                                                const { user, isPremium } = getUserData();
-                                                const canCreate = user?.freePlan?.canCreateMockExam;
-
-                                                if (!isPremium && !canCreate) {
-                                                    // ✅ Set simulados specific message
-                                                    setModalMessage("Simulados (Mock Exam) is a premium feature. Upgrade your plan to create custom mock tests.");
-                                                    setShowUpgradeModal(true);
-                                                    return;
-                                                }
-
-                                                ChooseSubject();
-                                                setSource(QuestionSource.SIMULADO);
-                                            }}
-                                            className="w-full h-[50px] bg-primary rounded-[16px] flex items-center justify-center cursor-pointer"
-                                        >
-                                            <span className="text-white text-[18px] font-semibold">
-                                                {t('home.simulados.createSimulados')}
-                                            </span>
-                                            <GoArrowRight className="text-white text-[26px] ml-4" />
-                                        </button>
+                                        <div style={{ borderRadius: '10px', boxShadow: '0px 0px 50px 0px #1953CB40' }}>
+                                            <div style={{
+                                                position: 'relative', width: '380px', height: '48px',
+                                                borderRadius: '12px', overflow: 'hidden',
+                                                backgroundImage: "url('/images/buttonBg.svg')",
+                                                backgroundSize: '350% 700%', backgroundPosition: 'center',
+                                            }}>
+                                                <button
+                                                    onClick={() => {
+                                                        const { user, isPremium } = getUserData();
+                                                        const canCreate = user?.freePlan?.canCreateMockExam;
+                                                        if (!isPremium && !canCreate) {
+                                                            setModalMessage("Simulados (Mock Exam) is a premium feature. Upgrade your plan to create custom mock tests.");
+                                                            setShowUpgradeModal(true);
+                                                            return;
+                                                        }
+                                                        ChooseSubject();
+                                                        setSource(QuestionSource.SIMULADO);
+                                                    }}
+                                                    style={{
+                                                        width: '100%', height: '100%', background: 'transparent',
+                                                        border: '1px solid rgba(255,255,255,0.35)', color: 'white',
+                                                        fontWeight: '600', fontSize: '18px', cursor: 'pointer',
+                                                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px'
+                                                    }}
+                                                >
+                                                    {t('home.simulados.createSimulados')}
+                                                    <GoArrowRight style={{ fontSize: '26px' }} />
+                                                </button>
+                                            </div>
+                                        </div>
 
                                     </div>
                                 </div>

@@ -107,9 +107,9 @@ const CustomBar = (props: any) => {
       <clipPath id={uid}>
         <rect x={x} y={y} width={width} height={height} rx={radius} ry={radius} />
       </clipPath>
-      <rect x={x} y={y} width={width} height={height} rx={radius} ry={radius} fill="white" stroke="#1B2A4A" strokeWidth={1.5} />
+      <rect x={x} y={y} width={width} height={height} rx={radius} ry={radius} fill="white" stroke="#2563EB" strokeWidth={1.5} />
       {filledHeight > 0 && (
-        <rect x={x} y={y + height - filledHeight} width={width} height={filledHeight} fill="#1B2A4A" clipPath={`url(#${uid})`} />
+        <rect x={x} y={y + height - filledHeight} width={width} height={filledHeight} fill="#2563EB" clipPath={`url(#${uid})`} />
       )}
     </g>
   );
@@ -251,7 +251,8 @@ const WeakSpotTracker = () => {
               >
                 <p className="font-semibold text-gray-900 text-[15px]">{card.subject}</p>
                 <p className="text-sm text-secondary flex-1 line-clamp-2">{card.tip}</p>
-                <button className="self-start px-4 py-1.5 rounded-full text-sm font-medium text-white bg-primary">
+                {/* <button className="self-start px-4 py-1.5 rounded-full text-sm font-medium text-white bg-primary"> */}
+                <button className="self-start px-4 py-1.5 rounded-full text-sm font-medium text-white bg-[#2563EB]">
                   {card.actionLabel}
                 </button>
               </div>
@@ -275,7 +276,8 @@ const WeakSpotTracker = () => {
                     key={v}
                     onClick={() => setChartView(v)}
                     className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
-                      chartView === v ? "bg-primary text-white shadow" : "text-secondary"
+                      // chartView === v ? "bg-primary text-white shadow" : "text-secondary"
+                      chartView === v ? "bg-[#2563EB] text-white shadow" : "text-secondary"
                     }`}
                   >
                     {v.charAt(0).toUpperCase() + v.slice(1)}

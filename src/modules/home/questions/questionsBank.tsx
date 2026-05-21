@@ -187,13 +187,15 @@ const QuestionsBank = ({
 
     if (status === "wrong" && selectedOption === optionId) return "#EF4444";
 
-    if (status === "showAnswer" && isCorrectOption) return "#0F3057";
+    // if (status === "showAnswer" && isCorrectOption) return "#0F3057";
+    if (status === "showAnswer" && isCorrectOption) return "#2563EB";
 
     if (status === "explanation") {
       if (isCorrectOption) return "#22C55E";
       if (selectedOption === optionId) return "#EF4444";
     }
-    if (status === "idle" && selectedOption === optionId) return "#0F3057";
+    // if (status === "idle" && selectedOption === optionId) return "#0F3057";
+    if (status === "idle" && selectedOption === optionId) return "#2563EB";
 
     return "#DADADA";
   };
@@ -226,7 +228,7 @@ const QuestionsBank = ({
 
           <div className="flex-1 h-[6px] bg-[#0F305729] rounded-full overflow-hidden">
             <div
-              className="h-full bg-[#0F3057]"
+              className="h-full bg-[#2563EB]"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -255,12 +257,18 @@ const QuestionsBank = ({
               <div
                 key={option.id}
                 onClick={() => handleSelect(option.id)}
+                // className="w-[50%] min-h-[56px] rounded-[14px] px-6 py-4 flex items-center justify-between cursor-pointer transition-all"
+                // style={{
+                //   border: `1px solid ${borderColor}`,
+                // }}
                 className="w-[50%] min-h-[56px] rounded-[14px] px-6 py-4 flex items-center justify-between cursor-pointer transition-all"
                 style={{
                   border: `1px solid ${borderColor}`,
+                  background: status === "idle" && selectedOption === option.id ? "#2563EB" : "white",
                 }}
               >
-                <span className="text-[18px] text-[#121212] leading-6 pr-4">
+                {/* <span className="text-[18px] text-[#121212] leading-6 pr-4"> */}
+                <span className="text-[18px] leading-6 pr-4" style={{ color: status === "idle" && selectedOption === option.id ? "#fff" : "#121212" }}>
                   {option.text}
                 </span>
 
@@ -269,12 +277,18 @@ const QuestionsBank = ({
                   style={{ borderColor }}
                 >
                   {shouldFill(option.id, isCorrectOption) && (
+                    // <div
+                    //   className="w-3 h-3 rounded-full"
+                    //   style={{
+                    //     background: borderColor,
+                    //   }}
+                    // />
                     <div
-                      className="w-3 h-3 rounded-full"
-                      style={{
-                        background: borderColor,
-                      }}
-                    />
+                        className="w-3 h-3 rounded-full"
+                        style={{
+                          background: status === "idle" && selectedOption === option.id ? "#fff" : borderColor,
+                        }}
+                      />
                   )}
                 </div>
               </div>
@@ -288,7 +302,14 @@ const QuestionsBank = ({
             <button
               onClick={handleSubmit}
               disabled={submitting}
-              className="w-[60%] h-[48px] mx-auto bg-[#0F3057] text-white rounded-xl flex justify-center items-center gap-2"
+              // className="w-[60%] h-[48px] mx-auto bg-[#0F3057] text-white rounded-xl flex justify-center items-center gap-2"
+              className="w-[60%] h-[48px] mx-auto text-white rounded-xl flex justify-center items-center gap-2"
+          style={{
+            backgroundImage: "url('/images/buttonBg.svg')",
+            backgroundSize: '350% 900%', backgroundPosition: 'center',
+            boxShadow: '0px 0px 50px 0px #1953CB40',
+            border: '1px solid rgba(255,255,255,0.35)',
+          }}
             >
               {submitting ? (
                 <>
@@ -357,7 +378,13 @@ const QuestionsBank = ({
                 </button>
                 <button
                   onClick={handleNext}
-                  className="flex-1 h-[48px] bg-[#0F3057] text-white rounded-xl"
+                  className="flex-1 h-[48px] text-white rounded-xl"
+                  style={{
+                    backgroundImage: "url('/images/buttonBg.svg')",
+                    backgroundSize: '350% 1200%', backgroundPosition: 'center',
+                    boxShadow: '0px 0px 50px 0px #1953CB40',
+                    border: '1px solid rgba(255,255,255,0.35)',
+                  }}
                 >
                   Skip explanation
                 </button>

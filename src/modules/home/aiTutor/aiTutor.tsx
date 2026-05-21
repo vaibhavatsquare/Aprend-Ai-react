@@ -702,7 +702,15 @@ const AiTutor = () => {
               setShowUpgradeModal(false);
               useRedirect("/profile?open=subscription");
             }}
-            className="w-full h-[48px] bg-primary text-white rounded-[12px] text-[15px] font-semibold hover:opacity-90 transition-opacity"
+            // className="w-full h-[48px] bg-primary text-white rounded-[12px] text-[15px] font-semibold hover:opacity-90 transition-opacity"
+            className="w-full h-[48px] text-white rounded-[12px] text-[15px] font-semibold hover:opacity-90 transition-opacity"
+            style={{
+              backgroundImage: "url('/images/buttonBg.svg')",
+              backgroundSize: '175% 700%',
+              backgroundPosition: 'center',
+              boxShadow: '0px 0px 50px 0px #1953CB40',
+              border: '1px solid rgba(255,255,255,0.35)',
+            }}
           >
             Upgrade To Premium
           </button>
@@ -736,7 +744,15 @@ const AiTutor = () => {
                 }, 300);
               }}
             >
-              <div className="w-[100px] h-[100px] rounded-full bg-primary flex items-center justify-center">
+              {/* <div className="w-[100px] h-[100px] rounded-full bg-primary flex items-center justify-center"> */}
+              <div className="w-[100px] h-[100px] rounded-full flex items-center justify-center"
+                style={{
+                  backgroundImage: "url('/images/buttonBg.svg')",
+                  backgroundSize: '1400% 900%',
+                  backgroundPosition: 'center',
+                  boxShadow: '0px 0px 50px 0px #1953CB40',
+                  border: '1px solid rgba(255,255,255,0.35)',
+                }}>
                 <svg width="42" height="42" fill="none" viewBox="0 0 24 24" stroke="white" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
@@ -755,7 +771,19 @@ const AiTutor = () => {
                 }, 300);
               }}
             >
-              <div className="w-[100px] h-[100px] rounded-full bg-[#1B2A4A] flex items-center justify-center">
+              {/* <div className="w-[100px] h-[100px] rounded-full bg-[#1B2A4A] flex items-center justify-center">
+                <svg width="42" height="42" fill="none" viewBox="0 0 24 24" stroke="white" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 18h16.5M3.75 6h16.5A1.5 1.5 0 0121.75 7.5v9a1.5 1.5 0 01-1.5 1.5H3.75a1.5 1.5 0 01-1.5-1.5v-9A1.5 1.5 0 013.75 6z" />
+                </svg>
+              </div> */}
+              <div className="w-[100px] h-[100px] rounded-full flex items-center justify-center"
+                style={{
+                  backgroundImage: "url('/images/buttonBg.svg')",
+                  backgroundSize: '1400% 900%',
+                  backgroundPosition: 'center',
+                  boxShadow: '0px 0px 50px 0px #1953CB40',
+                  border: '1px solid rgba(255,255,255,0.35)',
+                }}>
                 <svg width="42" height="42" fill="none" viewBox="0 0 24 24" stroke="white" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 18h16.5M3.75 6h16.5A1.5 1.5 0 0121.75 7.5v9a1.5 1.5 0 01-1.5 1.5H3.75a1.5 1.5 0 01-1.5-1.5v-9A1.5 1.5 0 013.75 6z" />
                 </svg>

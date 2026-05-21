@@ -44,7 +44,7 @@ export interface SubscriptionDetails {
   pausedAt: string | null;
   resumedAt: string | null;
   cancelledAt: string | null;
-  subscriptionStatus: "ACTIVE" | "CANCELLED" | "PAUSED";
+  subscriptionStatus: "ACTIVE" | "CANCELLED" | "PAUSED" | "TRIAL";
   status: "ENABLED" | "DISABLED";
   isDeleted: boolean;
   createdAt: string;

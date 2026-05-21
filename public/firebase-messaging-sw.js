@@ -59,7 +59,47 @@ self.addEventListener("notificationclick", (event) => {
 
 
 
+// importScripts("https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js");
+// importScripts("https://www.gstatic.com/firebasejs/9.22.0/firebase-messaging-compat.js");
 
+// let messaging;
+
+// async function initFirebase() {
+//   const res = await fetch("/api/firebase-config");
+//   const config = await res.json();
+//   firebase.initializeApp(config);
+//   messaging = firebase.messaging();
+
+//   messaging.onBackgroundMessage((payload) => {
+//     if (!payload.notification) return;
+
+//     const notificationTitle = payload.notification.title;
+//     const notificationOptions = {
+//       body: payload.notification.body,
+//       icon: payload.notification.icon,
+//       data: { url: payload.fcmOptions?.link || "/" },
+//     };
+
+//     self.registration.getNotifications().then((existingNotifications) => {
+//       const alreadyExists = existingNotifications.some(
+//         (n) => n.title === notificationTitle && n.body === notificationOptions.body
+//       );
+//       if (!alreadyExists) {
+//         self.registration.showNotification(notificationTitle, notificationOptions);
+//       }
+//     });
+//   });
+// }
+
+// self.addEventListener("install", (event) => {
+//   event.waitUntil(initFirebase());
+// });
+
+// self.addEventListener("notificationclick", (event) => {
+//   event.notification.close();
+//   const url = event.notification?.data?.url || "/";
+//   event.waitUntil(clients.openWindow(url));
+// });
 
 
 

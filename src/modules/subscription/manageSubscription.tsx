@@ -9,7 +9,6 @@ const ManageSubscriptionPage = () => {
     const [subscription, setSubscription] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [cancelling, setCancelling] = useState(false);
-    // const redirect = useRedirect();
 
     const loadSubscription = async () => {
         try {
@@ -26,16 +25,16 @@ const ManageSubscriptionPage = () => {
     useEffect(() => {
         loadSubscription();
     }, []);
-    
+
     useEffect(() => {
-    const handlePageShow = (e: PageTransitionEvent) => {
-        if (e.persisted) {
-            setLoading(false);
-        }
-    };
-    window.addEventListener("pageshow", handlePageShow);
-    return () => window.removeEventListener("pageshow", handlePageShow);
-}, []);
+        const handlePageShow = (e: PageTransitionEvent) => {
+            if (e.persisted) {
+                setLoading(false);
+            }
+        };
+        window.addEventListener("pageshow", handlePageShow);
+        return () => window.removeEventListener("pageshow", handlePageShow);
+    }, []);
 
     const handleCancel = async () => {
         if (cancelling) return;
@@ -59,11 +58,14 @@ const ManageSubscriptionPage = () => {
         });
     };
 
-    const planLabel = subscription?.planType
-        ? `Your ${subscription.planType.charAt(0).toUpperCase() + subscription.planType.slice(1).toLowerCase()} Plan`
-        : "Your Plan";
+    // ── Derived state — declared before use ──────────────────────────────────
+    const isTrial = subscription?.subscriptionStatus === "TRIAL";
+    const isActive = subscription?.subscriptionStatus === "ACTIVE" ||
+        subscription?.subscriptionStatus === "TRIAL";
 
-    const isActive = subscription?.subscriptionStatus === "ACTIVE";
+    const planLabel = subscription?.planType
+        ? `Your ${subscription.price >= 100 ? "Yearly" : "Monthly"} Plan${isTrial ? " (Free Trial)" : ""}`
+        : "Your Plan";
 
     return (
         <div className="min-h-screen bg-gray-50 px-6 py-6 flex flex-col">
@@ -105,16 +107,23 @@ const ManageSubscriptionPage = () => {
                     </button>
                 </div>
             ) : (
-                /* Active subscription */
+                /* Active / Trial subscription */
                 <div className="flex-1 flex flex-col items-center justify-center gap-8">
                     {/* Plan Overview Card */}
                     <div
                         className="w-full max-w-sm bg-white rounded-[20px] p-6 flex flex-col gap-4"
                         style={{ boxShadow: "0px 2px 12px rgba(0,0,0,0.08)" }}
                     >
-                        <p className="text-[14px] text-secondary">
-                            Check Your Plan Overview :
-                        </p>
+                        <div className="flex items-center justify-between">
+                            <p className="text-[14px] text-secondary">
+                                Check Your Plan Overview :
+                            </p>
+                            {isTrial && (
+                                <span className="text-[11px] bg-blue-600 text-white px-2 py-0.5 rounded-full">
+                                    Free Trial
+                                </span>
+                            )}
+                        </div>
 
                         <h2 className="text-[24px] font-bold text-gray-900">
                             {planLabel}
@@ -122,7 +131,7 @@ const ManageSubscriptionPage = () => {
 
                         {/* Timeline */}
                         <div className="flex flex-col gap-0">
-                            {/* Active From */}
+                            {/* Active From / Trial Started */}
                             <div className="flex items-start gap-3">
                                 <div className="flex flex-col items-center">
                                     <div className="w-7 h-7 rounded-full bg-gray-900 flex items-center justify-center shrink-0">
@@ -133,14 +142,14 @@ const ManageSubscriptionPage = () => {
                                     <div className="w-px h-8 border-l-2 border-dashed border-gray-300 mt-1" />
                                 </div>
                                 <p className="text-[15px] text-gray-700 mt-0.5">
-                                    Active From{" "}
+                                    {isTrial ? "Trial Started" : "Active From"}{" "}
                                     <span className="font-bold">
                                         {subscription?.purchasedAt ? formatDate(subscription.purchasedAt) : "—"}
                                     </span>
                                 </p>
                             </div>
 
-                            {/* Expire On */}
+                            {/* Expire On / Trial Ends */}
                             <div className="flex items-start gap-3">
                                 <div className="w-7 h-7 rounded-full bg-gray-900 flex items-center justify-center shrink-0">
                                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -148,7 +157,7 @@ const ManageSubscriptionPage = () => {
                                     </svg>
                                 </div>
                                 <p className="text-[15px] text-gray-700 mt-0.5">
-                                    Expire on{" "}
+                                    {isTrial ? "Trial Ends" : "Expire on"}{" "}
                                     <span className="font-bold">
                                         {subscription?.endsAt ? formatDate(subscription.endsAt) : "—"}
                                     </span>
@@ -159,7 +168,10 @@ const ManageSubscriptionPage = () => {
                         {/* Status */}
                         <p className="text-[14px] text-gray-600 mt-2">
                             <span className="font-semibold underline">Status:</span>{" "}
-                            You can explore all features and content without limits.
+                            {isTrial
+                                ? "You are on a free trial. You will be charged after the trial ends."
+                                : "You can explore all features and content without limits."
+                            }
                         </p>
                     </div>
 

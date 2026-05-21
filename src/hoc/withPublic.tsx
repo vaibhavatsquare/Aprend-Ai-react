@@ -20,7 +20,7 @@ function withPublic<P extends object>(
         if (user && idToken) {
           router.replace("/home"); // Replace with your protected home route
         } else {
-          clearData();
+         if (!user) clearData();
           setLoading(false);
         }
       });

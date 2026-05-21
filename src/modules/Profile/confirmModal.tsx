@@ -62,7 +62,8 @@ const { t } = useTranslation();
               {isDelete ? (
                 <FiTrash2 size={50} className="text-red-500" />
               ) : (
-                <FiLogOut size={50} className="text-[#0F3057]" />
+                // <FiLogOut size={50} className="text-[#0F3057]" />
+                <FiLogOut size={50} className="text-[#2563EB]" />
               )}
             </div>
 
@@ -84,9 +85,13 @@ const { t } = useTranslation();
 
               <button
                 onClick={onConfirm}
-                className={`flex-1 h-[40px] rounded-[8px] text-white ${
-                  isDelete ? "bg-red-500" : "bg-[#0F3057]"
-                }`}
+               className={`flex-1 h-[40px] rounded-[8px] text-white ${isDelete ? "bg-red-500" : ""}`}
+              style={!isDelete ? {
+                backgroundImage: "url('/images/buttonBg.svg')",
+                backgroundSize: '350% 700%', backgroundPosition: 'center',
+                boxShadow: '0px 0px 50px 0px #1953CB40',
+                border: '1px solid rgba(255,255,255,0.35)',
+              } : {}}
               >
                 {isDelete ? t("common.delete") : t("nav.logout")}
               </button>

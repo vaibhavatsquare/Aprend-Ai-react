@@ -143,8 +143,10 @@ const ChooseSubjects = ({
                 className="h-[36px] px-4 flex items-center rounded-[4px] border text-[18px] cursor-pointer transition-all"
                 style={{
                   borderColor: isSelected ? "#0F3057" : "#DADADA",
-                  color: isSelected ? "#0F3057" : "#121212",
-                  background: isSelected ? "#F5F9FF" : "white",
+                  // color: isSelected ? "#0F3057" : "#121212",
+                  color: isSelected ? "#fff" : "#121212",
+                  // background: isSelected ? "#F5F9FF" : "white",
+                  background: isSelected ? "#2563EB" : "white",
                 }}
               >
                 {item.label}
@@ -173,7 +175,7 @@ const ChooseSubjects = ({
                 max={remainingQuestions} // ✅ limited to remainingQuestions for free users
                 value={value}
                 onChange={(e) => setValue(Number(e.target.value))}
-                className="w-full accent-[#0F3057]"
+                className="w-full accent-[#2563EB]"
               />
 
               {/* VALUE UNDER THUMB */}
@@ -208,14 +210,17 @@ const ChooseSubjects = ({
                     onClick={() => handleDifficulty(item.value)}
                     className="w-full h-[70px] border rounded-[12px] px-4 flex items-center justify-between cursor-pointer transition-all"
                     style={{
-                      borderColor: isSelected ? "#0F3057" : "#DADADA",
-                      background: isSelected ? "#F5F9FF" : "white",
+                      // borderColor: isSelected ? "#0F3057" : "#DADADA",
+                      borderColor: isSelected ? "#2563EB" : "#DADADA",
+                      // background: isSelected ? "#F5F9FF" : "white",
+                      background: isSelected ? "#2563EB" : "white",
                     }}
                   >
                     <span
                       className="text-[18px]"
                       style={{
-                        color: isSelected ? "#0F3057" : "#121212",
+                        // color: isSelected ? "#0F3057" : "#121212",
+                        color: isSelected ? "#fff" : "#121212",
                       }}
                     >
                       {item.label}
@@ -225,11 +230,13 @@ const ChooseSubjects = ({
                     <div
                       className="w-4 h-4 rounded-full border flex items-center justify-center"
                       style={{
-                        borderColor: isSelected ? "#0F3057" : "#DADADA",
+                        // borderColor: isSelected ? "#0F3057" : "#DADADA",
+                        borderColor: isSelected ? "#fff" : "#DADADA",
                       }}
                     >
                       {isSelected && (
-                        <div className="w-2 h-2 rounded-full bg-[#0F3057]" />
+                        // <div className="w-2 h-2 rounded-full bg-[#0F3057]" />
+                        <div className="w-2 h-2 rounded-full bg-white" />
                       )}
                     </div>
                   </div>
@@ -255,20 +262,35 @@ const ChooseSubjects = ({
         </button>
 
         {/* CONTINUE */}
-        <button
-          onClick={handleContinue}
-          disabled={loading}
-          className="w-80 h-[50px] px-16 bg-[#0F3057] text-white rounded-[12px] flex items-center justify-center gap-2 disabled:opacity-60"
-        >
-          {loading ? (
-            <>
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              Generating...
-            </>
-          ) : (
-            "Continue"
-          )}
-        </button>
+       <div style={{ borderRadius: '12px', boxShadow: '0px 0px 50px 0px #1953CB40' }}>
+  <div style={{
+    position: 'relative', width: '320px', height: '50px',
+    borderRadius: '12px', overflow: 'hidden',
+    backgroundImage: "url('/images/buttonBg.svg')",
+    backgroundSize: '350% 700%', backgroundPosition: 'center',
+  }}>
+    <button
+      onClick={handleContinue}
+      disabled={loading}
+      style={{
+        width: '100%', height: '100%', background: 'transparent',
+        border: '1px solid rgba(255,255,255,0.35)', color: 'white',
+        fontWeight: '600', fontSize: '16px', cursor: 'pointer',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+        opacity: loading ? 0.6 : 1,
+      }}
+    >
+      {loading ? (
+        <>
+          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          Generating...
+        </>
+      ) : (
+        "Continue"
+      )}
+    </button>
+  </div>
+</div>
 
       </div>
     </div>

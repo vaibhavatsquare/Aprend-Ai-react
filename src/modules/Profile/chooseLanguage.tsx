@@ -58,15 +58,21 @@ const LanguageSection = ({
                     {languages.map((language: any) => (
                         <div
                             key={language.value}
+                            //             className={`w-full h-10 border rounded-xl flex justify-center items-center gap-3 cursor-pointer transition-all
+                            // ${selectedLang === language.value
+                            //                     ? "border-primary"
+                            //                     : "border-[#DADADA] hover:border-gray-400"
+                            //                 }`}
                             className={`w-full h-10 border rounded-xl flex justify-center items-center gap-3 cursor-pointer transition-all
                 ${selectedLang === language.value
-                                    ? "border-primary"
+                                    ? "border-[#2563EB] bg-[#2563EB]"
                                     : "border-[#DADADA] hover:border-gray-400"
                                 }`}
                             onClick={() => setSelectedLang(language.value)}
                         >
                             <Image src={language.flag} alt="" width={24} height={24} />
-                            <p className="text-sm font-medium">{language.label}</p>
+                            {/* <p className="text-sm font-medium">{language.label}</p> */}
+                            <p className={`text-sm font-medium ${selectedLang === language.value ? "text-white" : "text-[#121212]"}`}>{language.label}</p>
                         </div>
                     ))}
                 </div>
@@ -77,7 +83,15 @@ const LanguageSection = ({
                 <button
                     onClick={handleSave}
                     disabled={!selectedLang}
-                    className="w-[280px] h-10 rounded-xl text-white bg-primary disabled:opacity-50"
+                    // className="w-[280px] h-10 rounded-xl text-white bg-primary disabled:opacity-50"
+                    // className="w-[280px] h-10 rounded-xl text-white bg-[#2563EB] disabled:opacity-50"
+                    className="w-[280px] h-10 rounded-xl text-white disabled:opacity-50"
+                    style={{
+                        backgroundImage: "url('/images/buttonBg.svg')",
+                        backgroundSize: '350% 700%', backgroundPosition: 'center',
+                        boxShadow: '0px 0px 50px 0px #1953CB40',
+                        border: '1px solid rgba(255,255,255,0.35)',
+                    }}
                 >
                     {t('onboarding.completeProfile')}
                 </button>

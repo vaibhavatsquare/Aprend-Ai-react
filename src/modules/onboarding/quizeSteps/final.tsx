@@ -18,7 +18,7 @@ const Final = ({ quiz }: { quiz: any }) => {
           width={110}
           height={110}
         />
-        <h1 className="text-xl font-semibold text-primary">
+        <h1 className="text-xl font-semibold text-[#1D47A5] ">
           Congratulation! Your study plan is ready.
         </h1>
       </div>
@@ -70,7 +70,14 @@ const Final = ({ quiz }: { quiz: any }) => {
 
       <Button
         onClick={() => useRedirect("/home")}
-        className="h-10! px-16! rounded-xl! text-white! bg-primary! mt-4"
+        // className="h-10! px-16! rounded-xl! text-white! bg-primary! mt-4"
+        className="h-10! px-16! rounded-xl! text-white! mt-4"
+        style={{
+          backgroundImage: "url('/images/buttonBg.svg')",
+          backgroundSize: '350% 700%', backgroundPosition: 'center',
+          boxShadow: '0px 0px 50px 0px #1953CB40',
+          border: '1px solid rgba(255,255,255,0.35)',
+        }}
       >
         Start Your Learning Journey
       </Button>

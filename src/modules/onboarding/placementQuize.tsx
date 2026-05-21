@@ -50,14 +50,16 @@ const PlacementQuize = () => {
       <div className="flex flex-col gap-6 items-center">
         {currentStep <= 5 && (
           <div className="w-[250px] flex flex-col items-center gap-2">
-            <p className="text-xs text-primary font-medium">
+            {/* <p className="text-xs text-primary font-medium"> */}
+            <p className="text-xs text-[#2563EB] font-medium">
               {currentStep}/5
             </p>
             <Progress
               percent={currentStep * 20}
               size="small"
               showInfo={false}
-              strokeColor="#0F3057"
+              // strokeColor="#0F3057"
+              strokeColor="#2563EB"
             />
           </div>
         )}
