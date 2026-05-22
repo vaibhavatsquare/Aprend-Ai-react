@@ -36,6 +36,11 @@ const Home = () => {
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   const fetched = useRef(false);
+
+  useEffect(() => {
+    const img = new window.Image();
+    img.src = '/images/buttonBg.svg';
+  }, []);
   useEffect(() => {
     const checkPremium = () => {
       const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -67,6 +72,26 @@ const Home = () => {
 
     return () => clearTimeout(timer);
   }, []);
+
+// Add this ref
+const activeTaskRef = useRef<any>(null);
+
+// Keep ref in sync with state
+useEffect(() => {
+    activeTaskRef.current = activeTask;
+}, [activeTask]);
+
+// Use ref inside popstate handler
+useEffect(() => {
+    const handlePopState = () => {
+        if (activeTaskRef.current) {
+            setActiveTask(null);
+        }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+}, []); // 👈 empty deps — only registers once
+
 
   const handleWeakSpotClick = () => {
     if (!isPremium) {
@@ -172,7 +197,7 @@ const Home = () => {
             {streakSub}
           </h1>
           <AiOutlineFire className="text-white text-4xl" />
-          {streak > 0 && (
+          {streak >= 0 && (
             <div className="absolute -bottom-3 right-5 flex gap-2 items-center text-[#FFFFFF80] font-medium">
               <h2 className="text-5xl">{streak}</h2>
               <p className="text-xl">days</p>
@@ -186,11 +211,24 @@ const Home = () => {
             const iso = date.toISOString().split("T")[0];
             const isSelected = iso === selectedDate;
             return (
+              // <div
+              //   key={index}
+              //   onClick={() => setSelectedDate(iso)}
+              //   className={`w-[56px] h-[66px] rounded-lg flex flex-col items-center justify-center cursor-pointer transition-all border
+              //     ${isSelected ? "text-white border-transparent" : "bg-white text-black border-[#E5E5E5]"}`}
+              //   style={isSelected ? {
+              //     backgroundImage: "url('/images/buttonBg.svg')",
+              //     backgroundSize: '1700% 1400%',
+              //     backgroundPosition: 'center',
+              //     boxShadow: '0px 0px 50px 0px #1953CB40',
+              //     border: '1px solid rgba(255,255,255,0.35)',
+              //   } : { boxShadow: "0px 2px 6px rgba(0,0,0,0.06)" }}
+              // >
               <div
                 key={index}
                 onClick={() => setSelectedDate(iso)}
-                className={`w-[56px] h-[66px] rounded-lg flex flex-col items-center justify-center cursor-pointer transition-all border
-                  ${isSelected ? "text-white border-transparent" : "bg-white text-black border-[#E5E5E5]"}`}
+                className={`w-[56px] h-[66px] rounded-lg flex flex-col items-center justify-center cursor-pointer border
+    ${isSelected ? "text-white border-transparent reveal-from-center" : "bg-white text-black border-[#E5E5E5]"}`}
                 style={isSelected ? {
                   backgroundImage: "url('/images/buttonBg.svg')",
                   backgroundSize: '1700% 1400%',
@@ -227,7 +265,11 @@ const Home = () => {
             {tasksForDate.map((task: any) => (
               <div
                 key={task.id}
-                onClick={() => setActiveTask(task)}
+                // onClick={() => setActiveTask(task)}
+                onClick={() => {
+                  window.history.pushState({ task: true }, '');
+                  setActiveTask(task);
+                }}
                 className="p-2 border border-gray-200 rounded-[14px] flex gap-1 items-center justify-between cursor-pointer"
                 style={{ boxShadow: "0px 0px 1px 0px #00000040" }}
               >

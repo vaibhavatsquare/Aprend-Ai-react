@@ -132,6 +132,7 @@ const SavedNotes = ({ showBack = false, onBack }: SavedNotesProps) => {
                 className="h-[calc(100vh-100px)] mt-1 mb-4 rounded-[32px] col-span-2 flex flex-col gap-4 overflow-hidden"
                 style={{
                     boxShadow: "0px 0px 4px 0px #00000040",
+                    backgroundColor: '#F7F9FC'
                 }}
             >
                 {/* 🔹 FIXED HEADER */}

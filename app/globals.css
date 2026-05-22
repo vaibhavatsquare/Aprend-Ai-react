@@ -170,3 +170,70 @@ body {
   top: 12px !important;
   right: 12px !important;
 }
+
+@keyframes revealFromCenter {
+  from { clip-path: circle(0% at 50% 50%); }
+  to   { clip-path: circle(150% at 50% 50%); }
+}
+
+.reveal-from-center {
+  animation: revealFromCenter 0.3s ease-out forwards;
+}
+
+.notification-switch.ant-switch {
+  border-radius: 30px !important;
+  min-width: 40px !important;
+  height: 25px !important;
+}
+
+.notification-switch.ant-switch .ant-switch-handle {
+  border-radius: 50% !important;
+  width: 18px !important;
+  height: 20px !important;
+}
+/*-------------------------------------------------------------------------------*/
+/* .focus-switch.ant-switch {
+  border-radius: 30px !important;
+  min-width: 120px !important;
+  width: 120px !important;
+  height: 44px !important;
+  line-height: 44px !important;
+}
+
+.focus-switch.ant-switch .ant-switch-handle {
+  border-radius: 50% !important;
+  width: 36px !important;
+  height: 36px !important;
+  top: 4px !important;
+  inset-inline-start: 4px !important;
+}
+
+.focus-switch.ant-switch.ant-switch-checked .ant-switch-handle {
+  inset-inline-start: calc(100% - 40px) !important;
+}
+
+.focus-switch.ant-switch .ant-switch-inner {
+  padding-inline-start: 12px !important;
+  padding-inline-end: 48px !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  letter-spacing: 1px !important;
+}
+
+.focus-switch.ant-switch.ant-switch-checked .ant-switch-inner {
+  padding-inline-start: 48px !important;
+  padding-inline-end: 12px !important;
+} */
+
+
+.focus-switch.ant-switch {
+  border-radius: 20px !important;
+  min-width: 50px !important;
+  height: 28px !important;
+}
+
+.focus-switch.ant-switch .ant-switch-handle {
+  border-radius: 50% !important;
+  width: 22px !important;
+  height: 22px !important;
+}

@@ -167,7 +167,7 @@ const { t } = useTranslation();
     <div className="px-4">
       <div
         className="h-[calc(100vh-100px)] mt-1 mb-4 py-6 rounded-[32px] flex flex-col"
-        style={{ boxShadow: "0px 0px 4px 0px #00000040" }}
+        style={{ boxShadow: "0px 0px 4px 0px #00000040",backgroundColor: '#F7F9FC' }}
       >
         {/* HEADER */}
         <div className="relative flex justify-center items-center">

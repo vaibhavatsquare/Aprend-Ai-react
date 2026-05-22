@@ -169,7 +169,7 @@ const SavedFlashCards = ({
         <div className="px-4">
             <div
                 className="h-[calc(100vh-100px)] mt-1 mb-4 rounded-[32px] col-span-2 flex flex-col gap-4 overflow-hidden"
-                style={{ boxShadow: "0px 0px 4px 0px #00000040" }}
+                style={{ boxShadow: "0px 0px 4px 0px #00000040",backgroundColor: '#F7F9FC' }}
             >
                 <div
                     className={`py-3 px-6 flex items-center relative ${!initialLoading && flashCards.length === 0 ? "mt-5" : ""}`}>
@@ -186,7 +186,7 @@ const SavedFlashCards = ({
                     </h1>
                 </div>
 
-                <div className="flex-1 overflow-y-auto px-6 scrollbar">
+                <div className="flex-1 overflow-y-auto px-6 scrollbar ">
                     {initialLoading ? (
                         <CardsShimmer count={5} />
                     ) : flashCards.length === 0 ? (

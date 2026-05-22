@@ -27,6 +27,11 @@ const Navbar = () => {
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+  const img = new window.Image();
+  img.src = '/images/buttonBg.svg';
+}, []);
+
   // USER INIT
  useEffect(() => {
     const storedUser = getStoredUser();
@@ -93,11 +98,12 @@ const Navbar = () => {
       <div className="flex gap-3 items-center relative" ref={dropdownRef}>
 
         {/* FOCUS MODE */}
-        <Switch
+        {/* <Switch
+          className="focus-switch"
           checked={focusMode}
           onChange={handleFocusToggle}
           checkedChildren={
-            <p className="font-semibold text-white">ON</p>
+            <p className="font-roboto text-white">FOCUS</p>
           }
           unCheckedChildren={
             <p className="font-semibold text-black">OFF</p>
@@ -110,8 +116,54 @@ const Navbar = () => {
             } : {
               backgroundColor: '#E5E7EB',
             }}
-        />
+        /> */}
+<div
+  onClick={() => handleFocusToggle(!focusMode)}
+  className={`relative cursor-pointer flex items-center ${focusMode ? 'reveal-from-center' : ''}`}
+  style={{
+    width: focusMode ? '86px' : '65px',   // 👈 changes based on state
+    height: '36px',
+    borderRadius: '24px',
+    padding: '4px 8px',
+    gap: '8px',
+    transition: 'all 0.3s',
+    ...(focusMode ? {
+      backgroundImage: "url('/images/buttonBg.svg')",
+      backgroundSize: '800% 900%',
+      backgroundPosition: 'center',
+      boxShadow: '0px 0px 20px 0px #1953CB40',
+    } : {
+      backgroundColor: '#E5E7EB',
+    })
+  }}
+>
+  {/* Text */}
+  <span
+    className="font-bold text-[11px] tracking-wider absolute"
+    style={{
+      color: focusMode ? 'white' : '#374151',
+      left: focusMode ? '10px' : 'auto',    // 👈 left when ON
+    right: focusMode ? 'auto' : '10px',
+    }}
+  >
+    {focusMode ? 'FOCUS' : 'OFF'}
+  </span>
 
+  {/* Thumb */}
+  <div
+    style={{
+      position: 'absolute',
+      width: '28px',
+      height: '28px',
+      borderRadius: '50%',
+      backgroundColor: 'white',
+      top: '4px',
+      left: focusMode ? 'calc(100% - 36px)' : '4px',
+      transition: 'left 0.3s ease',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+    }}
+  />
+</div>
         {/* BELL */}
         <div className="cursor-pointer" onClick={() => setOpen(!open)}>
           <IconNotificationBell />

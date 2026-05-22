@@ -355,9 +355,10 @@ const AiTutor = () => {
         className="h-[calc(100vh-100px)] mt-1 mb-4 py-4 rounded-xl col-span-2 flex flex-col gap-4"
         style={{
           boxShadow: "0px 0px 4px 0px #00000040",
+          backgroundColor: '#F7F9FC'
         }}
       >
-        <div className="mx-4 flex relative justify-center">
+        <div className="mx-4 flex relative justify-center" style={{ backgroundColor: '#F7F9FC' }}>
           <GoArrowLeft
             className="text-xl absolute left-0 cursor-pointer"
             onClick={() => useBack()}
@@ -365,7 +366,7 @@ const AiTutor = () => {
           <h1 className="text-base font-semibold">AI Tutor</h1>
         </div>
 
-        <div className="px-4 relative flex-1 flex flex-col gap-2 overflow-y-auto scrollbar">
+        <div className="px-4 relative flex-1 flex flex-col gap-2 overflow-y-auto scrollbar" style={{ backgroundColor: '#F7F9FC' }}>
           {messages.length === 0 && (
             <h1 className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-4xl font-semibold bg-linear-to-r from-primary via-[#6D8199] to-primary bg-clip-text text-transparent">
               Hello{userName ? `, ${userName}!` : ""}
@@ -435,9 +436,9 @@ const AiTutor = () => {
         {/* Inputs */}
         <div className="flex flex-col gap-4">
           {messages.length > 0 && (
-            <div className="px-4 grid grid-cols-2 gap-3">
+            <div className="px-4 grid grid-cols-2 gap-3  ">
               <div
-                className={`w-full flex gap-2 items-center justify-between rounded-full px-4 py-2.5 border border-[#DADADA] transition-all
+                className={`w-full flex gap-2 items-center justify-between rounded-full px-4 py-2.5 border border-[#DADADA] transition-all bg-white
     ${!conversationId || isSavingNote ? "opacity-50 pointer-events-none" : "cursor-pointer"}
   `}
                 onClick={handleGenerateNote}
@@ -447,13 +448,13 @@ const AiTutor = () => {
                 </p>
 
                 {isSavingNote ? (
-                  <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" style={{backgroundColor: '#ffffff'}} />
                 ) : (
                   <NotesIcon />
                 )}
               </div>
               <div
-                className={`w-full flex gap-2 items-center justify-between rounded-full px-4 py-2.5 border border-[#DADADA] transition-all
+                className={`w-full flex gap-2 items-center justify-between rounded-full px-4 py-2.5 border border-[#DADADA] transition-all bg-white
     ${!conversationId || isGeneratingFlashcard
                     ? "opacity-50 pointer-events-none"
                     : "cursor-pointer"
@@ -478,6 +479,7 @@ const AiTutor = () => {
             className="mx-4 flex flex-col gap-2 rounded-xl p-3"
             style={{
               boxShadow: "0px 0px 4px 0px #00000040",
+              backgroundColor: '#ffffff',
             }}
           >
             {/* Image Preview */}

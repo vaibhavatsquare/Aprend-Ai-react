@@ -62,6 +62,7 @@ const SavedCard = ({
         height: "76px",
         boxShadow: "0px 0px 4px 0px #00000040",
         borderRadius: "20px",
+        backgroundColor: "#ffffff",
       }}
     >
       {/* LEFT SECTION */}

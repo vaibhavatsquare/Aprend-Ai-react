@@ -233,11 +233,12 @@ const UserProfile = () => {
                                     title={t('profile.notificationPreference')}
                                     rightContent={
                                         <Switch
+                                            className="notification-switch"
                                             checked={notifications}
                                             loading={notificationLoading}
                                             onChange={handleNotificationToggle}
-                                            checkedChildren={<p className="font-semibold text-white">ON</p>}
-                                            unCheckedChildren={<p className="font-semibold text-black">OFF</p>}
+                                            checkedChildren={<p className="font-semibold text-white"></p>}
+                                            unCheckedChildren={<p className="font-semibold text-black"></p>}
                                             style={notifications ? {
                                                 backgroundImage: "url('/images/buttonBg.svg')",
                                                 backgroundSize: '500% 400%',
@@ -548,7 +549,7 @@ const SubscriptionSection = () => {
         return (
             <div className="flex flex-col h-full">
                 <div className="flex-1 flex flex-col gap-6 justify-center">
-                    <div className="bg-white rounded-[20px] p-6 flex flex-col gap-4 border border-gray-200" style={{ minHeight: 300 }}>
+                    <div className="bg-white rounded-[20px] p-6 mx-6 flex flex-col gap-6 border border-gray-200" style={{ minHeight: 300 }}>
                         <p className="text-[14px] text-secondary">Check Your Plan Overview :</p>
                         <h2 className="text-[22px] font-bold text-gray-900">
                             Your {subscription.price >= 100 ? "Yearly" : "Monthly"} Plan
@@ -594,20 +595,21 @@ const SubscriptionSection = () => {
                             }
                         </p>
                     </div>
-
-                    <button
-                        onClick={() => window.location.href = "/home"}
-                        // className="w-full h-[52px] bg-gray-900 text-white rounded-[14px] text-[16px] font-semibold hover:opacity-90 transition-opacity"
-                        className="w-full h-[52px] text-white rounded-[14px] text-[16px] font-semibold hover:opacity-90 transition-opacity"
-                        style={{
-                            backgroundImage: "url('/images/buttonBg.svg')",
-                            backgroundSize: '350% 700%', backgroundPosition: 'center',
-                            boxShadow: '0px 0px 50px 0px #1953CB40',
-                            border: '1px solid rgba(255,255,255,0.35)',
-                        }}
-                    >
-                        Back to Home
-                    </button>
+                    <div className="mx-14">
+                        <button
+                            onClick={() => window.location.href = "/home"}
+                            // className="w-full h-[52px] bg-gray-900 text-white rounded-[14px] text-[16px] font-semibold hover:opacity-90 transition-opacity"
+                            className="w-full h-[52px] text-white rounded-[14px] text-[16px] font-semibold hover:opacity-90 transition-opacity"
+                            style={{
+                                backgroundImage: "url('/images/buttonBg.svg')",
+                                backgroundSize: '350% 700%', backgroundPosition: 'center',
+                                boxShadow: '0px 0px 50px 0px #1953CB40',
+                                border: '1px solid rgba(255,255,255,0.35)',
+                            }}
+                        >
+                            Back to Home
+                        </button>
+                    </div>
                     <button
                         onClick={handleCancel}
                         disabled={cancelling}
@@ -681,7 +683,7 @@ const SubscriptionSection = () => {
                         <div>
                             <p className="text-[13px] text-secondary font-medium">MONTHLY</p>
                             <p className="text-[18px] font-bold text-gray-900">
-                                $39.90 <span className="text-[13px] font-normal text-secondary">/year</span>
+                                $29.90 <span className="text-[13px] font-normal text-secondary">/year</span>
                             </p>
                         </div>
                         {expandedMonthly
@@ -703,23 +705,27 @@ const SubscriptionSection = () => {
 
                 {/* YEARLY */}
                 <div
-                    className={`border rounded-[12px] overflow-hidden cursor-pointer transition-all ${selectedPlan === "yearly" ? "border-[#2563EB] bg-[#EFF6FF]" : "border-gray-200"}`}
+                    // className={`border rounded-[12px] overflow-hidden cursor-pointer transition-all ${selectedPlan === "yearly" ? "border-[#2563EB] bg-[#EFF6FF]" : "border-gray-200"}`}
+                    className={`relative border rounded-[12px] cursor-pointer transition-all ${selectedPlan === "yearly" ? "border-[#2563EB] bg-[#EFF6FF]" : "border-gray-200"}`}
+
                     style={{ backgroundColor: "#F7F7F8" }}
                     // onClick={() => { setSelectedPlan("yearly"); setExpandedYearly((p) => !p); }}
                     onClick={() => { setSelectedPlan("yearly"); setExpandedYearly((p) => !p); setExpandedFree(false); setExpandedMonthly(false); }}
                 >
+                    <span className="absolute -top-2 right-4 bg-[#2563EB] text-white text-[10px] font-semibold px-3 py-1 rounded-full italic">
+                        7-Days free trial
+                    </span>
                     <div className="flex items-center justify-between px-4 py-3">
+
                         <div>
                             <p className="text-[13px] text-secondary font-medium">YEARLY</p>
                             <p className="text-[18px] font-bold text-gray-900">
-                                $159.90 <span className="text-[13px] font-normal text-secondary">/year</span>
+                                $239.90 <span className="text-[13px] font-normal text-secondary">/year</span>
                             </p>
                         </div>
                         <div className="flex items-center gap-2">
                             {/* <span className="bg-primary text-white text-[10px] font-semibold px-2 py-0.5 rounded-full"> */}
-                            <span className="bg-[#2563EB] text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">
-                                7-Days free trial
-                            </span>
+
                             {expandedYearly
                                 ? <LuChevronUp size={18} className="text-secondary" />
                                 : <LuChevronDown size={18} className="text-secondary" />
