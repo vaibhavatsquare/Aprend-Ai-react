@@ -20,14 +20,14 @@ export const useLanguageStore = create<LangState>()(
         }
       },
       initializeLanguage: (userLanguage) => {
-        // Priority: userLanguage > localStorage > default (ENGLISH)
-        const currentLanguage = userLanguage ||
+        // 👇 Prioritize explicitly stored language over profile language
+        const currentLanguage =
           (typeof window !== 'undefined' ? localStorage.getItem('language') as UserLanguage : null) ||
+          userLanguage ||
           'ENGLISH';
 
         set({ language: currentLanguage });
 
-        // Ensure localStorage is set
         if (typeof window !== 'undefined') {
           localStorage.setItem('language', currentLanguage);
         }

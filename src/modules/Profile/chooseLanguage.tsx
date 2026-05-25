@@ -27,22 +27,27 @@ const LanguageSection = ({
         setSelectedLang(currentLanguage);
     }, [currentLanguage]);
 
-    const handleSave = async () => {
-        if (!selectedLang) return;
+   const handleSave = async () => {
+    if (!selectedLang) return;
 
-        try {
-            await saveLanguage({
-                user_language: selectedLang,
-            });
+    try {
+        await saveLanguage({ user_language: selectedLang });
 
-            setLanguage(selectedLang);
-            message.success(t('profile.languageUpdated'));
+        setLanguage(selectedLang);
 
-            onClose(selectedLang); // parent update + close split
-        } catch {
-            message.error(t('profile.languageUpdateFailed'));
-        }
-    };
+        // 👇 Update user in localStorage so useLanguageInit picks up new language
+        const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+        localStorage.setItem('user', JSON.stringify({ 
+            ...storedUser, 
+            user_language: selectedLang 
+        }));
+
+        message.success(t('profile.languageUpdated'));
+        onClose(selectedLang);
+    } catch {
+        message.error(t('profile.languageUpdateFailed'));
+    }
+};
 
     return (
         <div className="w-full h-full flex flex-col justify-between">

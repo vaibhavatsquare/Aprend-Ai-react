@@ -30,6 +30,32 @@ const ChooseSubjects = ({
   const isSimulado = source === QuestionSource.SIMULADO;
   const isExplore = source === QuestionSource.EXPLORE_QUESTION;
 
+  const getSubjectLabel = (value: string) => {
+    const map: Record<string, string> = {
+        'ALL': t('questions.allSubjects' as any),
+        'MATHEMATICS': t('questions.mathematics' as any),
+        'SCIENCE': t('questions.science' as any),
+        'HISTORY': t('questions.history' as any),
+        'GEOGRAPHY': t('questions.geography' as any),
+        'ENGLISH': t('questions.english' as any),
+        'COMPUTER_SCIENCE': 'Computer Science',
+        'BUSINESS_ECONOMICS': 'Business / Economics',
+        'LANGUAGES': 'Languages',
+        'OTHER': t('common.other' as any),
+    };
+    return map[value] || value;
+};
+
+const getDifficultyLabel = (value: string) => {
+    const map: Record<string, string> = {
+        'EASY': t('home.simulados.easy' as any),
+        'MEDIUM': t('home.simulados.medium' as any),
+        'HARD': t('home.simulados.hard' as any),
+        'MIX': t('home.simulados.mix' as any),
+    };
+    return map[value] || value;
+};
+
   // TOGGLE SUBJECT
   const handleSubject = (value: string) => {
 
@@ -149,7 +175,8 @@ const ChooseSubjects = ({
                   background: isSelected ? "#2563EB" : "white",
                 }}
               >
-                {item.label}
+                {/* {item.label} */}
+                {getSubjectLabel(item.value)}
               </div>
             );
           })}
@@ -223,7 +250,8 @@ const ChooseSubjects = ({
                         color: isSelected ? "#fff" : "#121212",
                       }}
                     >
-                      {item.label}
+                      {/* {item.label} */}
+                      {getDifficultyLabel(item.value)}
                     </span>
 
                     {/* RADIO */}
@@ -257,7 +285,7 @@ const ChooseSubjects = ({
         >
           <GoArrowLeft className="text-[#121212] text-[20px]" />
           <span className="text-[#121212] text-[16px] ml-2">
-            Back
+            {t('common.back')}
           </span>
         </button>
 
@@ -283,10 +311,10 @@ const ChooseSubjects = ({
       {loading ? (
         <>
           <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-          Generating...
+          {t('common.loading')}
         </>
       ) : (
-        "Continue"
+        t('common.continue')
       )}
     </button>
   </div>

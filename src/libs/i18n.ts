@@ -116,7 +116,30 @@ type TranslationKey =
     // Time
     | 'time.seconds' | 'time.minutes' | 'time.hours' | 'time.days' | 'time.weeks'
     | 'time.months' | 'time.years' | 'time.ago' | 'time.fromNow' | 'time.justNow'
-    | 'time.inAMoment';
+    | 'time.inAMoment'
+
+    | 'home.tasks.conceptExplanation'
+    | 'home.tasks.noTasksTitle' | 'home.tasks.noTasksSubtitle'
+    | 'subscription.manage' | 'subscription.checkPlanOverview'
+    | 'subscription.activeFrom' | 'subscription.expireOn'
+    | 'subscription.backToHome' | 'subscription.cancel'
+    | 'subscription.free' | 'subscription.monthly' | 'subscription.yearly'
+    | 'subscription.restore' | 'subscription.upgradeToPremium'
+    | 'limits.dailyQuestion' | 'limits.dailyFlashcard' | 'limits.focusModePremium'
+    | 'achievements.new' | 'achievements.empty'
+    | 'aiTutor.generateFlashcards' | 'aiTutor.saveNotes'
+
+    | 'subscription.your'
+
+    | 'subscription.status' | 'subscription.statusDescription' | 'subscription.trialDescription'
+
+    | 'limits.weakSpotTracker' | 'limits.flashcardLimit'
+
+    | 'aiTutor.uploadImage' | 'aiTutor.camera' | 'aiTutor.gallery'
+    | 'common.premiumFeature'
+    ;
+
+
 
 // Translation object with type safety
 const translations = {
@@ -410,6 +433,42 @@ const translations = {
         'time.fromNow': 'from now',
         'time.justNow': 'just now',
         'time.inAMoment': 'in a moment',
+
+        'home.tasks.conceptExplanation': 'Concept Explanation',
+        'home.tasks.noTasksTitle': 'No tasks today',
+        'home.tasks.noTasksSubtitle': 'Pick another date or generate a new plan to keep your streak going.',
+        'subscription.manage': 'Manage subscription',
+        'subscription.checkPlanOverview': 'Check your plan overview:',
+        'subscription.activeFrom': 'Active from',
+        'subscription.expireOn': 'Expire on',
+        'subscription.backToHome': 'Back to home',
+        'subscription.cancel': 'Cancel subscription',
+        'subscription.free': 'Free',
+        'subscription.monthly': 'Monthly',
+        'subscription.yearly': 'Yearly',
+        'subscription.restore': 'Restore',
+        'subscription.upgradeToPremium': 'Upgrade to premium',
+        'limits.dailyQuestion': 'Daily question limit reached.',
+        'limits.dailyFlashcard': 'Daily flashcard limit reached.',
+        'limits.focusModePremium': 'Focus mode is available for premium users',
+        'achievements.new': 'New Achievement',
+        'achievements.empty': 'No Achievements available yet.',
+        'aiTutor.generateFlashcards': 'Generate Flashcards',
+        'aiTutor.saveNotes': 'Save to Notes',
+
+        'subscription.your': 'Your',
+
+        'subscription.status': 'Status',
+        'subscription.statusDescription': 'You can explore all features and content without limits.',
+        'subscription.trialDescription': 'You are on a free trial. You will be charged after the trial ends.',
+
+        'limits.weakSpotTracker': 'Weak Spot Tracker is a premium feature. Upgrade your plan to get advanced analytics.',
+        'limits.flashcardLimit': 'You\'ve used all 12 daily flashcards. Upgrade to Premium for unlimited flashcards.',
+
+        'aiTutor.uploadImage': 'Upload image',
+        'aiTutor.camera': 'Camera',
+        'aiTutor.gallery': 'Gallery',
+        'common.premiumFeature': 'Premium Feature',
     },
 
     SPANISH: {
@@ -702,6 +761,43 @@ const translations = {
         'time.fromNow': 'desde ahora',
         'time.justNow': 'justo ahora',
         'time.inAMoment': 'en un momento',
+
+        'home.tasks.conceptExplanation': 'Explicación de concepto',
+        'home.tasks.noTasksTitle': 'No hay tareas hoy',
+        'home.tasks.noTasksSubtitle': 'Elige otra fecha o genera un nuevo plan para mantener tu racha.',
+        'subscription.manage': 'Administrar suscripción',
+        'subscription.checkPlanOverview': 'Consulta el resumen de tu plan:',
+        'subscription.activeFrom': 'Activo desde',
+        'subscription.expireOn': 'Expira el',
+        'subscription.backToHome': 'Volver al inicio',
+        'subscription.cancel': 'Cancelar suscripción',
+        'subscription.free': 'Gratis',
+        'subscription.monthly': 'Mensual',
+        'subscription.yearly': 'Anual',
+        'subscription.restore': 'Restaurar',
+        'subscription.upgradeToPremium': 'Actualizar a premium',
+        'limits.dailyQuestion': 'Se alcanzó el límite diario de preguntas.',
+        'limits.dailyFlashcard': 'Se alcanzó el límite diario de tarjetas.',
+        'limits.focusModePremium': 'El modo enfoque está disponible para usuarios premium',
+        'achievements.new': 'Nuevo logro',
+        'achievements.empty': 'Aún no hay logros disponibles.',
+        'aiTutor.generateFlashcards': 'Generar tarjetas didácticas',
+        'aiTutor.saveNotes': 'Guardar en notas',
+
+        'subscription.your': 'Tu',
+
+        'subscription.status': 'Estado',
+        'subscription.statusDescription': 'Puedes explorar todas las funciones y contenido sin límites.',
+        'subscription.trialDescription': 'Estás en un período de prueba gratuito. Se te cobrará después de que finalice.',
+
+        'limits.weakSpotTracker': 'El rastreador de puntos débiles es una función premium.',
+        'limits.flashcardLimit': 'Has usado todas las 12 tarjetas diarias. Actualiza a Premium para tarjetas ilimitadas.',
+
+        'aiTutor.uploadImage': 'Subir imagen',
+        'aiTutor.camera': 'Cámara',
+        'aiTutor.gallery': 'Galería',
+        'common.premiumFeature': 'Función Premium',
+
     },
 
     PORTUGUESE: {
@@ -994,6 +1090,42 @@ const translations = {
         'time.fromNow': 'a partir de agora',
         'time.justNow': 'agora mesmo',
         'time.inAMoment': 'em um momento',
+
+        'home.tasks.conceptExplanation': 'Explicação de conceito',
+        'home.tasks.noTasksTitle': 'Nenhuma tarefa hoje',
+        'home.tasks.noTasksSubtitle': 'Escolha outra data ou gere um novo plano para manter sua sequência.',
+        'subscription.manage': 'Gerenciar assinatura',
+        'subscription.checkPlanOverview': 'Verifique o resumo do seu plano:',
+        'subscription.activeFrom': 'Ativo desde',
+        'subscription.expireOn': 'Expira em',
+        'subscription.backToHome': 'Voltar para a página inicial',
+        'subscription.cancel': 'Cancelar assinatura',
+        'subscription.free': 'Livre',
+        'subscription.monthly': 'Mensal',
+        'subscription.yearly': 'Anual',
+        'subscription.restore': 'Restaurar',
+        'subscription.upgradeToPremium': 'Atualizar para premium',
+        'limits.dailyQuestion': 'Limite diário de perguntas atingido.',
+        'limits.dailyFlashcard': 'Limite diário de flashcards atingido.',
+        'limits.focusModePremium': 'O modo foco está disponível para usuários premium',
+        'achievements.new': 'Nova Conquista',
+        'achievements.empty': 'Nenhuma conquista disponível ainda.',
+        'aiTutor.generateFlashcards': 'Gerar cartões flash',
+        'aiTutor.saveNotes': 'Salvar nas notas',
+
+        'subscription.your': 'Seu',
+
+        'subscription.status': 'Status',
+        'subscription.statusDescription': 'Você pode explorar todos os recursos e conteúdo sem limites.',
+        'subscription.trialDescription': 'Você está em um período de teste gratuito. Você será cobrado após o término do teste.',
+
+        'limits.weakSpotTracker': 'O rastreador de pontos fracos é um recurso premium.',
+        'limits.flashcardLimit': 'Você usou todos os 12 flashcards diários. Atualize para Premium para flashcards ilimitados.',
+
+        'aiTutor.uploadImage': 'Enviar imagem',
+        'aiTutor.camera': 'Câmera',
+        'aiTutor.gallery': 'Galeria',
+        'common.premiumFeature': 'Recurso Premium',
     },
 } as const;
 

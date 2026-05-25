@@ -19,7 +19,7 @@ import { useRedirect } from "@/src/hooks/router.hooks";
 const Navbar = () => {
   const { t } = useTranslation();
   const [user, setUser] = useState<UserDetail | null>(null);
-  const [greeting, setGreeting] = useState("");
+  // const [greeting, setGreeting] = useState("");
   const [open, setOpen] = useState(false);
   const [focusMode, setFocusModeState] = useState(false);
   const [isPremium, setIsPremium] = useState(false);
@@ -27,16 +27,24 @@ const Navbar = () => {
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  const getGreetingKey = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'home.greeting.morning';
+    if (hour < 18) return 'home.greeting.afternoon';
+    return 'home.greeting.evening';
+};
+
   useEffect(() => {
   const img = new window.Image();
   img.src = '/images/buttonBg.svg';
 }, []);
 
+
   // USER INIT
  useEffect(() => {
     const storedUser = getStoredUser();
     setUser(storedUser);
-    setGreeting(getGreeting());
+    // setGreeting(getGreeting());
     const storedFocus = getFocusMode();
     setFocusModeState(storedFocus);
     listenForNotifications();
@@ -86,7 +94,8 @@ const Navbar = () => {
       {/* LEFT SIDE */}
       <div className="flex flex-col gap-1">
         <h1 className="text-[18px] font-medium">
-          {greeting}
+          {/* {greeting} */}
+          {t(getGreetingKey() as any)}
           {displayName === "" ? "" : ", " + displayName + "!"} 👋
         </h1>
         <p className="text-xs text-secondary">
@@ -117,11 +126,13 @@ const Navbar = () => {
               backgroundColor: '#E5E7EB',
             }}
         /> */}
-<div
+
+        {/* -------------------------------------------------------------------------------------------- */}
+{/* <div
   onClick={() => handleFocusToggle(!focusMode)}
   className={`relative cursor-pointer flex items-center ${focusMode ? 'reveal-from-center' : ''}`}
   style={{
-    width: focusMode ? '86px' : '65px',   // 👈 changes based on state
+    width: focusMode ? '84px' : '65px',   // 👈 changes based on state
     height: '36px',
     borderRadius: '24px',
     padding: '4px 8px',
@@ -136,8 +147,8 @@ const Navbar = () => {
       backgroundColor: '#E5E7EB',
     })
   }}
->
-  {/* Text */}
+> */}
+  {/* Text
   <span
     className="font-bold text-[11px] tracking-wider absolute"
     style={{
@@ -147,14 +158,67 @@ const Navbar = () => {
     }}
   >
     {focusMode ? 'FOCUS' : 'OFF'}
-  </span>
+  </span> */}
 
   {/* Thumb */}
-  <div
+  {/* <div
     style={{
       position: 'absolute',
       width: '28px',
       height: '28px',
+      borderRadius: '50%',
+      backgroundColor: 'white',
+      top: '4px',
+      left: focusMode ? 'calc(100% - 36px)' : '4px',
+      transition: 'left 0.3s ease',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+    }}
+  />
+</div> */}
+
+<div
+  onClick={() => handleFocusToggle(!focusMode)}
+  className="relative cursor-pointer flex items-center"
+  style={{
+    width: focusMode ? '86px' : '72px',
+    height: '38px',
+    borderRadius: '20px',
+    transition: 'width 0.3s ease',
+    backgroundColor: focusMode ? 'transparent' : '#E5E7EB',
+  }}
+>
+  {/* Background layer — animates from center */}
+  {focusMode && (
+    <div
+      className="absolute inset-0 reveal-from-center"
+      style={{
+        borderRadius: '20px',
+        backgroundImage: "url('/images/buttonBg.svg')",
+        backgroundSize: '800% 900%',
+        backgroundPosition: 'center',
+        boxShadow: '0px 0px 20px 0px #1953CB40',
+      }}
+    />
+  )}
+
+  {/* Text */}
+  <span
+    className="font-bold text-[11px] tracking-wider absolute z-10"
+    style={{
+      color: focusMode ? 'white' : '#374151',
+      left: focusMode ? '10px' : 'auto',
+      right: focusMode ? 'auto' : '10px',
+    }}
+  >
+    {focusMode ? 'FOCUS' : 'OFF'}
+  </span>
+
+  {/* Thumb */}
+  <div
+    className="absolute z-10"
+    style={{
+      width: '27px',
+      height: '27px',
       borderRadius: '50%',
       backgroundColor: 'white',
       top: '4px',
@@ -188,10 +252,11 @@ const Navbar = () => {
     </svg>
 </div>
           <h3 className="text-[20px] font-bold text-gray-900 text-center">
-            Premium Feature
+            {/* Premium Feature */}
+            {t('common.premiumFeature')}
           </h3>
           <p className="text-[14px] text-secondary text-center">
-            Focus Mode is a premium feature. Upgrade your plan to unlock it and many more features.
+           {t('limits.focusModePremium')}
           </p>
           <button
             onClick={() => {
@@ -208,13 +273,15 @@ const Navbar = () => {
               border: '1px solid rgba(255,255,255,0.35)',
             }}
           >
-            Upgrade To Premium
+            {/* Upgrade To Premium */}
+            {t('subscription.upgradeToPremium')}
           </button>
           <button
             onClick={() => setShowUpgradeModal(false)}
             className="text-[14px] text-secondary hover:text-gray-700 transition-colors"
           >
-            Maybe later
+            {/* Maybe later */}
+            {t('common.cancel')}
           </button>
         </div>
       </Modal>

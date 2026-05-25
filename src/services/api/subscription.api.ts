@@ -85,3 +85,32 @@ export const cancelSubscription = async (): Promise<void> => {
     data: { immediate: false },
   });
 };
+
+export interface SubscriptionPlans {
+  success: boolean;
+  plans: {
+    monthly: {
+      checkoutPlan: string;
+      planType: string;
+      billingInterval: string;
+      amount: number;
+      currency: string;
+      active: boolean;
+    };
+    yearly: {
+      checkoutPlan: string;
+      planType: string;
+      billingInterval: string;
+      amount: number;
+      currency: string;
+      active: boolean;
+    };
+  };
+}
+
+export const getSubscriptionPlans = async (): Promise<SubscriptionPlans> => {
+  return fetch<SubscriptionPlans>({
+    url: "/subscription/plans",
+    method: "GET",
+  });
+};

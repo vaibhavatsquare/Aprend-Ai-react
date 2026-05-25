@@ -62,7 +62,7 @@ const QuestionsBank = ({
       <div className="px-4">
         <div
           className="h-[calc(100vh-100px)] mt-1 mb-4 py-6 rounded-[32px] flex flex-col animate-[pulse_1.2s_ease-in-out_infinite]"
-          style={{ boxShadow: "0px 0px 4px 0px #00000040" }}
+          style={{ boxShadow: "0px 0px 4px 0px #00000040" ,backgroundColor: '#F7F9FC' }}
         >
           <div className="px-6 flex items-center gap-4">
             <div className="w-6 h-6 bg-gray-200 rounded-full" />
@@ -220,7 +220,7 @@ const QuestionsBank = ({
     <div className="px-4">
       <div
         className="h-[calc(100vh-100px)] mt-1 mb-4 py-6 rounded-[32px] flex flex-col overflow-hidden"
-        style={{ boxShadow: "0px 0px 4px 0px #00000040" }}
+        style={{ boxShadow: "0px 0px 4px 0px #00000040",backgroundColor: '#F7F9FC' }}
       >
         {/* TOP BAR */}
         <div className="px-6 flex items-center gap-4">
@@ -381,7 +381,7 @@ const QuestionsBank = ({
                   className="flex-1 h-[48px] text-white rounded-xl"
                   style={{
                     backgroundImage: "url('/images/buttonBg.svg')",
-                    backgroundSize: '350% 1200%', backgroundPosition: 'center',
+                    backgroundSize: '900% 1400%', backgroundPosition: 'center',
                     boxShadow: '0px 0px 50px 0px #1953CB40',
                     border: '1px solid rgba(255,255,255,0.35)',
                   }}

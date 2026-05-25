@@ -1,0 +1,11 @@
+{
+  "subscription": {
+    "premiumFeature": "Premium Feature",
+    "upgradeTitle": "Upgrade To Premium",
+    "maybeLater": "Maybe later",
+    "focusModeDesc": "Focus Mode is a premium feature. Upgrade your plan to unlock it and many more features.",
+    "weakSpotDesc": "Weak Spot Tracker is a premium feature. Upgrade your plan to get advanced analytics and track your weak spots.",
+    "simuladosDesc": "Simulados (Mock Exam) is a premium feature. Upgrade your plan to create custom mock tests.",
+    "questionsLimitDesc": "You have used your 20 free questions for today. Upgrade to Premium for unlimited questions every day."
+  }
+}

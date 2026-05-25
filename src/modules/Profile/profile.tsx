@@ -27,7 +27,7 @@ import { LuChevronDown, LuChevronUp } from "react-icons/lu";
 import { TbCards } from "react-icons/tb";
 import { PiMagicWandLight, PiExamLight, PiBookOpenTextLight } from "react-icons/pi";
 import { BsFilePdf, BsEmojiSmile, BsGraphUp } from "react-icons/bs";
-import { getSubscription, createCheckoutSession, cancelSubscription } from "@/src/services/api/subscription.api";
+import { getSubscription, createCheckoutSession, cancelSubscription, getSubscriptionPlans } from "@/src/services/api/subscription.api";
 import { useSearchParams } from "next/navigation";
 
 // ─── Main Component ───────────────────────────────────────────────────────────
@@ -98,9 +98,21 @@ const UserProfile = () => {
         loadProfile();
     }, []);
 
-    const educationLabel = educationLevels.find(
-        (e) => e.value === user?.user_EducationLevel
-    )?.label || "—";
+    const getEducationLabel = (value: string) => {
+        const map: Record<string, string> = {
+            'ELEMENTARY': 'onboarding.elementary',
+            'HIGH_SCHOOL': 'onboarding.highSchool',
+            'PRE_VESTIBULAR': 'onboarding.preUniversity',
+            'UNIVERSITY': 'onboarding.university',
+            'COMPETITIVE_EXAMS': 'onboarding.competitiveExams',
+        };
+        return map[value] ? t(map[value] as any) : value;
+    };
+
+    // const educationLabel = educationLevels.find(
+    //     (e) => e.value === user?.user_EducationLevel
+    // )?.label || "—";
+    const educationLabel = getEducationLabel(user?.user_EducationLevel || "");
 
     const handleLogout = async () => {
         try {
@@ -232,22 +244,63 @@ const UserProfile = () => {
                                 <ProfileItem
                                     title={t('profile.notificationPreference')}
                                     rightContent={
-                                        <Switch
-                                            className="notification-switch"
-                                            checked={notifications}
-                                            loading={notificationLoading}
-                                            onChange={handleNotificationToggle}
-                                            checkedChildren={<p className="font-semibold text-white"></p>}
-                                            unCheckedChildren={<p className="font-semibold text-black"></p>}
-                                            style={notifications ? {
-                                                backgroundImage: "url('/images/buttonBg.svg')",
-                                                backgroundSize: '500% 400%',
-                                                backgroundPosition: 'center',
-                                                boxShadow: '0px 0px 20px 0px #1953CB40',
-                                            } : {
-                                                backgroundColor: '#E5E7EB',
+                                        // <Switch
+                                        //     className="notification-switch"
+                                        //     checked={notifications}
+                                        //     loading={notificationLoading}
+                                        //     onChange={handleNotificationToggle}
+                                        //     checkedChildren={<p className="font-semibold text-white"></p>}
+                                        //     unCheckedChildren={<p className="font-semibold text-black"></p>}
+                                        //     style={notifications ? {
+                                        //         backgroundImage: "url('/images/buttonBg.svg')",
+                                        //         backgroundSize: '500% 400%',
+                                        //         backgroundPosition: 'center',
+                                        //         boxShadow: '0px 0px 20px 0px #1953CB40',
+                                        //     } : {
+                                        //         backgroundColor: '#E5E7EB',
+                                        //     }}
+                                        // />
+                                        <div
+                                            onClick={() => !notificationLoading && handleNotificationToggle(!notifications)}
+                                            style={{
+                                                width: '44px',
+                                                height: '26px',
+                                                borderRadius: '20px',
+                                                position: 'relative',
+                                                cursor: notificationLoading ? 'not-allowed' : 'pointer',
+                                                backgroundColor: notifications ? 'transparent' : '#E5E7EB',
+                                                transition: 'background-color 0.3s',
+                                                flexShrink: 0,
                                             }}
-                                        />
+                                        >
+                                            {/* Background layer */}
+                                            {notifications && (
+                                                <div
+                                                    className="absolute inset-0 reveal-from-center"
+                                                    style={{
+                                                        borderRadius: '20px',
+                                                        background: 'linear-gradient(135deg, #1B3A6B 0%, #1953CB 100%)',
+                                                        boxShadow: '0px 0px 20px 0px #1953CB40',
+                                                    }}
+                                                />
+                                            )}
+
+                                            {/* Thumb */}
+                                            <div
+                                                style={{
+                                                    position: 'absolute',
+                                                    width: '22px',
+                                                    height: '22px',
+                                                    borderRadius: '50%',
+                                                    backgroundColor: 'white',
+                                                    top: '2px',
+                                                    left: notifications ? '20px' : '2px',
+                                                    transition: 'left 0.3s ease',
+                                                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                                                    zIndex: 10,
+                                                }}
+                                            />
+                                        </div>
                                     }
                                 />
 
@@ -394,6 +447,8 @@ const SubscriptionSection = () => {
     const [loadingSubscription, setLoadingSubscription] = useState(true);
     const [cancelling, setCancelling] = useState(false);
     const [restoring, setRestoring] = useState(false);
+    const [plans, setPlans] = useState<any>(null);
+    const { t } = useTranslation();
 
     const handleRestore = async () => {
         if (restoring) return;
@@ -434,7 +489,13 @@ const SubscriptionSection = () => {
     useEffect(() => {
         const load = async () => {
             try {
-                const res = await getSubscription();
+                // Load plans and subscription in parallel
+                const [subRes, plansRes] = await Promise.all([
+                    getSubscription(),
+                    getSubscriptionPlans(),
+                ]);
+                if (plansRes?.plans) setPlans(plansRes.plans);
+                const res = subRes;
                 if (res?.subscriptionStatus === "ACTIVE" || res?.subscriptionStatus === "CANCELLED" || res?.subscriptionStatus === "TRIAL") {
                     setSubscription(res);
                     const plan = res.planType?.toLowerCase();
@@ -460,6 +521,21 @@ const SubscriptionSection = () => {
         return () => window.removeEventListener("pageshow", handlePageShow);
     }, []);
 
+    const FREE_FEATURES = [
+        { icon: <TbCards size={18} />, label: t('limits.dailyFlashcard') },
+        { icon: <PiMagicWandLight size={18} />, label: "20 " + t('questions.numberOfQuestions') },
+        { icon: <PiExamLight size={18} />, label: "1 mock exam per day" },
+        { icon: <PiBookOpenTextLight size={18} />, label: "Basic task" },
+    ];
+
+    const PAID_FEATURES = [
+        { icon: <PiMagicWandLight size={18} />, label: t('questions.numberOfQuestions') },
+        { icon: <PiBookOpenTextLight size={18} />, label: t('profile.subscription.currentlySubscribed') },
+        { icon: <PiExamLight size={18} />, label: "Unlimited mock exam" },
+        { icon: <BsFilePdf size={18} />, label: "PDF materials / summaries" },
+        { icon: <BsEmojiSmile size={18} />, label: t('limits.focusModePremium') },
+        { icon: <BsGraphUp size={18} />, label: "Advance analytics" },
+    ];
     const isActive = subscription?.subscriptionStatus === "ACTIVE" ||
         subscription?.subscriptionStatus === "CANCELLED" ||
         subscription?.subscriptionStatus === "TRIAL";
@@ -550,9 +626,11 @@ const SubscriptionSection = () => {
             <div className="flex flex-col h-full">
                 <div className="flex-1 flex flex-col gap-6 justify-center">
                     <div className="bg-white rounded-[20px] p-6 mx-6 flex flex-col gap-6 border border-gray-200" style={{ minHeight: 300 }}>
-                        <p className="text-[14px] text-secondary">Check Your Plan Overview :</p>
+                        <p className="text-[14px] text-secondary">{t('subscription.checkPlanOverview')}</p>
                         <h2 className="text-[22px] font-bold text-gray-900">
-                            Your {subscription.price >= 100 ? "Yearly" : "Monthly"} Plan
+                            {/* Your {subscription.price >= 100 ? "Yearly" : "Monthly"} Plan */}
+                            {t('subscription.your') as any} {subscription.price >= 100 ? t('subscription.yearly') : t('subscription.monthly')} Plan
+
                             {isTrial && (
                                 <span className="ml-2 text-[12px] bg-blue-600 text-white px-2 py-0.5 rounded-full align-middle">
                                     Free Trial
@@ -571,7 +649,7 @@ const SubscriptionSection = () => {
                                 </div>
                                 <p className="text-[14px] text-gray-700 mt-0.5">
                                     {/* Active From <span className="font-bold">{formatDate(subscription.purchasedAt)}</span> */}
-                                    {isTrial ? "Trial Started" : "Active From"} <span className="font-bold">{formatDate(subscription.purchasedAt)}</span>
+                                    {isTrial ? "Trial Started" : t('subscription.activeFrom')} <span className="font-bold">{formatDate(subscription.purchasedAt)}</span>
                                 </p>
                             </div>
                             <div className="flex items-start gap-3">
@@ -582,16 +660,16 @@ const SubscriptionSection = () => {
                                 </div>
                                 <p className="text-[14px] text-gray-700 mt-0.5">
                                     {/* Expire on <span className="font-bold">{formatDate(subscription.endsAt)}</span> */}
-                                    {isTrial ? "Trial Ends" : "Expire on"} <span className="font-bold">{formatDate(subscription.endsAt)}</span>
+                                    {isTrial ? "Trial Ends" : t('subscription.expireOn')} <span className="font-bold">{formatDate(subscription.endsAt)}</span>
                                 </p>
                             </div>
                         </div>
                         <p className="text-[13px] text-gray-600">
-                            <span className="font-semibold underline">Status:</span>{" "}
+                            <span className="font-semibold underline">{t('subscription.status')}:</span>{" "}
                             {/* You can explore all features and content without limits. */}
                             {isTrial
-                                ? "You are on a free trial. You will be charged after the trial ends."
-                                : "You can explore all features and content without limits."
+                                ? t('subscription.trialDescription')
+                                : t('subscription.statusDescription')
                             }
                         </p>
                     </div>
@@ -607,7 +685,7 @@ const SubscriptionSection = () => {
                                 border: '1px solid rgba(255,255,255,0.35)',
                             }}
                         >
-                            Back to Home
+                            {t('subscription.backToHome')}
                         </button>
                     </div>
                     <button
@@ -616,7 +694,7 @@ const SubscriptionSection = () => {
                         className="w-full text-center text-[14px] text-secondary hover:text-red-500 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                     >
                         {cancelling && <Spin size="small" />}
-                        {cancelling ? "Cancelling..." : "Cancel or change subscription"}
+                        {cancelling ? t('common.loading') : t('subscription.cancel')}
                     </button>
                 </div>
             </div>
@@ -632,7 +710,7 @@ const SubscriptionSection = () => {
                     disabled={restoring}
                     className="text-[14px] text-primary underline disabled:opacity-50"
                 >
-                    {restoring ? "Checking..." : "Restore."}
+                    {restoring ? t('common.loading') : t('subscription.restore')}
                 </button>
             </div>
 
@@ -654,7 +732,7 @@ const SubscriptionSection = () => {
                     onClick={() => { setSelectedPlan("free"); setExpandedFree((p) => !p); setExpandedMonthly(false); setExpandedYearly(false); }}
                 >
                     <div className="w-full flex items-center justify-between px-4 py-3">
-                        <span className="text-[15px] font-semibold text-gray-900">FREE</span>
+                        <span className="text-[15px] font-semibold text-gray-900">{t('subscription.free').toUpperCase()}</span>
                         {expandedFree
                             ? <LuChevronUp size={18} className="text-secondary" />
                             : <LuChevronDown size={18} className="text-secondary" />
@@ -681,9 +759,10 @@ const SubscriptionSection = () => {
                 >
                     <div className="flex items-center justify-between px-4 py-3">
                         <div>
-                            <p className="text-[13px] text-secondary font-medium">MONTHLY</p>
+                            <p className="text-[13px] text-secondary font-medium">{t('subscription.monthly').toUpperCase()}</p>
                             <p className="text-[18px] font-bold text-gray-900">
-                                $29.90 <span className="text-[13px] font-normal text-secondary">/year</span>
+                                {plans?.monthly?.currency === "BRL" ? "R$" : "$"}{plans?.monthly?.amount ?? 29.90}
+                                <span className="text-[13px] font-normal text-secondary"> /month</span>
                             </p>
                         </div>
                         {expandedMonthly
@@ -713,14 +792,15 @@ const SubscriptionSection = () => {
                     onClick={() => { setSelectedPlan("yearly"); setExpandedYearly((p) => !p); setExpandedFree(false); setExpandedMonthly(false); }}
                 >
                     <span className="absolute -top-2 right-4 bg-[#2563EB] text-white text-[10px] font-semibold px-3 py-1 rounded-full italic">
-                        7-Days free trial
+                        7-{t('time.days')} free trial
                     </span>
                     <div className="flex items-center justify-between px-4 py-3">
 
                         <div>
-                            <p className="text-[13px] text-secondary font-medium">YEARLY</p>
+                            <p className="text-[13px] text-secondary font-medium">{t('subscription.yearly').toUpperCase()}</p>
                             <p className="text-[18px] font-bold text-gray-900">
-                                $239.90 <span className="text-[13px] font-normal text-secondary">/year</span>
+                                {plans?.yearly?.currency === "BRL" ? "R$" : "$"}{plans?.yearly?.amount ?? 239.90}
+                                <span className="text-[13px] font-normal text-secondary"> /year</span>
                             </p>
                         </div>
                         <div className="flex items-center gap-2">
@@ -758,7 +838,7 @@ const SubscriptionSection = () => {
                 }}
             >
                 {upgrading && <Spin size="small" />}
-                {upgrading ? "Processing..." : "Upgrade To Premium"}
+                {upgrading ? t('common.loading') : t('subscription.upgradeToPremium')}
             </button>
         </div>
     );

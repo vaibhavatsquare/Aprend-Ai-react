@@ -13,15 +13,10 @@ import { IoArrowForwardSharp } from "react-icons/io5";
 import { LuChevronRight } from "react-icons/lu";
 import QuestionsBank from "./questions/questionsBank";
 import Flashcards from "../flashcards/flashCards";
-import { useTranslation, t } from "@/src/libs/i18n";
+import { useTranslation } from "@/src/libs/i18n";
 import { Modal } from "antd";
 
-const formatTaskType = (type: string) => {
-  if (type === "FLASHCARD") return t('flashcards.title');
-  if (type === "PRACTICE_QUESTION") return t('questions.practiceTopicWise');
-  if (type === "CONCEPT_EXPLANATION") return "Concept Explanation";
-  return type;
-};
+
 
 const Home = () => {
   const { t } = useTranslation();
@@ -36,6 +31,13 @@ const Home = () => {
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   const fetched = useRef(false);
+
+  const formatTaskType = (type: string) => {
+if (type === "FLASHCARD") return t('flashcards.title');
+    if (type === "PRACTICE_QUESTION") return t('questions.practiceTopicWise');
+    if (type === "CONCEPT_EXPLANATION") return t('home.tasks.conceptExplanation');
+    return type;
+  };
 
   useEffect(() => {
     const img = new window.Image();
@@ -73,24 +75,24 @@ const Home = () => {
     return () => clearTimeout(timer);
   }, []);
 
-// Add this ref
-const activeTaskRef = useRef<any>(null);
+  // Add this ref
+  const activeTaskRef = useRef<any>(null);
 
-// Keep ref in sync with state
-useEffect(() => {
+  // Keep ref in sync with state
+  useEffect(() => {
     activeTaskRef.current = activeTask;
-}, [activeTask]);
+  }, [activeTask]);
 
-// Use ref inside popstate handler
-useEffect(() => {
+  // Use ref inside popstate handler
+  useEffect(() => {
     const handlePopState = () => {
-        if (activeTaskRef.current) {
-            setActiveTask(null);
-        }
+      if (activeTaskRef.current) {
+        setActiveTask(null);
+      }
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-}, []); // 👈 empty deps — only registers once
+  }, []); // 👈 empty deps — only registers once
 
 
   const handleWeakSpotClick = () => {
@@ -142,7 +144,7 @@ useEffect(() => {
 
   const streakSub =
     streak === 0
-      ? "Consistency builds mastery. Let's begin!"
+      ? t('home.streak.startJourney')
       : t('home.streak.keepItUp');
 
   const tasksForDate =
@@ -308,9 +310,12 @@ useEffect(() => {
         >
           <IconSparkel />
           <h2 className="text-white text-sm tracking-wider">
-            {t('home.aiTutor.ready').split(' ').map((word, index) =>
-              index === 2 ? <span key={index} className="font-medium">{word}</span> : word
-            )}
+            {t('home.aiTutor.ready').split(' ').map((word, index, arr) => (
+              <span key={index}>
+                {index === 2 ? <span className="font-medium">{word}</span> : word}
+                {index < arr.length - 1 ? ' ' : ''}
+              </span>
+            ))}
           </h2>
           <img
             src="/images/home/robot.svg"
@@ -377,9 +382,12 @@ useEffect(() => {
                 <path d="M4.93797 44.4392L0.0332797 12.56C-0.329533 10.2058 2.35259 8.59866 4.25803 10.0284L19.5392 21.4879C19.9364 21.7855 20.39 21.9989 20.8725 22.1153C21.355 22.2317 21.8561 22.2485 22.3452 22.1648C22.8344 22.081 23.3014 21.8984 23.7177 21.6282C24.1339 21.358 24.4908 21.0057 24.7663 20.593L37.489 1.51172C38.8327 -0.503906 41.7943 -0.503906 43.1381 1.51172L55.8607 20.593C56.1363 21.0057 56.4931 21.358 56.9094 21.6282C57.3257 21.8984 57.7926 22.081 58.2818 22.1648C58.771 22.2485 59.2721 22.2317 59.7546 22.1153C60.237 21.9989 60.6907 21.7855 61.0879 21.4879L76.369 10.0284C78.2772 8.59866 80.9566 10.2058 80.5938 12.56L75.6891 44.4392H4.93797ZM71.9992 62.1283H8.6279C8.14334 62.1283 7.66351 62.0328 7.21583 61.8474C6.76814 61.662 6.36137 61.3902 6.01872 61.0475C5.32673 60.3555 4.93797 59.417 4.93797 58.4383V50.3355H75.6891V58.4383C75.6891 60.4755 74.0363 62.1283 71.9992 62.1283Z" fill="#1B2A4A" />
               </svg>
             </div>
-            <h3 className="text-[20px] font-bold text-gray-900 text-center">Premium Feature</h3>
+            <h3 className="text-[20px] font-bold text-gray-900 text-center">
+            {/* Premium Feature */}
+            {t('common.premiumFeature')}
+              </h3>
             <p className="text-[14px] text-secondary text-center">
-              Weak Spot Tracker is a premium feature. Upgrade your plan to get advanced analytics and track your weak spots.
+              {t('limits.weakSpotTracker')}
             </p>
           </div>
 
@@ -416,7 +424,8 @@ useEffect(() => {
                 cursor: 'pointer'
               }}
             >
-              Upgrade To Premium
+              {/* Upgrade To Premium */}
+              {t('subscription.upgradeToPremium')}
             </button>
           </div>
 
@@ -424,7 +433,8 @@ useEffect(() => {
             onClick={() => setShowUpgradeModal(false)}
             className="text-[14px] text-secondary hover:text-gray-700 transition-colors self-center"
           >
-            Maybe later
+            {/* Maybe later */}
+            {t('common.cancel')}
           </button>
         </div>
       </Modal>

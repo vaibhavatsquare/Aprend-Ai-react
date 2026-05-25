@@ -307,7 +307,8 @@ const AiTutor = () => {
     const remainingFlashcardsToday = user?.freePlan?.remainingFlashcardsToday;
 
     if (!isPremium && (!canCreateFlashcards || remainingFlashcardsToday <= 0)) {
-      setModalMessage("You've used all 12 daily flashcards. Upgrade to Premium for unlimited flashcards.");
+      // setModalMessage("You've used all 12 daily flashcards. Upgrade to Premium for unlimited flashcards.");
+      setModalMessage(t('limits.dailyFlashcard'));
       setShowUpgradeModal(true);
       return;
     }
@@ -327,10 +328,12 @@ const AiTutor = () => {
       // ✅ Check 2 - AFTER API call, in case localStorage was stale
       if (errorMessage.toLowerCase().includes("limit reached") ||
         errorMessage.toLowerCase().includes("daily free")) {
-        setModalMessage("You've used all 12 daily flashcards. Upgrade to Premium for unlimited flashcards.");
+        // setModalMessage("You've used all 12 daily flashcards. Upgrade to Premium for unlimited flashcards.");
+        setModalMessage(t('limits.dailyFlashcard'));
         setShowUpgradeModal(true);
       } else {
-        antMessage.error("Failed to generate flashcards. Please try again.");
+        // antMessage.error("Failed to generate flashcards. Please try again.");
+        antMessage.error(t('errors.somethingWentWrong'));
       }
     } finally {
       setIsGeneratingFlashcard(false);
@@ -444,7 +447,8 @@ const AiTutor = () => {
                 onClick={handleGenerateNote}
               >
                 <p className="text-sm text-secondary">
-                  {isSavingNote ? t('common.saving') : t('notes.title')}
+                  {/* {isSavingNote ? t('common.saving') : t('notes.title')} */}
+                  {isSavingNote ? t('common.saving') : t('aiTutor.saveNotes')}
                 </p>
 
                 {isSavingNote ? (
@@ -463,7 +467,8 @@ const AiTutor = () => {
                 onClick={handleGenerateFlashcard}
               >
                 <p className="text-sm text-secondary">
-                  {isGeneratingFlashcard ? t('common.generating') : t('flashcards.title')}
+                  {/* {isGeneratingFlashcard ? t('common.generating') : t('flashcards.title')} */}
+                  {isGeneratingFlashcard ? t('common.generating') : t('aiTutor.generateFlashcards')}
                 </p>
 
                 {isGeneratingFlashcard ? (
@@ -546,13 +551,15 @@ const AiTutor = () => {
                   {isRecording && (
                     <div className="flex items-center gap-2 text-sm text-red-500 px-1">
                       <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                      Listening...
+                      {/* Listening... */}
+                      {t('common.listening')}...
                     </div>
                   )}
                   <textarea
                     ref={textareaRef}
                     className="flex-1 resize-none outline-none transition-all duration-150"
-                    placeholder="Ask Your AI Tutor"
+                    // placeholder="Ask Your AI Tutor"
+                    placeholder={t('home.aiTutor.ready')}
                     value={message}
                     rows={1}
                     onChange={(e) => setMessage(e.target.value)}
@@ -589,7 +596,7 @@ const AiTutor = () => {
                   <div className="flex-1 flex justify-center items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
                     <span className="text-sm text-gray-600">
-                      Listening...
+                       {t('common.listening')}...
                     </span>
                   </div>
                 </div>
@@ -642,7 +649,9 @@ const AiTutor = () => {
           {streak > 0 && (
             <div className="absolute -bottom-3 right-5 flex gap-2 items-center text-[#FFFFFF80] font-medium">
               <h2 className="text-5xl">{streak}</h2>
-              <p className="text-xl">{streak > 1 ? "days" : "day"}</p>
+              {/* <p className="text-xl">{streak > 1 ? "days" : "day"}</p> */}
+              <p className="text-xl">{t('home.streak.days')}</p>
+
             </div>
           )}
         </div>
@@ -695,7 +704,10 @@ const AiTutor = () => {
               <path d="M4.93797 44.4392L0.0332797 12.56C-0.329533 10.2058 2.35259 8.59866 4.25803 10.0284L19.5392 21.4879C19.9364 21.7855 20.39 21.9989 20.8725 22.1153C21.355 22.2317 21.8561 22.2485 22.3452 22.1648C22.8344 22.081 23.3014 21.8984 23.7177 21.6282C24.1339 21.358 24.4908 21.0057 24.7663 20.593L37.489 1.51172C38.8327 -0.503906 41.7943 -0.503906 43.1381 1.51172L55.8607 20.593C56.1363 21.0057 56.4931 21.358 56.9094 21.6282C57.3257 21.8984 57.7926 22.081 58.2818 22.1648C58.771 22.2485 59.2721 22.2317 59.7546 22.1153C60.237 21.9989 60.6907 21.7855 61.0879 21.4879L76.369 10.0284C78.2772 8.59866 80.9566 10.2058 80.5938 12.56L75.6891 44.4392H4.93797ZM71.9992 62.1283H8.6279C8.14334 62.1283 7.66351 62.0328 7.21583 61.8474C6.76814 61.662 6.36137 61.3902 6.01872 61.0475C5.32673 60.3555 4.93797 59.417 4.93797 58.4383V50.3355H75.6891V58.4383C75.6891 60.4755 74.0363 62.1283 71.9992 62.1283Z" fill="#1B2A4A" />
             </svg>
           </div>
-          <h3 className="text-[20px] font-bold text-gray-900 text-center">Premium Feature</h3>
+          <h3 className="text-[20px] font-bold text-gray-900 text-center">
+            {/* Premium Feature */}
+            {t('common.premiumFeature')}
+          </h3>
           <p className="text-[14px] text-secondary text-center">
             {modalMessage}
           </p>
@@ -714,13 +726,15 @@ const AiTutor = () => {
               border: '1px solid rgba(255,255,255,0.35)',
             }}
           >
-            Upgrade To Premium
+            {/* Upgrade To Premium */}
+            {t('subscription.upgradeToPremium')}
           </button>
           <button
             onClick={() => setShowUpgradeModal(false)}
             className="text-[14px] text-secondary hover:text-gray-700 transition-colors"
           >
-            Maybe later
+            {/* Maybe later */}
+            {t('common.cancel')}
           </button>
         </div>
       </Modal>
@@ -733,7 +747,7 @@ const AiTutor = () => {
         width={380}
       >
         <div className="flex flex-col items-center gap-8 py-4">
-          <h3 className="text-[20px] font-bold text-gray-900">Upload image</h3>
+          <h3 className="text-[20px] font-bold text-gray-900">{t('aiTutor.uploadImage')}</h3>
 
           <div className="flex gap-10 justify-center">
             {/* Camera */}
@@ -760,7 +774,7 @@ const AiTutor = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
                 </svg>
               </div>
-              <p className="text-[16px] font-medium text-primary">Camera</p>
+              <p className="text-[16px] font-medium text-primary">{t('aiTutor.camera')}</p>
             </div>
 
             {/* Gallery */}
@@ -790,7 +804,7 @@ const AiTutor = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 18h16.5M3.75 6h16.5A1.5 1.5 0 0121.75 7.5v9a1.5 1.5 0 01-1.5 1.5H3.75a1.5 1.5 0 01-1.5-1.5v-9A1.5 1.5 0 013.75 6z" />
                 </svg>
               </div>
-              <p className="text-[16px] font-medium text-primary">Gallery</p>
+              <p className="text-[16px] font-medium text-primary">{t('aiTutor.gallery')}</p>
             </div>
           </div>
         </div>

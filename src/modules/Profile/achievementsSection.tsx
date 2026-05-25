@@ -5,6 +5,7 @@ import ConfirmModal from "./confirmModal";
 import { Achievement } from "@/src/libs/types";
 import { getUserAchievements } from "@/src/services/api/user.api";
 import { useInitialFetch } from "@/src/libs/helpersWithUseClient";
+import { useTranslation } from "@/src/libs/i18n";
 
 const PAGE_LIMIT = 10;
 
@@ -21,6 +22,7 @@ const AchievementsSection = () => {
   const [selectedAchievement, setSelectedAchievement] =
     useState<Achievement | null>(null);
   const observerRef = useRef<HTMLDivElement | null>(null);
+  const { t } = useTranslation();
 
   const fetchAchievements = async (currentSkip: number, isFirst = false) => {
     try {
@@ -88,7 +90,7 @@ const AchievementsSection = () => {
   const EmptyState = () => (
     <div className="flex flex-col items-center justify-center mt-20 text-center">
       <div className="text-[50px] mb-3">🏆</div>
-      <p className="text-lg font-medium">No Achievements Yet</p>
+      <p className="text-lg font-medium">{t('achievements.empty')}</p>
       <p className="text-sm text-gray-400 mt-1">
         Start learning to unlock achievements
       </p>
@@ -98,7 +100,7 @@ const AchievementsSection = () => {
   return (
     <div className="flex flex-col h-full">
       <h3 className="text-[22px] font-semibold text-center mt-4 mb-4">
-        Achievements
+        {t('profile.achievements')}
       </h3>
 
       <div className="flex-1 overflow-y-auto px-5 scrollbar">

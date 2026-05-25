@@ -14,6 +14,7 @@ import ConfirmModal from "@/src/components/common/ConfirmModal";
 import { message } from "antd";
 import { Flashcard, FlashcardUI, mapFlashcardQuestions } from "@/src/libs/types/flashcards.types";
 import Flashcards from "./flashCards";
+import { useTranslation } from "@/src/libs/i18n";
 
 const PAGE_LIMIT = 10;
 
@@ -39,6 +40,7 @@ const SavedFlashCards = ({
     const observerRef = useRef<HTMLDivElement | null>(null);
 
     const fetched = useRef(false);
+    const { t } = useTranslation();
 
     useEffect(() => {
         if (fetched.current) return;
@@ -180,9 +182,7 @@ const SavedFlashCards = ({
                         />
                     )}
                     <h1 className="text-[28px] font-semibold text-primaryText w-full text-center">
-                        {!initialLoading && flashCards.length === 0
-                            ? ""
-                            : "Saved Flashcards"}
+                        {!initialLoading && flashCards.length === 0 ? "" : t('flashcards.savedFlashcards')}
                     </h1>
                 </div>
 

@@ -10,6 +10,7 @@ import ConfirmModal from "@/src/components/common/ConfirmModal";
 import { message } from "antd";
 import { Note } from "@/src/libs/types/notes.types";
 import { useInitialFetch } from "@/src/libs/helpersWithUseClient";
+import { useTranslation } from "@/src/libs/i18n";
 
 const PAGE_LIMIT = 10;
 
@@ -31,6 +32,7 @@ const SavedNotes = ({ showBack = false, onBack }: SavedNotesProps) => {
     const [actionLoading, setActionLoading] = useState(false);
 
     const observerRef = useRef<HTMLDivElement | null>(null);
+    const { t } = useTranslation();
 
     useInitialFetch(() => fetchNotes(0, true));
 
@@ -97,7 +99,8 @@ const SavedNotes = ({ showBack = false, onBack }: SavedNotesProps) => {
             );
 
             setShowRenameModal(false);
-            message.success("Note renamed successfully");
+            // message.success("Note renamed successfully");
+            message.success(t('success.updated'));
         } catch (err) {
             console.error(err);
         } finally {
@@ -118,7 +121,8 @@ const SavedNotes = ({ showBack = false, onBack }: SavedNotesProps) => {
             );
 
             setShowDeleteModal(false);
-            message.success("Note deleted successfully");
+            // message.success("Note deleted successfully");
+            message.success(t('success.deleted'));
         } catch (err) {
             console.error(err);
         } finally {
@@ -145,7 +149,7 @@ const SavedNotes = ({ showBack = false, onBack }: SavedNotesProps) => {
                         />
                     )}
                     <h1 className="text-[28px] font-semibold text-primaryText w-full text-center">
-                        {!initialLoading && notes.length === 0 ? "" : "Saved Notes"}
+                        {!initialLoading && notes.length === 0 ? "" : t('notes.savedNotes')}
                     </h1>
                 </div>
 
@@ -206,10 +210,10 @@ const SavedNotes = ({ showBack = false, onBack }: SavedNotesProps) => {
 
             <ConfirmModal
                 isOpen={showDeleteModal}
-                title="Delete Note"
-                description="Are you sure you want to delete this note?"
-                confirmText="Delete"
-                cancelText="Cancel"
+                title={t('notes.delete')}
+                description={t('notes.areYouSureDelete')}
+                confirmText={t('notes.delete')}
+                cancelText={t('common.cancel')}
                 confirmColor="red"
                 loading={actionLoading}
                 onClose={() => setShowDeleteModal(false)}

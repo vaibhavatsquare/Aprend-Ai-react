@@ -45,7 +45,7 @@ const Questions = () => {
                     <div
                         className="h-[calc(100vh-100px)] mt-1 mb-4 py-4 rounded-[32px] col-span-2 flex flex-col gap-4"
                         style={{
-                            boxShadow: "0px 0px 4px 0px #00000040",
+                            boxShadow: "0px 0px 4px 0px #00000040",backgroundColor: '#F7F9FC'
                         }}
                     >
                         {/* Back Arrow */}
@@ -107,7 +107,8 @@ const Questions = () => {
                                                         const { user, isPremium } = getUserData();
                                                         const canAskQuestion = user?.freePlan?.canAskQuestion;
                                                         if (!isPremium && !canAskQuestion) {
-                                                            setModalMessage("You've used all 20 daily questions. Upgrade to Premium for unlimited questions.");
+                                                            // setModalMessage("You've used all 20 daily questions. Upgrade to Premium for unlimited questions.");
+                                                            setModalMessage(t('limits.dailyQuestion'));
                                                             setShowUpgradeModal(true);
                                                             return;
                                                         }
@@ -167,7 +168,8 @@ const Questions = () => {
                                                         const { user, isPremium } = getUserData();
                                                         const canCreate = user?.freePlan?.canCreateMockExam;
                                                         if (!isPremium && !canCreate) {
-                                                            setModalMessage("Simulados (Mock Exam) is a premium feature. Upgrade your plan to create custom mock tests.");
+                                                            // setModalMessage("Simulados (Mock Exam) is a premium feature. Upgrade your plan to create custom mock tests.");
+                                                            setModalMessage(t('limits.focusModePremium'));
                                                             setShowUpgradeModal(true);
                                                             return;
                                                         }
@@ -199,7 +201,7 @@ const Questions = () => {
             {step === "chooseSubject" && (
                 <div className="px-4">
                     <div className="h-[calc(100vh-100px)] mt-1 mb-4 py-4 rounded-xl flex flex-col gap-4"
-                        style={{ boxShadow: "0px 0px 4px 0px #00000040" }}
+                        style={{ boxShadow: "0px 0px 4px 0px #00000040",backgroundColor: '#F7F9FC' }}
                     >
                         <div className="mx-4 flex relative justify-center">
                             <GoArrowLeft
@@ -255,7 +257,8 @@ const Questions = () => {
                         </svg>
                     </div>
                     <h3 className="text-[20px] font-bold text-gray-900 text-center">
-                        Premium Feature
+                        {/* Premium Feature */}
+                        {t('profile.mySubscription')} 
                     </h3>
                     {/* ✅ Dynamic message based on what triggered the modal */}
                     <p className="text-[14px] text-secondary text-center">
@@ -268,13 +271,15 @@ const Questions = () => {
                         }}
                         className="w-full h-[48px] bg-primary text-white rounded-[12px] text-[15px] font-semibold hover:opacity-90 transition-opacity"
                     >
-                        Upgrade To Premium
+                        {/* Upgrade To Premium */}
+                        {t('subscription.upgradeToPremium')}
                     </button>
                     <button
                         onClick={() => setShowUpgradeModal(false)}
                         className="text-[14px] text-secondary hover:text-gray-700 transition-colors"
                     >
-                        Maybe later
+                        {/* Maybe later */}
+                        {t('common.cancel')}
                     </button>
                 </div>
             </Modal>
