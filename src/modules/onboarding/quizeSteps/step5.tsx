@@ -4,6 +4,7 @@ import { FaArrowLeft } from "react-icons/fa";
 import { Step5Options } from "@/src/libs/constants/onboarding.constants";
 import { setSearchParam, useRedirect } from "@/src/hooks/router.hooks";
 import { savePlacementQuiz } from "@/src/services/api/user.api";
+import { useTranslation } from "@/src/libs/i18n";
 
 const Step5 = ({
   setCurrentStep,
@@ -18,6 +19,16 @@ const Step5 = ({
   const handleSelect = (val: string) => {
     setQuiz((p: any) => ({ ...p, preferredTime: val }));
   };
+  const { t } = useTranslation();
+  const getTimeLabel = (value: string) => {
+    const map: Record<string, string> = {
+        'MORNING': t('quiz.option.morning' as any),
+        'AFTERNOON': t('quiz.option.afternoon' as any),
+        'EVENING': t('quiz.option.evening' as any),
+        'FLEXIBLE': t('quiz.option.flexible' as any),
+    };
+    return map[value] || value;
+};
 
   const handleFinish = async () => {
     try {
@@ -32,8 +43,8 @@ const Step5 = ({
   return (
     <div className="flex flex-col gap-6 items-center">
       <div className="flex flex-col items-center gap-3 mt-4">
-        <h1 className="text-xl font-semibold">Placement Quiz</h1>
-        <p>When do you prefer to study?</p>
+        <h1 className="text-xl font-semibold">{t('onboarding.placementQuiz')}</h1>
+        <p>{t('quiz.q5' as any)}</p>
       </div>
 
       <div className="w-[300px] grid grid-cols-1 gap-3">
@@ -48,7 +59,7 @@ const Step5 = ({
             onClick={() => handleSelect(level.value)}
           >
             {/* <p className="text-sm">{level.label}</p> */}
-            <p className={`text-sm ${quiz.preferredTime === level.value ? "text-white" : "text-[#121212]"}`}>{level.label}</p>
+            <p className={`text-sm ${quiz.preferredTime === level.value ? "text-white" : "text-[#121212]"}`}>{getTimeLabel(level.value)}</p>
             <div
               className={`w-4 h-4 flex justify-center items-center border-2 rounded-full transition-all ${
                 quiz.preferredTime === level.value
@@ -74,7 +85,7 @@ const Step5 = ({
           className="flex-1 h-10! rounded-xl! border border-[#DADADA]! text-primary! bg-white! mt-4"
           icon={<FaArrowLeft />}
         >
-          Back
+          {t('common.back')}
         </Button>
 
         <Button
@@ -89,7 +100,7 @@ const Step5 = ({
             border: '1px solid rgba(255,255,255,0.35)',
           }}
         >
-          Finish
+          {t('common.finish')}
         </Button>
       </div>
     </div>

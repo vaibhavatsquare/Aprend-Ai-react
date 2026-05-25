@@ -137,6 +137,21 @@ type TranslationKey =
 
     | 'aiTutor.uploadImage' | 'aiTutor.camera' | 'aiTutor.gallery'
     | 'common.premiumFeature'
+    | 'home.streak.consistencyMessage'
+
+    // Add to TranslationKey
+    | 'quiz.q1' | 'quiz.q2' | 'quiz.q3' | 'quiz.q4' | 'quiz.q5'
+    | 'quiz.subject' | 'quiz.goal' | 'quiz.learningStyle' | 'quiz.startJourney' | 'quiz.congratulations'
+    | 'quiz.writeSubjectHere'
+    | 'quiz.option.english' | 'quiz.option.mathematics' | 'quiz.option.science'
+    | 'quiz.option.history' | 'quiz.option.geography' | 'quiz.option.computerScience'
+    | 'quiz.option.business' | 'quiz.option.languages' | 'quiz.option.other'
+    | 'quiz.option.exam' | 'quiz.option.grades' | 'quiz.option.newTopic'
+    | 'quiz.option.mastery' | 'quiz.option.revise' | 'quiz.option.consistency'
+    | 'quiz.option.visual' | 'quiz.option.auditory' | 'quiz.option.reading'
+    | 'quiz.option.kinesthetic' | 'quiz.option.aiGuided'
+    | 'quiz.option.less15' | 'quiz.option.15to30' | 'quiz.option.30to60' | 'quiz.option.1hour'
+    | 'quiz.option.morning' | 'quiz.option.afternoon' | 'quiz.option.evening' | 'quiz.option.flexible'
     ;
 
 
@@ -469,6 +484,47 @@ const translations = {
         'aiTutor.camera': 'Camera',
         'aiTutor.gallery': 'Gallery',
         'common.premiumFeature': 'Premium Feature',
+        'home.streak.consistencyMessage': 'Consistency builds mastery. Let\'s begin!',
+
+        'quiz.q1': 'What subject do you want to learn?',
+        'quiz.q2': "What's your main learning goal?",
+        'quiz.q3': "What's your learning style?",
+        'quiz.q4': 'How much time can you study each day?',
+        'quiz.q5': 'When do you prefer to study?',
+        'quiz.subject': 'Subject',
+        'quiz.goal': 'Goal',
+        'quiz.learningStyle': 'Learning Style',
+        'quiz.startJourney': 'Start Your Learning Journey',
+        'quiz.congratulations': 'Congratulation! Your study plan is ready.',
+        'quiz.writeSubjectHere': 'Write your subject here',
+        'quiz.option.english': 'English',
+        'quiz.option.mathematics': 'Mathematics',
+        'quiz.option.science': 'Science',
+        'quiz.option.history': 'History',
+        'quiz.option.geography': 'Geography',
+        'quiz.option.computerScience': 'Computer Science / Coding',
+        'quiz.option.business': 'Business / Economics',
+        'quiz.option.languages': 'Languages',
+        'quiz.option.other': 'Other',
+        'quiz.option.exam': 'Prepare for an exam or test',
+        'quiz.option.grades': 'Improve grades / performance in school',
+        'quiz.option.newTopic': 'Learn a new topic from scratch',
+        'quiz.option.mastery': 'Build long-term mastery or fluency',
+        'quiz.option.revise': 'Revise / refresh previous knowledge',
+        'quiz.option.consistency': 'Improve study consistency or habits',
+        'quiz.option.visual': 'Visual',
+        'quiz.option.auditory': 'Auditory',
+        'quiz.option.reading': 'Reading/Writing',
+        'quiz.option.kinesthetic': 'Kinesthetic',
+        'quiz.option.aiGuided': 'AI-guided',
+        'quiz.option.less15': '<15 minutes',
+        'quiz.option.15to30': '15-30 minutes',
+        'quiz.option.30to60': '30-60 minutes',
+        'quiz.option.1hour': '1 hour',
+        'quiz.option.morning': 'Morning',
+        'quiz.option.afternoon': 'Afternoon',
+        'quiz.option.evening': 'Evening',
+        'quiz.option.flexible': 'Flexible',
     },
 
     SPANISH: {
@@ -797,7 +853,47 @@ const translations = {
         'aiTutor.camera': 'Cámara',
         'aiTutor.gallery': 'Galería',
         'common.premiumFeature': 'Función Premium',
+        'home.streak.consistencyMessage': 'La constancia construye el dominio. ¡Comencemos!',
 
+        'quiz.q1': '¿Qué materia quieres aprender?',
+        'quiz.q2': '¿Cuál es tu objetivo principal de aprendizaje?',
+        'quiz.q3': '¿Cuál es tu estilo de aprendizaje?',
+        'quiz.q4': '¿Cuánto tiempo puedes estudiar cada día?',
+        'quiz.q5': '¿Cuándo prefieres estudiar?',
+        'quiz.subject': 'Materia',
+        'quiz.goal': 'Objetivo',
+        'quiz.learningStyle': 'Estilo de aprendizaje',
+        'quiz.startJourney': 'Comienza tu viaje de aprendizaje',
+        'quiz.congratulations': '¡Felicitaciones! Tu plan de estudio está listo.',
+        'quiz.writeSubjectHere': 'Escribe tu materia aquí',
+        'quiz.option.english': 'Inglés',
+        'quiz.option.mathematics': 'Matemáticas',
+        'quiz.option.science': 'Ciencias',
+        'quiz.option.history': 'Historia',
+        'quiz.option.geography': 'Geografía',
+        'quiz.option.computerScience': 'Informática / Programación',
+        'quiz.option.business': 'Negocios / Economía',
+        'quiz.option.languages': 'Idiomas',
+        'quiz.option.other': 'Otro',
+        'quiz.option.exam': 'Prepararse para un examen',
+        'quiz.option.grades': 'Mejorar calificaciones',
+        'quiz.option.newTopic': 'Aprender un tema nuevo desde cero',
+        'quiz.option.mastery': 'Construir dominio a largo plazo',
+        'quiz.option.revise': 'Repasar conocimientos previos',
+        'quiz.option.consistency': 'Mejorar hábitos de estudio',
+        'quiz.option.visual': 'Visual',
+        'quiz.option.auditory': 'Auditivo',
+        'quiz.option.reading': 'Lectura/Escritura',
+        'quiz.option.kinesthetic': 'Kinestésico',
+        'quiz.option.aiGuided': 'Guiado por IA',
+        'quiz.option.less15': '<15 minutos',
+        'quiz.option.15to30': '15-30 minutos',
+        'quiz.option.30to60': '30-60 minutos',
+        'quiz.option.1hour': '1 hora',
+        'quiz.option.morning': 'Mañana',
+        'quiz.option.afternoon': 'Tarde',
+        'quiz.option.evening': 'Noche',
+        'quiz.option.flexible': 'Flexible',
     },
 
     PORTUGUESE: {
@@ -1126,6 +1222,47 @@ const translations = {
         'aiTutor.camera': 'Câmera',
         'aiTutor.gallery': 'Galeria',
         'common.premiumFeature': 'Recurso Premium',
+        'home.streak.consistencyMessage': 'A consistência constrói o domínio. Vamos começar!',
+
+        'quiz.q1': 'Qual matéria você quer aprender?',
+        'quiz.q2': 'Qual é seu principal objetivo de aprendizado?',
+        'quiz.q3': 'Qual é seu estilo de aprendizado?',
+        'quiz.q4': 'Quanto tempo você pode estudar por dia?',
+        'quiz.q5': 'Quando você prefere estudar?',
+        'quiz.subject': 'Matéria',
+        'quiz.goal': 'Objetivo',
+        'quiz.learningStyle': 'Estilo de aprendizado',
+        'quiz.startJourney': 'Comece sua jornada de aprendizado',
+        'quiz.congratulations': 'Parabéns! Seu plano de estudos está pronto.',
+        'quiz.writeSubjectHere': 'Escreva sua matéria aqui',
+        'quiz.option.english': 'Inglês',
+        'quiz.option.mathematics': 'Matemática',
+        'quiz.option.science': 'Ciências',
+        'quiz.option.history': 'História',
+        'quiz.option.geography': 'Geografia',
+        'quiz.option.computerScience': 'Informática / Programação',
+        'quiz.option.business': 'Negócios / Economia',
+        'quiz.option.languages': 'Idiomas',
+        'quiz.option.other': 'Outro',
+        'quiz.option.exam': 'Preparar para um exame',
+        'quiz.option.grades': 'Melhorar notas',
+        'quiz.option.newTopic': 'Aprender um novo tópico do zero',
+        'quiz.option.mastery': 'Construir domínio a longo prazo',
+        'quiz.option.revise': 'Revisar conhecimentos anteriores',
+        'quiz.option.consistency': 'Melhorar hábitos de estudo',
+        'quiz.option.visual': 'Visual',
+        'quiz.option.auditory': 'Auditivo',
+        'quiz.option.reading': 'Leitura/Escrita',
+        'quiz.option.kinesthetic': 'Cinestésico',
+        'quiz.option.aiGuided': 'Guiado por IA',
+        'quiz.option.less15': '<15 minutos',
+        'quiz.option.15to30': '15-30 minutos',
+        'quiz.option.30to60': '30-60 minutos',
+        'quiz.option.1hour': '1 hora',
+        'quiz.option.morning': 'Manhã',
+        'quiz.option.afternoon': 'Tarde',
+        'quiz.option.evening': 'Noite',
+        'quiz.option.flexible': 'Flexível',
     },
 } as const;
 

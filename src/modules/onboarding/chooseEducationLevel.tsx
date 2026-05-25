@@ -5,10 +5,25 @@ import { useState } from "react";
 import { Button, message } from "antd";
 import { useRedirect } from "@/src/hooks/router.hooks";
 import { saveEducationlevel } from "@/src/services/api/user.api";
+import { useTranslation } from "@/src/libs/i18n";
+
 
 const ChooseEducationLevel = () => {
+  const { t } = useTranslation();
+
   const [selectedEducationLevel, setSelectedEducationLevel] =
     useState<string | null>(null);
+
+    const getEducationLabel = (value: string) => {
+    const map: Record<string, string> = {
+        'ELEMENTARY': t('onboarding.elementary' as any),
+        'HIGH_SCHOOL': t('onboarding.highSchool' as any),
+        'PRE_VESTIBULAR': t('onboarding.preUniversity' as any),
+        'UNIVERSITY': t('onboarding.university' as any),
+        'COMPETITIVE_EXAMS': t('onboarding.competitiveExams' as any),
+    };
+    return map[value] || value;
+};
 
   const handleContinue = async () => {
     if (!selectedEducationLevel) return;
@@ -28,7 +43,7 @@ const ChooseEducationLevel = () => {
     <div className="w-full h-full flex justify-center items-center">
       <div className="flex flex-col gap-6 items-center">
         <h1 className="text-xl font-semibold">
-          Choose your education level
+          {t('onboarding.chooseEducationLevel')}
         </h1>
 
         <div className="flex flex-col gap-3">
@@ -43,7 +58,7 @@ const ChooseEducationLevel = () => {
               onClick={() => setSelectedEducationLevel(level.value)}
             >
               {/* <p className="text-sm">{level.label}</p> */}
-              <p className={`text-sm ${selectedEducationLevel === level.value ? "text-white" : ""}`}>{level.label}</p>
+              <p className={`text-sm ${selectedEducationLevel === level.value ? "text-white" : ""}`}>{getEducationLabel(level.value)}</p>
               <div
                 className={`w-4 h-4 flex justify-center items-center border-2 rounded-full ${
                   selectedEducationLevel === level.value
@@ -71,7 +86,7 @@ const ChooseEducationLevel = () => {
               border: '1px solid rgba(255,255,255,0.35)',
             }}
           >
-            Continue
+            {t('common.continue')}
           </Button>
         )}
       </div>

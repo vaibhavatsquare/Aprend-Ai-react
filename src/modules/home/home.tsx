@@ -144,7 +144,7 @@ if (type === "FLASHCARD") return t('flashcards.title');
 
   const streakSub =
     streak === 0
-      ? t('home.streak.startJourney')
+      ? t('home.streak.consistencyMessage')
       : t('home.streak.keepItUp');
 
   const tasksForDate =

@@ -3,6 +3,7 @@ import { Button } from "antd";
 import { FaArrowLeft } from "react-icons/fa";
 import { Step4Options } from "@/src/libs/constants/onboarding.constants";
 import { setSearchParam } from "@/src/hooks/router.hooks";
+import { useTranslation } from "@/src/libs/i18n";
 
 const Step4 = ({
   setCurrentStep,
@@ -22,12 +23,23 @@ const Step4 = ({
     setSearchParam("step", 5);
     setCurrentStep(5);
   };
+  const { t } = useTranslation();
+
+  const getTimeLabel = (value: string) => {
+    const map: Record<string, string> = {
+        'LESS_THAN_15_MIN': t('quiz.option.less15' as any),
+        'MIN_15_TO_30': t('quiz.option.15to30' as any),
+        'MIN_30_TO_60': t('quiz.option.30to60' as any),
+        'ONE_HOUR': t('quiz.option.1hour' as any),
+    };
+    return map[value] || value;
+};
 
   return (
     <div className="flex flex-col gap-6 items-center">
       <div className="flex flex-col items-center gap-3 mt-4">
-        <h1 className="text-xl font-semibold">Placement Quiz</h1>
-        <p>How much time can you study each day?</p>
+        <h1 className="text-xl font-semibold">{t('onboarding.placementQuiz')}</h1>
+        <p>{t('quiz.q4' as any)}</p>
       </div>
 
       <div className="w-[300px] grid grid-cols-1 gap-3">
@@ -42,7 +54,7 @@ const Step4 = ({
             onClick={() => handleSelect(level.value)}
           >
             {/* <p className="text-sm">{level.label}</p> */}
-            <p className={`text-sm ${quiz.studyTimePerDay === level.value ? "text-white" : "text-[#121212]"}`}>{level.label}</p>
+            <p className={`text-sm ${quiz.studyTimePerDay === level.value ? "text-white" : "text-[#121212]"}`}>{getTimeLabel(level.value)}</p>
             <div
               className={`w-4 h-4 flex justify-center items-center border-2 rounded-full transition-all ${
                 quiz.studyTimePerDay === level.value
@@ -68,7 +80,7 @@ const Step4 = ({
           className="flex-1 h-10! rounded-xl! border border-[#DADADA]! text-primary! bg-white! mt-4"
           icon={<FaArrowLeft />}
         >
-          Back
+          {t('common.back')}
         </Button>
 
         <Button
@@ -83,7 +95,7 @@ const Step4 = ({
             border: '1px solid rgba(255,255,255,0.35)',
           }}
         >
-          Continue
+          {t('common.continue')}
         </Button>
       </div>
     </div>

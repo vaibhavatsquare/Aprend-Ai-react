@@ -7,10 +7,11 @@ import { useRedirect } from "@/src/hooks/router.hooks";
 import { useLanguageStore } from "@/src/store/language.store";
 import { saveLanguage } from "@/src/services/api/user.api";
 import { UserLanguage } from "@/src/libs/types";
-
+import { useTranslation } from "@/src/libs/i18n";
 const ChooseLanguage = () => {
   const [selectedLanguage, setSelectedLanguage] = useState<UserLanguage | null>(null);
   const setLanguage = useLanguageStore((s) => s.setLanguage);
+  const { t } = useTranslation();
 
   const handleContinue = async () => {
     if (!selectedLanguage) return;
@@ -28,7 +29,7 @@ const ChooseLanguage = () => {
   return (
     <div className="w-full h-full flex justify-center items-center">
       <div className="flex flex-col gap-6 items-center">
-        <h1 className="text-xl font-semibold">Choose your language</h1>
+        <h1 className="text-xl font-semibold">{t('onboarding.chooseLanguage')}</h1>
 
         <div className="flex flex-col gap-3">
           {languages.map((language: any) => (
@@ -59,7 +60,7 @@ const ChooseLanguage = () => {
               border: '1px solid rgba(255,255,255,0.35)',
             }}
           >
-            Continue
+            {t('common.continue')}
           </Button>
         )}
       </div>

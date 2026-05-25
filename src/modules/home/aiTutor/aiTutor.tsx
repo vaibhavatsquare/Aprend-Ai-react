@@ -348,7 +348,7 @@ const AiTutor = () => {
 
   const streakSub =
     streak === 0
-      ? "Consistency builds mastery. Let's begin!"
+      ? t('home.streak.consistencyMessage')
       : t('home.streak.keepItUp');
 
   return (

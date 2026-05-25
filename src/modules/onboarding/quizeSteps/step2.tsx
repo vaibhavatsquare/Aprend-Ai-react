@@ -3,6 +3,7 @@ import { Button } from "antd";
 import { FaArrowLeft } from "react-icons/fa";
 import { step2Options } from "@/src/libs/constants/onboarding.constants";
 import { setSearchParam } from "@/src/hooks/router.hooks";
+import { useTranslation } from "@/src/libs/i18n";
 
 const Step2 = ({
   setCurrentStep,
@@ -17,7 +18,18 @@ const Step2 = ({
   const handleSelect = (val: string) => {
     setQuiz((p: any) => ({ ...p, learningGoal: val }));
   };
-
+const { t } = useTranslation();
+  const getGoalLabel = (value: string) => {
+    const map: Record<string, string> = {
+        'PREPARE_FOR_EXAM': t('quiz.option.exam' as any),
+        'REVISE_PREVIOUS_KNOWLEDGE': t('quiz.option.revise' as any),
+        'IMPROVE_GRADES': t('quiz.option.grades' as any),
+        'IMPROVE_STUDY_HABITS': t('quiz.option.consistency' as any),
+        'LEARN_FROM_SCRATCH': t('quiz.option.newTopic' as any),
+        'BUILD_LONG_TERM_MASTERY': t('quiz.option.mastery' as any),
+    };
+    return map[value] || value;
+};
   const handleContinue = () => {
     setSearchParam("step", 3);
     setCurrentStep(3);
@@ -26,8 +38,8 @@ const Step2 = ({
   return (
     <div className="flex flex-col gap-6 items-center">
       <div className="flex flex-col items-center gap-3 mt-4">
-        <h1 className="text-xl font-semibold">Placement Quiz</h1>
-        <p>What's your main learning goal?</p>
+        <h1 className="text-xl font-semibold">{t('onboarding.placementQuiz')}</h1>
+        <p>{t('quiz.q2' as any)}</p>
       </div>
 
       <div className="w-[650px] grid grid-cols-2 gap-3">
@@ -42,7 +54,7 @@ const Step2 = ({
             onClick={() => handleSelect(level.value)}
           >
             {/* <p className="text-sm">{level.label}</p> */}
-            <p className={`text-sm ${quiz.learningGoal === level.value ? "text-white" : "text-[#121212]"}`}>{level.label}</p>
+            <p className={`text-sm ${quiz.learningGoal === level.value ? "text-white" : "text-[#121212]"}`}>{getGoalLabel(level.value)}</p>
             <div
               className={`w-4 h-4 flex justify-center items-center border-2 rounded-full transition-all ${
                 quiz.learningGoal === level.value
@@ -68,7 +80,7 @@ const Step2 = ({
           className="flex-1 h-10! rounded-xl! border border-[#DADADA]! text-primary! bg-white! mt-4"
           icon={<FaArrowLeft />}
         >
-          Back
+          {t('common.back')}
         </Button>
 
         <Button
@@ -83,7 +95,7 @@ const Step2 = ({
             border: '1px solid rgba(255,255,255,0.35)',
           }}
         >
-          Continue
+          {t('common.continue')}
         </Button>
       </div>
     </div>

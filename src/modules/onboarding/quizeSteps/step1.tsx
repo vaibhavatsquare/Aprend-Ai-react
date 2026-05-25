@@ -4,6 +4,7 @@ import { Button, Input } from "antd";
 import { FaArrowLeft } from "react-icons/fa";
 import { canGoBack, setSearchParam, useBack } from "@/src/hooks/router.hooks";
 import { useEffect, useState } from "react";
+import { useTranslation } from "@/src/libs/i18n";
 
 const Step1 = ({
   setCurrentStep,
@@ -16,6 +17,22 @@ const Step1 = ({
 }) => {
   
   const [showBack, setShowBack] = useState(false);
+const { t } = useTranslation();
+
+const getSubjectLabel = (value: string) => {
+    const map: Record<string, string> = {
+        'ENGLISH': t('quiz.option.english' as any),
+        'MATHEMATICS': t('quiz.option.mathematics' as any),
+        'SCIENCE': t('quiz.option.science' as any),
+        'HISTORY': t('quiz.option.history' as any),
+        'GEOGRAPHY': t('quiz.option.geography' as any),
+        'COMPUTER_SCIENCE': t('quiz.option.computerScience' as any),
+        'BUSINESS_ECONOMICS': t('quiz.option.business' as any),
+        'LANGUAGES': t('quiz.option.languages' as any),
+        'OTHER': t('quiz.option.other' as any),
+    };
+    return map[value] || value;
+};
 
   useEffect(() => {
     setShowBack(canGoBack());
@@ -38,8 +55,8 @@ const Step1 = ({
   return (
     <div className="flex flex-col gap-6 items-center">
       <div className="flex flex-col items-center gap-3">
-        <h1 className="text-xl font-semibold">Placement Quiz</h1>
-        <p>What subject do you want to learn?</p>
+        <h1 className="text-xl font-semibold">{t('onboarding.placementQuiz')}</h1>
+        <p>{t('quiz.q1' as any)}</p>
       </div>
 
       <div className="w-[650px] grid grid-cols-2 gap-3 mt-4">
@@ -53,7 +70,7 @@ const Step1 = ({
             onClick={() => toggle(level.value)}
           >
             {/* <p className="text-sm">{level.label}</p> */}
-            <p className={`text-sm ${quiz.subjects.includes(level.value) ? "text-white" : "text-[#121212]"}`}>{level.label}</p>
+            <p className={`text-sm ${quiz.subjects.includes(level.value) ? "text-white" : "text-[#121212]"}`}>{getSubjectLabel(level.value)}</p>
             <div
               className={`w-4 h-4 flex justify-center items-center border-2 rounded-[4px] transition-all ${quiz.subjects.includes(level.value)
                 ? "border-white bg-white"
@@ -71,7 +88,7 @@ const Step1 = ({
 
         <div className="w-full h-11">
           <Input
-            placeholder="Write your subject here"
+            placeholder={t('quiz.writeSubjectHere' as any)}
             className="w-full h-full border-t-0! border-r-0! border-l-0! border-b! rounded-none! outline-none! shadow-none! hover:border-primary! focus-within:border-primary!"
           />
         </div>
@@ -84,7 +101,7 @@ const Step1 = ({
             className="flex-1 h-10! rounded-xl! border border-[#DADADA]! text-primary! bg-white! mt-4"
             icon={<FaArrowLeft />}
           >
-            Back
+            {t('common.back')}
           </Button>
         )}
         <Button
@@ -99,7 +116,7 @@ const Step1 = ({
             border: '1px solid rgba(255,255,255,0.35)',
           }}
         >
-          Continue
+          {t('common.continue')}
         </Button>
       </div>
     </div>

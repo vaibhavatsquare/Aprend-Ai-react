@@ -3,6 +3,7 @@ import { Button } from "antd";
 import { FaArrowLeft } from "react-icons/fa";
 import { Step3Options } from "@/src/libs/constants/onboarding.constants";
 import { setSearchParam } from "@/src/hooks/router.hooks";
+import { useTranslation } from "@/src/libs/i18n";
 
 const Step3 = ({
   setCurrentStep,
@@ -22,6 +23,17 @@ const Step3 = ({
         : [...p.learningStyles, val],
     }));
   };
+  const { t } = useTranslation();
+  const getStyleLabel = (value: string) => {
+    const map: Record<string, string> = {
+        'VISUAL': t('quiz.option.visual' as any),
+        'AI_GUIDED': t('quiz.option.aiGuided' as any),
+        'AUDITORY': t('quiz.option.auditory' as any),
+        'READING_WRITING': t('quiz.option.reading' as any),
+        'KINESTHETIC': t('quiz.option.kinesthetic' as any),
+    };
+    return map[value] || value;
+};
 
   const handleContinue = () => {
     setSearchParam("step", 4);
@@ -31,8 +43,8 @@ const Step3 = ({
   return (
     <div className="flex flex-col gap-6 items-center">
       <div className="flex flex-col items-center gap-3 mt-4">
-        <h1 className="text-xl font-semibold">Placement Quiz</h1>
-        <p>What's your learning style?</p>
+        <h1 className="text-xl font-semibold">{t('onboarding.placementQuiz')}</h1>
+        <p>{t('quiz.q3' as any)}</p>
       </div>
 
       <div className="w-[650px] grid grid-cols-2 gap-3">
@@ -47,7 +59,7 @@ const Step3 = ({
             onClick={() => toggle(level.value)}
           >
             {/* <p className="text-sm">{level.label}</p> */}
-            <p className={`text-sm ${quiz.learningStyles.includes(level.value) ? "text-white" : "text-[#121212]"}`}>{level.label}</p>
+            <p className={`text-sm ${quiz.learningStyles.includes(level.value) ? "text-white" : "text-[#121212]"}`}>{getStyleLabel(level.value)}</p>
             <div
               className={`w-4 h-4 flex justify-center items-center border-2 rounded-[4px] transition-all ${
                 quiz.learningStyles.includes(level.value)
@@ -74,7 +86,7 @@ const Step3 = ({
           className="flex-1 h-10! rounded-xl! border border-[#DADADA]! text-primary! bg-white! mt-4"
           icon={<FaArrowLeft />}
         >
-          Back
+          {t('common.back')}
         </Button>
 
         <Button
@@ -89,7 +101,7 @@ const Step3 = ({
             border: '1px solid rgba(255,255,255,0.35)',
           }}
         >
-          Continue
+          {t('common.continue')}
         </Button>
       </div>
     </div>
