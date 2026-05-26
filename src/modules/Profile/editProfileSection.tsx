@@ -134,10 +134,15 @@ const EditProfileSection = ({ user, onUpdated, onCancel }: Props) => {
                         Name
                     </label>
 
-                    <input
+                    {/* <input
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         className="w-full h-[48px] mt-1 px-4 bg-[#F5F5F6] rounded-[12px] outline-none"
+                    /> */}
+                    <input
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className="w-full h-[48px] mt-1 px-4 bg-[#F5F5F6] rounded-[12px] outline-none border border-transparent focus:border-2 focus:border-[#2563EB] transition-all"
                     />
                 </div>
 
@@ -163,12 +168,19 @@ const EditProfileSection = ({ user, onUpdated, onCancel }: Props) => {
 
                     <div className="relative mt-1">
 
-                        <select
+                        {/* <select
                             value={education}
                             onChange={(e) =>
                                 setEducation(e.target.value as UserEducationLevel)
                             }
                             className="w-full h-[48px] px-4 bg-[#F5F5F6] rounded-[12px] outline-none appearance-none"
+                        > */}
+                        <select
+                            value={education}
+                            onChange={(e) =>
+                                setEducation(e.target.value as UserEducationLevel)
+                            }
+                            className="w-full h-[48px] px-4 bg-[#F5F5F6] rounded-[12px] outline-none appearance-none border border-transparent focus:border-2 focus:border-[#2563EB] transition-all"
                         >
                             {educationLevels.map((level) => (
                                 <option key={level.value} value={level.value}>
@@ -194,21 +206,21 @@ const EditProfileSection = ({ user, onUpdated, onCancel }: Props) => {
                         Cancel
                     </button>
 
-                   <button
-    disabled={!hasChanges || loading}
-    onClick={handleSave}
-    className="w-full h-[48px] rounded-[12px] text-white flex items-center justify-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
-    style={hasChanges ? {
-        backgroundImage: "url('/images/buttonBg.svg')",
-        backgroundSize: '350% 700%',
-        backgroundPosition: 'center',
-        boxShadow: '0px 0px 50px 0px #1953CB40',
-        border: '1px solid rgba(255,255,255,0.35)',
-    } : { backgroundColor: '#D1D5DB' }}
->
-    {loading && <Spin size="small" className="[&_.ant-spin-dot-item]:bg-white" />}
-    {loading ? "Saving..." : "Save"}
-</button>
+                    <button
+                        disabled={!hasChanges || loading}
+                        onClick={handleSave}
+                        className="w-full h-[48px] rounded-[12px] text-white flex items-center justify-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        style={hasChanges ? {
+                            backgroundImage: "url('/images/buttonBg.svg')",
+                            backgroundSize: '350% 700%',
+                            backgroundPosition: 'center',
+                            boxShadow: '0px 0px 50px 0px #1953CB40',
+                            border: '1px solid rgba(255,255,255,0.35)',
+                        } : { backgroundColor: '#D1D5DB' }}
+                    >
+                        {loading && <Spin size="small" className="[&_.ant-spin-dot-item]:bg-white" />}
+                        {loading ? "Saving..." : "Save"}
+                    </button>
 
                 </div>
             </div>

@@ -450,12 +450,19 @@ const QuestionsBank = ({
               <p className="text-[#555] mb-6">
                 {currentQuestion.stepByStepExplanation}
               </p>
-              <button
-                onClick={handleNext}
-                className="w-full h-[50px] bg-[#0F3057] text-white rounded-xl"
-              >
-                {isLast ? "Finish" : "Got it"}
-              </button>
+             <button
+  onClick={handleNext}
+  className="w-full h-[50px] text-white rounded-xl font-semibold"
+  style={{
+    backgroundImage: "url('/images/buttonBg.svg')",
+    backgroundSize: '800% 1400%',
+    backgroundPosition: 'center',
+    boxShadow: '0px 0px 50px 0px #1953CB40',
+    border: '1px solid rgba(255,255,255,0.35)',
+  }}
+>
+  {isLast ? "Finish" : "Got it"}
+</button>
             </div>
           )}
         </div>

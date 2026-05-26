@@ -29,6 +29,7 @@ import { PiMagicWandLight, PiExamLight, PiBookOpenTextLight } from "react-icons/
 import { BsFilePdf, BsEmojiSmile, BsGraphUp } from "react-icons/bs";
 import { getSubscription, createCheckoutSession, cancelSubscription, getSubscriptionPlans } from "@/src/services/api/subscription.api";
 import { useSearchParams } from "next/navigation";
+import { GoArrowLeft } from "react-icons/go";
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
@@ -402,7 +403,8 @@ const UserProfile = () => {
                             />
                         )}
 
-                        {selected === "subscription" && <SubscriptionSection />}
+                        {/* {selected === "subscription" && <SubscriptionSection />} */}
+                        {selected === "subscription" && <SubscriptionSection onBack={() => setSelected(null)} />}
                         {selected === "terms" && <TermsSection />}
                         {selected === "privacy" && <PrivacySection />}
                         {selected === "achievements" && <AchievementsSection />}
@@ -447,7 +449,7 @@ const PAID_FEATURES = [
     { icon: <BsGraphUp size={18} />, label: "Advance analytics" },
 ];
 
-const SubscriptionSection = () => {
+const SubscriptionSection = ({ onBack }: { onBack?: () => void }) => {
     // ── All states declared at the top ────────────────────────────────────────
     const [expandedFree, setExpandedFree] = useState(true);
     const [expandedMonthly, setExpandedMonthly] = useState(false);
@@ -632,10 +634,13 @@ const SubscriptionSection = () => {
     }
 
     // ── Active subscription — show plan details ────────────────────────────────
-    if (isActive) {
-        return (
-            <div className="flex flex-col h-full">
-                <div className="flex-1 flex flex-col gap-6 justify-center">
+   if (isActive) {
+    return (
+        <div className="flex flex-col h-full">
+            <div className="flex items-center mb-4">
+                <GoArrowLeft className="text-xl cursor-pointer" onClick={onBack} />
+            </div>
+            <div className="flex-1 flex flex-col gap-6 justify-center">
                     <div className="bg-white rounded-[20px] p-6 mx-6 flex flex-col gap-6 border border-gray-200" style={{ minHeight: 300 }}>
                         <p className="text-[14px] text-secondary">{t('subscription.checkPlanOverview')}</p>
                         <h2 className="text-[22px] font-bold text-gray-900">
@@ -714,10 +719,11 @@ const SubscriptionSection = () => {
 
     // ── No subscription — show plans ──────────────────────────────────────────
     return (
-        <div className="flex flex-col h-full overflow-y-auto scrollbar">
-            <div className="flex justify-end mb-2">
-                <button
-                    onClick={handleRestore}
+    <div className="flex flex-col h-full overflow-y-auto scrollbar">
+        <div className="flex items-center justify-between mb-2">
+            <GoArrowLeft className="text-xl cursor-pointer" onClick={onBack} />
+            <button
+                onClick={handleRestore}
                     disabled={restoring}
                     className="text-[14px] text-primary underline disabled:opacity-50"
                 >
