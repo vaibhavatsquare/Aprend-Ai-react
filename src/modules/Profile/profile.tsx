@@ -47,6 +47,17 @@ const UserProfile = () => {
     const fetched = useRef(false);
     const searchParams = useSearchParams();
 
+    const handleSelect = (section: string) => {
+        window.history.pushState({ section }, '');
+        setSelected(section);
+    };
+
+    useEffect(() => {
+        const handlePopState = () => setSelected(null);
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, []);
+
     // Handle Stripe redirect back to profile
     useEffect(() => {
         const sub = searchParams.get("subscription");
@@ -194,7 +205,7 @@ const UserProfile = () => {
                                         </div>
                                     )}
                                     <div
-                                        onClick={() => setSelected("editProfile")}
+                                        onClick={() => handleSelect("editProfile")}
                                         className="absolute bottom-1 right-1 w-[32px] h-[32px] bg-white rounded-full flex items-center justify-center shadow"
                                     >
                                         <FiEdit2 size={16} />
@@ -223,7 +234,7 @@ const UserProfile = () => {
 
                                 <ProfileItem
                                     title={t('profile.preferredLanguage')}
-                                    onClick={() => setSelected("language")}
+                                    onClick={() => handleSelect("language")}
                                     rightContent={
                                         <span className="text-[14px] text-secondary">
                                             {languages.find((l: any) => l.value === selectedLanguage)?.label ?? "English (UK)"}
@@ -306,27 +317,27 @@ const UserProfile = () => {
 
                                 <ProfileItem
                                     title={t('profile.savedNotes')}
-                                    onClick={() => setSelected("notes")}
+                                    onClick={() => handleSelect("notes")}
                                 />
 
                                 <ProfileItem
                                     title={t('profile.savedFlashcards')}
-                                    onClick={() => setSelected("flashcards")}
+                                    onClick={() => handleSelect("flashcards")}
                                 />
 
                                 <ProfileItem
                                     title={t('profile.savedSummaries')}
-                                    onClick={() => setSelected("Summaries")}
+                                    onClick={() => handleSelect("Summaries")}
                                 />
 
                                 <ProfileItem
                                     title={t('profile.achievements')}
-                                    onClick={() => setSelected("achievements")}
+                                    onClick={() => handleSelect("achievements")}
                                 />
 
                                 <ProfileItem
                                     title={t('profile.mySubscription')}
-                                    onClick={() => setSelected("subscription")}
+                                    onClick={() => handleSelect("subscription")}
                                     rightContent={
                                         <span className="text-[12px] text-secondary">
                                             {isPremium ? "Premium" : ""}
@@ -336,12 +347,12 @@ const UserProfile = () => {
 
                                 <ProfileItem
                                     title={t('profile.termsConditions')}
-                                    onClick={() => setSelected("terms")}
+                                    onClick={() => window.open("https://docs.google.com/document/d/1-OmXZFvKtQd6qt0AjgEz7yBJNn7rG6yYXgOiePxneHc/edit?usp=drivesdk", "_blank")}
                                 />
 
                                 <ProfileItem
                                     title={t('profile.privacyPolicy')}
-                                    onClick={() => setSelected("privacy")}
+                                    onClick={() => window.open("https://docs.google.com/document/d/1-S91kyZ886iO70L3hdhXZYBb3eNkNjEusniH-vUGLOU/edit?usp=drivesdk", "_blank")}
                                 />
 
                                 <ProfileItem

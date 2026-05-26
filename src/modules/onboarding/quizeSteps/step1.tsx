@@ -68,6 +68,7 @@ const getSubjectLabel = (value: string) => {
                 : "border-[#DADADA] hover:border-gray-400"
               }`}
             onClick={() => toggle(level.value)}
+            style={quiz.subjects.includes(level.value) ? { boxShadow: '0px 4px 16px 0px #2563EB40' } : undefined}
           >
             {/* <p className="text-sm">{level.label}</p> */}
             <p className={`text-sm ${quiz.subjects.includes(level.value) ? "text-white" : "text-[#121212]"}`}>{getSubjectLabel(level.value)}</p>

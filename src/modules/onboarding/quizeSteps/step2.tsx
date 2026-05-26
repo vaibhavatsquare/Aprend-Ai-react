@@ -52,6 +52,7 @@ const { t } = useTranslation();
                 : "border-[#DADADA] hover:border-gray-400"
             }`}
             onClick={() => handleSelect(level.value)}
+            style={quiz.learningGoal === level.value ? { boxShadow: '0px 4px 16px 0px #2563EB40' } : undefined}
           >
             {/* <p className="text-sm">{level.label}</p> */}
             <p className={`text-sm ${quiz.learningGoal === level.value ? "text-white" : "text-[#121212]"}`}>{getGoalLabel(level.value)}</p>

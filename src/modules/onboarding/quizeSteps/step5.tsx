@@ -57,6 +57,7 @@ const Step5 = ({
                 : "border-[#DADADA] hover:border-gray-400"
             }`}
             onClick={() => handleSelect(level.value)}
+            style={quiz.preferredTime === level.value ? { boxShadow: '0px 4px 16px 0px #2563EB40' } : undefined}
           >
             {/* <p className="text-sm">{level.label}</p> */}
             <p className={`text-sm ${quiz.preferredTime === level.value ? "text-white" : "text-[#121212]"}`}>{getTimeLabel(level.value)}</p>

@@ -40,6 +40,7 @@ const ChooseLanguage = () => {
                   : "border-[#DADADA] hover:border-gray-400"
                 }`}
               onClick={() => setSelectedLanguage(language.value)}
+              style={selectedLanguage === language.value ? { boxShadow: '0px 4px 16px 0px #2563EB40' } : undefined}
             >
               <Image src={language.flag} alt="" width={24} height={24} />
               {/* <p className="text-sm font-medium">{language.label}</p> */}

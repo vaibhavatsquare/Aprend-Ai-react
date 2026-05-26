@@ -106,11 +106,23 @@ export const questionBankSimuladoQuestions = async (
     url: "/question-simulados/question-bank",
     method: "GET",
     params: {
-      subject: payload.subject.join(","),
+      subject: payload.subject, // ✅ pass array directly
       difficulty: payload.difficulty,
       skip: 0,
-      take: payload.numberOfQuestions, // ✅ fixed: was hardcoded 50, now uses selected value
-    }
+      take: payload.numberOfQuestions,
+    },
+    paramsSerializer: (params) => {
+      const searchParams = new URLSearchParams();
+      if (Array.isArray(params.subject)) {
+        params.subject.forEach((s: string) => searchParams.append('subject', s));
+      } else {
+        searchParams.append('subject', params.subject);
+      }
+      searchParams.append('difficulty', params.difficulty);
+      searchParams.append('skip', String(params.skip));
+      searchParams.append('take', String(params.take));
+      return searchParams.toString();
+    },
   });
 
   return {

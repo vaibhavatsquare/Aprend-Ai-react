@@ -200,7 +200,7 @@ const Questions = () => {
             {/* CHOOSE SUBJECT SCREEN */}
             {step === "chooseSubject" && (
                 <div className="px-4">
-                    <div className="h-[calc(100vh-100px)] mt-1 mb-4 py-4 rounded-xl flex flex-col gap-4"
+                    <div className="h-[calc(100vh-100px)] mt-1 mb-4 py-4 rounded-[32px] flex flex-col gap-4"
                         style={{ boxShadow: "0px 0px 4px 0px #00000040",backgroundColor: '#F7F9FC' }}
                     >
                         <div className="mx-4 flex relative justify-center">

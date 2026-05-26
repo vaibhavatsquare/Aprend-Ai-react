@@ -303,7 +303,7 @@ if (type === "FLASHCARD") return t('flashcards.title');
             backgroundImage: "url('/images/buttonBg.svg')",
             backgroundSize: '600% 700%',
             backgroundPosition: 'center',
-            boxShadow: '0px 0px 50px 0px #1953CB40',
+            // boxShadow: '0px 0px 50px 0px #1953CB40',
             border: '1px solid rgba(255,255,255,0.35)',
           }}
           onClick={() => useRedirect("/home/ai-tutor")}

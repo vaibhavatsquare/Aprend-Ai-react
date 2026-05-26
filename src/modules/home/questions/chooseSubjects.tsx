@@ -32,38 +32,38 @@ const ChooseSubjects = ({
 
   const getSubjectLabel = (value: string) => {
     const map: Record<string, string> = {
-        'ALL': t('questions.allSubjects' as any),
-        'MATHEMATICS': t('questions.mathematics' as any),
-        'SCIENCE': t('questions.science' as any),
-        'HISTORY': t('questions.history' as any),
-        'GEOGRAPHY': t('questions.geography' as any),
-        'ENGLISH': t('questions.english' as any),
-        'COMPUTER_SCIENCE': 'Computer Science',
-        'BUSINESS_ECONOMICS': 'Business / Economics',
-        'LANGUAGES': 'Languages',
-        'OTHER': t('common.other' as any),
+      'ALL': t('questions.allSubjects' as any),
+      'MATHEMATICS': t('questions.mathematics' as any),
+      'SCIENCE': t('questions.science' as any),
+      'HISTORY': t('questions.history' as any),
+      'GEOGRAPHY': t('questions.geography' as any),
+      'ENGLISH': t('questions.english' as any),
+      'COMPUTER_SCIENCE': 'Computer Science',
+      'BUSINESS_ECONOMICS': 'Business / Economics',
+      'LANGUAGES': 'Languages',
+      'OTHER': t('common.other' as any),
     };
     return map[value] || value;
-};
+  };
 
-const getDifficultyLabel = (value: string) => {
+  const getDifficultyLabel = (value: string) => {
     const map: Record<string, string> = {
-        'EASY': t('home.simulados.easy' as any),
-        'MEDIUM': t('home.simulados.medium' as any),
-        'HARD': t('home.simulados.hard' as any),
-        'MIX': t('home.simulados.mix' as any),
+      'EASY': t('home.simulados.easy' as any),
+      'MEDIUM': t('home.simulados.medium' as any),
+      'HARD': t('home.simulados.hard' as any),
+      'MIX': t('home.simulados.mix' as any),
     };
     return map[value] || value;
-};
+  };
 
   // TOGGLE SUBJECT
   const handleSubject = (value: string) => {
 
     // 👉 Explore = single select
-    if (isExplore) {
-      setSelectedSubjects([value]);
-      return;
-    }
+    // if (isExplore) {
+    //   setSelectedSubjects([value]);
+    //   return;
+    // }
 
     // 👉 Simulado = multi select (existing logic)
     if (value === "ALL") {
@@ -158,7 +158,7 @@ const getDifficultyLabel = (value: string) => {
       {/* SUBJECT BUTTONS */}
       <div className="flex gap-3 flex-wrap">
         {subjects
-          .filter((item) => !(isExplore && item.value === "ALL"))
+          // .filter((item) => !(isExplore && item.value === "ALL"))
           .map((item) => {
             const isSelected = selectedSubjects.includes(item.value);
 
@@ -193,30 +193,34 @@ const getDifficultyLabel = (value: string) => {
           </h1>
 
           {/* SLIDER */}
-          <div className="flex justify-start">
-            <div className="relative w-[60%]">
+          {/* SLIDER */}
+<div className="flex justify-start">
+  <div className="relative w-[60%] py-3">
 
-              <input
-                type="range"
-                min={1}
-                max={remainingQuestions} // ✅ limited to remainingQuestions for free users
-                value={value}
-                onChange={(e) => setValue(Number(e.target.value))}
-                className="w-full accent-[#2563EB]"
-              />
+    <input
+      type="range"
+      min={1}
+      max={remainingQuestions}
+      value={value}
+      onChange={(e) => setValue(Number(e.target.value))}
+      className="custom-range-slider"
+      style={{
+        '--progress': `${((value - 1) / (remainingQuestions - 1)) * 100}%`,
+      } as React.CSSProperties}
+    />
 
-              {/* VALUE UNDER THUMB */}
-              {/* ✅ position calculation now uses remainingQuestions instead of hardcoded 40 */}
-              <div
-                className="absolute top-6 text-[16px] text-[#121212] -translate-x-1/2"
-                style={{
-                  left: `calc(${(value - 0.5) / remainingQuestions * 100}%)`,
-                }}
-              >
-                {value}
-              </div>
-            </div>
-          </div>
+    {/* VALUE UNDER THUMB */}
+    <div
+      className="absolute text-[16px] font-medium text-[#121212] -translate-x-1/2"
+      style={{
+        top: '36px',
+        left: `${((value - 1) / (remainingQuestions - 1)) * 100}%`,
+      }}
+    >
+      {value}
+    </div>
+  </div>
+</div>
 
           {/* SPACING */}
           <div className="h-[52px]" />
@@ -290,35 +294,35 @@ const getDifficultyLabel = (value: string) => {
         </button>
 
         {/* CONTINUE */}
-       <div style={{ borderRadius: '12px', boxShadow: '0px 0px 50px 0px #1953CB40' }}>
-  <div style={{
-    position: 'relative', width: '320px', height: '50px',
-    borderRadius: '12px', overflow: 'hidden',
-    backgroundImage: "url('/images/buttonBg.svg')",
-    backgroundSize: '350% 700%', backgroundPosition: 'center',
-  }}>
-    <button
-      onClick={handleContinue}
-      disabled={loading}
-      style={{
-        width: '100%', height: '100%', background: 'transparent',
-        border: '1px solid rgba(255,255,255,0.35)', color: 'white',
-        fontWeight: '600', fontSize: '16px', cursor: 'pointer',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-        opacity: loading ? 0.6 : 1,
-      }}
-    >
-      {loading ? (
-        <>
-          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-          {t('common.loading')}
-        </>
-      ) : (
-        t('common.continue')
-      )}
-    </button>
-  </div>
-</div>
+        <div style={{ borderRadius: '12px', boxShadow: '0px 0px 50px 0px #1953CB40' }}>
+          <div style={{
+            position: 'relative', width: '320px', height: '50px',
+            borderRadius: '12px', overflow: 'hidden',
+            backgroundImage: "url('/images/buttonBg.svg')",
+            backgroundSize: '350% 700%', backgroundPosition: 'center',
+          }}>
+            <button
+              onClick={handleContinue}
+              disabled={loading}
+              style={{
+                width: '100%', height: '100%', background: 'transparent',
+                border: '1px solid rgba(255,255,255,0.35)', color: 'white',
+                fontWeight: '600', fontSize: '16px', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                opacity: loading ? 0.6 : 1,
+              }}
+            >
+              {loading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  {t('common.loading')}
+                </>
+              ) : (
+                t('common.continue')
+              )}
+            </button>
+          </div>
+        </div>
 
       </div>
     </div>

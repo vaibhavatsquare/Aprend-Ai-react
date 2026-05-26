@@ -62,7 +62,7 @@ const QuestionsBank = ({
       <div className="px-4">
         <div
           className="h-[calc(100vh-100px)] mt-1 mb-4 py-6 rounded-[32px] flex flex-col animate-[pulse_1.2s_ease-in-out_infinite]"
-          style={{ boxShadow: "0px 0px 4px 0px #00000040" ,backgroundColor: '#F7F9FC' }}
+          style={{ boxShadow: "0px 0px 4px 0px #00000040", backgroundColor: '#F7F9FC' }}
         >
           <div className="px-6 flex items-center gap-4">
             <div className="w-6 h-6 bg-gray-200 rounded-full" />
@@ -220,7 +220,7 @@ const QuestionsBank = ({
     <div className="px-4">
       <div
         className="h-[calc(100vh-100px)] mt-1 mb-4 py-6 rounded-[32px] flex flex-col overflow-hidden"
-        style={{ boxShadow: "0px 0px 4px 0px #00000040",backgroundColor: '#F7F9FC' }}
+        style={{ boxShadow: "0px 0px 4px 0px #00000040", backgroundColor: '#F7F9FC' }}
       >
         {/* TOP BAR */}
         <div className="px-6 flex items-center gap-4">
@@ -257,24 +257,68 @@ const QuestionsBank = ({
               <div
                 key={option.id}
                 onClick={() => handleSelect(option.id)}
-                // className="w-[50%] min-h-[56px] rounded-[14px] px-6 py-4 flex items-center justify-between cursor-pointer transition-all"
+                className="w-[50%] min-h-[56px] rounded-[14px] px-6 py-4 flex items-center justify-between cursor-pointer transition-all"
                 // style={{
                 //   border: `1px solid ${borderColor}`,
+                //   background: status === "idle" && selectedOption === option.id ? "#2563EB" : "white",
+                //   boxShadow: status === "idle" && selectedOption === option.id
+                //     ? "0px 4px 16px 0px #2563EB40"
+                //     : "none",
                 // }}
-                className="w-[50%] min-h-[56px] rounded-[14px] px-6 py-4 flex items-center justify-between cursor-pointer transition-all"
                 style={{
                   border: `1px solid ${borderColor}`,
-                  background: status === "idle" && selectedOption === option.id ? "#2563EB" : "white",
+                  background:
+                    (status === "correct" && isCorrectOption) ||
+                      (status === "showAnswer" && isCorrectOption) ||
+                      (status === "explanation" && isCorrectOption)
+                      ? "#22C55E"
+                      : (status === "wrong" && selectedOption === option.id) ||
+                        (status === "explanation" && selectedOption === option.id && !isCorrectOption)
+                        ? "#EF4444"
+                        : status === "idle" && selectedOption === option.id
+                          ? "#2563EB"
+                          : "white",
+                  boxShadow:
+                    status === "idle" && selectedOption === option.id
+                      ? "0px 4px 16px 0px #2563EB40"
+                      : (status === "correct" && isCorrectOption)
+                        ? "0px 4px 16px 0px #22C55E40"
+                        : (status === "wrong" && selectedOption === option.id)
+                          ? "0px 4px 16px 0px #EF444440"
+                          : "none",
                 }}
               >
                 {/* <span className="text-[18px] text-[#121212] leading-6 pr-4"> */}
-                <span className="text-[18px] leading-6 pr-4" style={{ color: status === "idle" && selectedOption === option.id ? "#fff" : "#121212" }}>
+                {/* <span className="text-[18px] leading-6 pr-4" style={{ color: status === "idle" && selectedOption === option.id ? "#fff" : "#121212" }}> */}
+                <span className="text-[18px] leading-6 pr-4"
+                  style={{
+                    color:
+                      (status === "idle" && selectedOption === option.id) ||
+                        (status === "correct" && isCorrectOption) ||
+                        (status === "showAnswer" && isCorrectOption) ||
+                        (status === "explanation" && isCorrectOption) ||
+                        (status === "wrong" && selectedOption === option.id) ||
+                        (status === "explanation" && selectedOption === option.id && !isCorrectOption)
+                        ? "#fff"
+                        : "#121212"
+                  }}>
                   {option.text}
                 </span>
 
                 <div
                   className="w-6 h-6 rounded-full border flex items-center justify-center flex-shrink-0"
-                  style={{ borderColor }}
+                  // style={{ borderColor: status === "idle" && selectedOption === option.id ? "white" : borderColor }}
+                  style={{
+                    borderColor:
+                      (status === "idle" && selectedOption === option.id) ||
+                        (status === "correct" && isCorrectOption) ||
+                        (status === "showAnswer" && isCorrectOption) ||
+                        (status === "explanation" && isCorrectOption) ||
+                        (status === "wrong" && selectedOption === option.id) ||
+                        (status === "explanation" && selectedOption === option.id && !isCorrectOption)
+                        ? "white"
+                        : borderColor
+                  }}
                 >
                   {shouldFill(option.id, isCorrectOption) && (
                     // <div
@@ -284,11 +328,19 @@ const QuestionsBank = ({
                     //   }}
                     // />
                     <div
-                        className="w-3 h-3 rounded-full"
-                        style={{
-                          background: status === "idle" && selectedOption === option.id ? "#fff" : borderColor,
-                        }}
-                      />
+                      className="w-3 h-3 rounded-full"
+                      style={{
+                        background:
+                          (status === "idle" && selectedOption === option.id) ||
+                            (status === "correct" && isCorrectOption) ||
+                            (status === "showAnswer" && isCorrectOption) ||
+                            (status === "explanation" && isCorrectOption) ||
+                            (status === "wrong" && selectedOption === option.id) ||  // 👈 this fixes it
+                            (status === "explanation" && selectedOption === option.id && !isCorrectOption)
+                            ? "#fff"
+                            : borderColor,
+                      }}
+                    />
                   )}
                 </div>
               </div>
@@ -304,12 +356,12 @@ const QuestionsBank = ({
               disabled={submitting}
               // className="w-[60%] h-[48px] mx-auto bg-[#0F3057] text-white rounded-xl flex justify-center items-center gap-2"
               className="w-[60%] h-[48px] mx-auto text-white rounded-xl flex justify-center items-center gap-2"
-          style={{
-            backgroundImage: "url('/images/buttonBg.svg')",
-            backgroundSize: '350% 900%', backgroundPosition: 'center',
-            boxShadow: '0px 0px 50px 0px #1953CB40',
-            border: '1px solid rgba(255,255,255,0.35)',
-          }}
+              style={{
+                backgroundImage: "url('/images/buttonBg.svg')",
+                backgroundSize: '350% 900%', backgroundPosition: 'center',
+                boxShadow: '0px 0px 50px 0px #1953CB40',
+                border: '1px solid rgba(255,255,255,0.35)',
+              }}
             >
               {submitting ? (
                 <>

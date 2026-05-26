@@ -56,6 +56,7 @@ const ChooseEducationLevel = () => {
                   : "border-[#DADADA] hover:border-[#2563EB]"
               }`}
               onClick={() => setSelectedEducationLevel(level.value)}
+              style={selectedEducationLevel === level.value ? { boxShadow: '0px 4px 16px 0px #2563EB40' } : undefined}
             >
               {/* <p className="text-sm">{level.label}</p> */}
               <p className={`text-sm ${selectedEducationLevel === level.value ? "text-white" : ""}`}>{getEducationLabel(level.value)}</p>
