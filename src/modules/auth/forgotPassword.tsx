@@ -105,13 +105,14 @@ const ForgotPassword = () => {
   return (
     <div className="w-full h-full bg-primary flex">
       {isLoading && <MiniLoader />}
-      <div className="h-full flex justify-end">
+      {/* <div className="h-full flex justify-end"> */}
+      <div className="h-full w-[35%] flex-shrink-0 relative overflow-hidden">
         <Image
           src="/images/auth/loginImg.svg"
           alt="Login background"
-          width={800}
-          height={600}
-          className="object-contain w-auto h-full"
+          fill
+          className="object-cover"
+          priority
         />
       </div>
 
@@ -124,7 +125,8 @@ const ForgotPassword = () => {
         {isOtpSent ? (
           !isResetOpen ? (
             /* OTP SCREEN */
-            <div className="w-[90%] sm:w-[80%] md:w-[60%] xl:w-[40%] h-full overflow-y-auto scrollbar-hide py-20 flex flex-col justify-center gap-10">
+            // <div className="w-[90%] sm:w-[80%] md:w-[60%] xl:w-[40%] h-full overflow-y-auto scrollbar-hide py-20 flex flex-col justify-center gap-10">
+            <div className="w-[90%] sm:w-[80%] md:w-[60%] xl:w-[40%] h-full overflow-y-auto scrollbar-hide py-20 px-4 flex flex-col justify-center gap-10">
               <div className="flex flex-col gap-1 text-primary">
                 <h1 className="text-2xl font-bold">Enter OTP</h1>
                 <p className="text-sm">
@@ -142,12 +144,22 @@ const ForgotPassword = () => {
               </div>
 
               <div className="flex flex-col gap-4">
-                <Button
-                  onClick={handleOtp}
-                  className="mt-6 w-full h-[40px]! bg-primary! text-white! border-none! rounded-xl!"
-                >
-                  Verify Code
-                </Button>
+                <div style={{ padding: '0 12px', marginTop: '24px' }} className="flex justify-center">
+                  <button
+                    onClick={handleOtp}
+                    disabled={isLoading}
+                    className="w-full h-[40px] rounded-xl text-white font-semibold disabled:opacity-50"
+                    style={{
+                      backgroundImage: "url('/images/buttonBg.svg')",
+                      backgroundSize: '350% 700%',
+                      backgroundPosition: 'center',
+                      boxShadow: '0px 0px 50px 0px #1953CB40',
+                      border: '1px solid rgba(255,255,255,0.35)',
+                    }}
+                  >
+                    Verify Code
+                  </button>
+                </div>
 
                 <div className="mt-8 text-center text-sm text-gray-600">
                   Didn’t receive?{" "}
@@ -162,7 +174,8 @@ const ForgotPassword = () => {
             </div>
           ) : (
             /* RESET PASSWORD SCREEN */
-            <div className="w-[90%] sm:w-[80%] md:w-[60%] xl:w-[40%] h-full overflow-y-auto scrollbar-hide py-20 flex flex-col justify-center gap-10">
+            // <div className="w-[90%] sm:w-[80%] md:w-[60%] xl:w-[40%] h-full overflow-y-auto scrollbar-hide py-20 flex flex-col justify-center gap-10">
+            <div className="w-[90%] sm:w-[80%] md:w-[60%] xl:w-[40%] h-full overflow-y-auto scrollbar-hide py-20 px-4 flex flex-col justify-center gap-10">
               <h1 className="text-2xl font-bold text-primary">
                 Create New Password
               </h1>
@@ -188,12 +201,22 @@ const ForgotPassword = () => {
                 )}
               />
 
-              <Button
-                onClick={handleSubmit(handleResetPassword)}
-                className="mt-6 w-full h-[40px]! bg-primary! text-white! border-none! rounded-xl!"
-              >
-                Create New Password
-              </Button>
+              <div style={{ padding: '0 8px', marginTop: '24px' }} className="flex justify-center">
+                <button
+                  onClick={handleSubmit(handleResetPassword)}
+                  disabled={isLoading}
+                  className="w-[500px] h-[40px] rounded-xl text-white font-semibold disabled:opacity-50"
+                  style={{
+                    backgroundImage: "url('/images/buttonBg.svg')",
+                    backgroundSize: '350% 700%',
+                    backgroundPosition: 'center',
+                    boxShadow: '0px 0px 20px 0px #1953CB40',
+                    border: '1px solid rgba(255,255,255,0.35)',
+                  }}
+                >
+                  Create New Password
+                </button>
+              </div>
             </div>
           )
         ) : (
@@ -210,12 +233,22 @@ const ForgotPassword = () => {
               render={({ field }) => <Input {...field} placeholder="Email" />}
             />
 
-            <Button
-              onClick={handleSubmit(handleForgotPassword)}
-              className="mt-6 w-full h-[40px]! bg-primary! text-white! border-none! rounded-xl!"
-            >
-              Send Verification Code
-            </Button>
+            <div style={{ padding: '0 14px', marginTop: '24px' }} className="flex justify-center">
+              <button
+                onClick={handleSubmit(handleForgotPassword)}
+                disabled={isLoading}
+                className="w-[80%] h-[40px] rounded-xl text-white font-semibold disabled:opacity-50"
+                style={{
+                  backgroundImage: "url('/images/buttonBg.svg')",
+                  backgroundSize: '350% 900%',
+                  backgroundPosition: 'center',
+                  boxShadow: '0px 0px 50px 0px #1953CB40',
+                  border: '1px solid rgba(255,255,255,0.35)',
+                }}
+              >
+                Send Verification Code
+              </button>
+            </div>
           </div>
         )}
       </form>
