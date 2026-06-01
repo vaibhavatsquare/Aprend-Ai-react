@@ -462,6 +462,9 @@ const SubscriptionSection = ({ onBack }: { onBack?: () => void }) => {
     const [restoring, setRestoring] = useState(false);
     const [plans, setPlans] = useState<any>(null);
     const { t } = useTranslation();
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [immediateCancel, setImmediateCancel] = useState(false);
+    const [cancelClickCount, setCancelClickCount] = useState(0);
 
     const handleRestore = async () => {
         if (restoring) return;
@@ -559,19 +562,18 @@ const SubscriptionSection = ({ onBack }: { onBack?: () => void }) => {
         day: "numeric", month: "short", year: "numeric",
     });
 
-    const handleCancel = async () => {
+    const handleCancel = async (immediate: boolean = false) => {
         if (cancelling) return;
         setCancelling(true);
         try {
-            await cancelSubscription();
+            await cancelSubscription(immediate);
             message.success(`Subscription cancelled. You will have access until ${formatDate(subscription.endsAt)}.`);
-            // Don't remove subscription — user still has access until endsAt
-            // Just update the status to show cancelled state
             setSubscription((prev: any) => ({ ...prev, subscriptionStatus: "CANCELLED" }));
         } catch {
             message.error("Failed to cancel. Please try again.");
         } finally {
             setCancelling(false);
+            setShowConfirmModal(false);
         }
     };
 
@@ -634,16 +636,16 @@ const SubscriptionSection = ({ onBack }: { onBack?: () => void }) => {
     }
 
     // ── Active subscription — show plan details ────────────────────────────────
-   if (isActive) {
-    return (
-        <div className="flex flex-col h-full">
-            <div className="flex items-center mb-4">
-                <GoArrowLeft className="text-xl cursor-pointer" onClick={onBack} />
-            </div>
-            <div className="flex-1 flex flex-col gap-6 justify-center">
+    if (isActive) {
+        return (
+            <div className="flex flex-col h-full">
+                <div className="flex items-center mb-4">
+                    <GoArrowLeft className="text-xl cursor-pointer" onClick={onBack} />
+                </div>
+                <div className="flex-1 flex flex-col gap-6 justify-center">
                     <div className="bg-white rounded-[20px] p-6 mx-6 flex flex-col gap-6 border border-gray-200" style={{ minHeight: 300 }}>
                         <p className="text-[14px] text-secondary">{t('subscription.checkPlanOverview')}</p>
-                        <h2 className="text-[22px] font-bold text-gray-900">
+                        <h2 className="text-[22px] font-bold text-[#2563EB]">
                             {/* Your {subscription.price >= 100 ? "Yearly" : "Monthly"} Plan */}
                             {t('subscription.your') as any} {subscription.price >= 100 ? t('subscription.yearly') : t('subscription.monthly')} Plan
 
@@ -704,26 +706,66 @@ const SubscriptionSection = ({ onBack }: { onBack?: () => void }) => {
                             {t('subscription.backToHome')}
                         </button>
                     </div>
+
                     <button
-                        onClick={handleCancel}
-                        disabled={cancelling}
-                        className="w-full text-center text-[14px] text-secondary hover:text-red-500 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                        onClick={() => {
+                            const isImmediate = cancelClickCount >= 1;
+                            setImmediateCancel(isImmediate);
+                            setShowConfirmModal(true);
+                            setCancelClickCount((prev) => prev + 1);
+                        }}
+                        className="w-full text-center text-[14px] text-secondary hover:text-red-500 transition-colors underline"
                     >
-                        {cancelling && <Spin size="small" />}
-                        {cancelling ? t('common.loading') : t('subscription.cancel')}
+                        {t('subscription.cancel')}
                     </button>
                 </div>
+                {showConfirmModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-6">
+                        <div className="bg-white rounded-[20px] p-6 w-full max-w-sm flex flex-col items-center gap-4">
+                            {/* <button onClick={() => setShowConfirmModal(false)} className="self-end text-gray-400 hover:text-gray-600">✕</button> */}
+                            <button onClick={() => { setShowConfirmModal(false); setCancelClickCount(0); }} className="self-end text-gray-400 hover:text-gray-600">✕</button>
+                            <div className="text-red-500">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                    <polyline points="3 6 5 6 21 6" />
+                                    <path d="M19 6l-1 14H6L5 6" />
+                                    <path d="M10 11v6M14 11v6" />
+                                    <path d="M9 6V4h6v2" />
+                                </svg>
+                            </div>
+                            <p className="text-[16px] font-bold text-gray-900 text-center">
+                                {immediateCancel
+                                    ? "Are you sure you want to cancel your subscription immediately?"
+                                    : "Are you sure you want to cancel your subscription?"}
+                            </p>
+                            <div className="flex gap-3 w-full mt-2">
+                                <button
+                                    onClick={() => { setShowConfirmModal(false); setCancelClickCount(0); }}
+                                    className="flex-1 h-[52px] border border-gray-200 rounded-[14px] text-[15px] font-medium text-gray-900"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={() => handleCancel(immediateCancel)}
+                                    disabled={cancelling}
+                                    className="flex-1 h-[52px] bg-red-500 text-white rounded-[14px] text-[15px] font-semibold hover:opacity-90 disabled:opacity-50"
+                                >
+                                    {cancelling ? "..." : "OK"}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         );
     }
 
     // ── No subscription — show plans ──────────────────────────────────────────
     return (
-    <div className="flex flex-col h-full overflow-y-auto scrollbar">
-        <div className="flex items-center justify-between mb-2">
-            <GoArrowLeft className="text-xl cursor-pointer" onClick={onBack} />
-            <button
-                onClick={handleRestore}
+        <div className="flex flex-col h-full overflow-y-auto scrollbar">
+            <div className="flex items-center justify-between mb-2">
+                <GoArrowLeft className="text-xl cursor-pointer" onClick={onBack} />
+                <button
+                    onClick={handleRestore}
                     disabled={restoring}
                     className="text-[14px] text-primary underline disabled:opacity-50"
                 >

@@ -166,12 +166,16 @@ const { t } = useTranslation();
   return (
     <div className="px-4">
       <div
-        className="h-[calc(100vh-100px)] mt-1 mb-4 py-6 rounded-[32px] flex flex-col"
+        // className="h-[calc(100vh-100px)] mt-1 mb-4 py-6 rounded-[32px] flex flex-col"
+        className="min-h-[calc(100vh-100px)] mt-1 mb-4 py-6 rounded-[32px] flex flex-col overflow-y-auto"
         style={{ boxShadow: "0px 0px 4px 0px #00000040",backgroundColor: '#F7F9FC' }}
       >
         {/* HEADER */}
         <div className="relative flex justify-center items-center">
-          <h1 className="text-[26px] font-semibold">{t("flashcards.title")}</h1>
+          <h1 
+          // className="text-[26px] font-semibold"
+          className="text-xl sm:text-[26px] font-semibold"
+          >{t("flashcards.title")}</h1>
 
           {streak > 0 && (
             <div className="absolute right-8 text-[22px]">{streak} 🔥</div>
@@ -192,7 +196,8 @@ const { t } = useTranslation();
           </div>
 
           <div
-            className="relative w-[640px] max-w-[90vw] min-h-[550px] py-10 rounded-[20px] p-6 transition-all duration-400"
+            // className="relative w-[640px] max-w-[90vw] min-h-[550px] py-10 rounded-[20px] p-6 transition-all duration-400"
+            className="relative w-[640px] max-w-[90vw] min-h-[300px] sm:min-h-[550px] py-6 sm:py-10 rounded-[20px] p-4 sm:p-6"
             style={{
               background: bgColor,
               perspective: "1000px",
@@ -218,7 +223,10 @@ const { t } = useTranslation();
                 style={{ backfaceVisibility: "hidden" }}
               >
                 {/* Question */}
-                <div className="text-center px-12">
+                <div 
+                // className="text-center px-12"
+                className="text-center px-4 sm:px-12"
+                >
                   <h2
                     className={`${getQuestionFontSize(
                       current.questionText,
@@ -229,7 +237,10 @@ const { t } = useTranslation();
                 </div>
 
                 {/* Options */}
-                <div className="px-10 mt-14 flex flex-col gap-6">
+                <div 
+                // className="px-10 mt-14 flex flex-col gap-6"
+                className="px-4 sm:px-10 mt-6 sm:mt-14 flex flex-col gap-4 sm:gap-6"
+                >
                   {current.options.map((option, i) => {
                     const isCorrect = option.id === current.correctOptionId;
                     const isSelected = i === selected;

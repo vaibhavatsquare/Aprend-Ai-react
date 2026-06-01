@@ -14,6 +14,7 @@ import NotesIcon from "../icons/notesIcon";
 import UserIcon from "../icons/userIcon";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@/src/libs/i18n";
+import ProChip from "@/src/components/common/ProChip";
 
 const poppins = Poppins({
   weight: ["300", "400", "500", "600", "700"],
@@ -24,6 +25,15 @@ const Sidebar = () => {
   const path = usePathname();
   const { t } = useTranslation();
   const [selectedItem, setSelectedItem] = useState("");
+  const [isPremium, setIsPremium] = useState(false);
+
+useEffect(() => {
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  setIsPremium(
+    user?.isPremium === true ||
+    user?.subscriptions?.some((s: any) => s.subscriptionStatus === "ACTIVE")
+  );
+}, []);
 
   const { isCollapsed, setIsCollapsed, setIsTabChangeLoading } =
     useSidebarContext();
@@ -61,6 +71,19 @@ const Sidebar = () => {
     if (page) setSelectedItem(page);
   }, [path]);
 
+  useEffect(() => {
+  const handleResize = () => {
+    if (window.innerWidth < 1280) {
+      setIsCollapsed(true);
+    } else {
+      setIsCollapsed(false);
+    }
+  };
+  handleResize();
+  window.addEventListener("resize", handleResize);
+  return () => window.removeEventListener("resize", handleResize);
+}, []);
+
   const handleNavigation = (key: string) => {
     if (selectedItem !== key) {
       setSelectedItem(key);
@@ -76,23 +99,46 @@ const Sidebar = () => {
   const router = useRouter();
 
   return (
-    <div
-      className={`relative h-full bg-white shadow-xl lg:shadow-none
-      ${poppins.className} flex flex-col transition-all duration-500
-      ${isCollapsed ? "w-[60px]" : "w-[230px]"}
-    `}
+    <div className={`hidden lg:flex relative h-full bg-white shadow-xl lg:shadow-none overflow-hidden
+  ${poppins.className} flex-col transition-all duration-500
+  ${isCollapsed ? "w-[60px]" : "w-[230px]"}
+`}
       style={{
         boxShadow: "0px 0px 10px 0px #0000001A inset",
       }}
     >
-      {/* Logo */}
+      {/* Logo
       <Link href="/home" className={`flex flex-col items-center`}>
         <img src="/images/appLogo.svg" alt="Loading" className="w-[90px] h-[90px]" />
         <p className="text-primary font-bold">MESTRE.IA</p>
       </Link>
+      
+      {isPremium && !isCollapsed && (
+  <div className="flex justify-center mt-2">
+    <ProChip />
+  </div>
+)} */}
+
+
+<Link href="/home" className={`flex flex-col items-center`}>
+  <img
+    src="/images/appLogo.svg"
+    alt="Loading"
+    className={`${isCollapsed ? "w-[50px] h-[50px]" : "w-[90px] h-[90px]"} transition-all duration-500`}
+  />
+  {!isCollapsed && <p className="text-primary font-bold">MESTRE.IA</p>}
+</Link>
+
+{isPremium && !isCollapsed && (
+  <div className="flex justify-center mt-2">
+    <ProChip />
+  </div>
+)}
 
       {/* Menu */}
-      <div className="flex flex-col gap-1 mt-10 overflow-y-auto scrollbar-mini pb-20">
+      {/* <div className="flex flex-col gap-1 mt-6 overflow-y-auto scrollbar-mini pb-20"> */}
+      <div className="flex flex-col gap-1 mt-6 overflow-y-auto scrollbar-hide flex-1 min-h-0 pb-4">
+
         {menuItems.map((item) => {
           const isActive = selectedItem === item.key;
           const Icon = item.icon;
@@ -114,11 +160,12 @@ const Sidebar = () => {
                 `}
                 style={isActive ? {
                   backgroundImage: "url('/images/buttonBg.svg')",
-                  backgroundSize: '350% 700%',
+                  backgroundSize: '1200% 800%',
                   backgroundPosition: 'center',
                   boxShadow: '0px 0px 50px 0px #1953CB40',
                   border: '1px solid rgba(255,255,255,0.35)',
                   WebkitTapHighlightColor: 'transparent',
+
                 } : { WebkitTapHighlightColor: 'transparent' }}
               >
                 <img src="/images/sidebar/curv.svg" alt="Loading" width={12} height={50} className="w-[12px] h-[50px] absolute left-0" />
@@ -128,7 +175,7 @@ const Sidebar = () => {
                   className={`${isActive ? "text-white" : "text-secondary"} text-xl`}
                 />
 
-                {!isCollapsed && (
+                {/* {!isCollapsed && (
                   <span
                     className={`${isActive
                       ? "text-white"
@@ -137,7 +184,17 @@ const Sidebar = () => {
                   >
                     {item.label}
                   </span>
-                )}
+                )} */}
+
+
+{!isCollapsed && (
+  <div className="flex items-center gap-2 min-w-0">
+    <span className={`${isActive ? "text-white" : "text-secondary"} text-[12px] truncate font-medium`}>
+      {item.label}
+    </span>
+    {item.key === "profile"}
+  </div>
+)}
               </Link>
             </Tooltip>
           );

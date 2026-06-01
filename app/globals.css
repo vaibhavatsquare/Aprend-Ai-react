@@ -279,3 +279,22 @@ body {
   border-radius: 999px;
   background: #2563EB;
 }
+
+.recharts-wrapper svg:focus,
+.recharts-wrapper:focus {
+  outline: none !important;
+}
+
+.recharts-wrapper:focus,
+.recharts-wrapper:focus-visible,
+.recharts-wrapper:focus-visible,
+.recharts-surface:focus,
+.recharts-surface:focus-visible {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}

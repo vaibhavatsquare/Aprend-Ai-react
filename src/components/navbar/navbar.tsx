@@ -15,6 +15,7 @@ import { useTranslation } from "@/src/libs/i18n";
 import { listenForNotifications } from "@/src/libs/notificationListener";
 import { getSubscription } from "@/src/services/api/subscription.api";
 import { useRedirect } from "@/src/hooks/router.hooks";
+import ProChip from "../common/ProChip";
 
 const Navbar = () => {
   const { t } = useTranslation();
@@ -49,7 +50,7 @@ const Navbar = () => {
     setFocusModeState(storedFocus);
     listenForNotifications();
 
-    const checkPremium = () => {
+    const checkPremium = ():any => {
         const user = JSON.parse(localStorage.getItem("user") || "{}");
         setIsPremium(
             user?.isPremium === true ||
@@ -90,18 +91,21 @@ const Navbar = () => {
   const displayName = user?.name || user?.email?.split("@")[0] || "";
 
   return (
-    <div className="relative w-full h-[80px] px-6 flex justify-between items-center">
+    <div className="relative w-full h-[60px] lg:h-[80px] px-4 lg:px-6 flex justify-between items-center">
       {/* LEFT SIDE */}
       <div className="flex flex-col gap-1">
-        <h1 className="text-[18px] font-medium">
+        <h1 className="text-[15px] lg:text-[18px] font-medium truncate max-w-[180px] lg:max-w-none">
           {/* {greeting} */}
           {t(getGreetingKey() as any)}
-          {displayName === "" ? "" : ", " + displayName + "!"} 👋
+          {displayName === "" ? "" : ", " + displayName + "!"} 👋    
         </h1>
         <p className="text-xs text-secondary">
           {t("home.readyToStart")}
         </p>
       </div>
+
+        
+      
 
       {/* RIGHT SIDE */}
       <div className="flex gap-3 items-center relative" ref={dropdownRef}>
@@ -210,7 +214,7 @@ const Navbar = () => {
       right: focusMode ? 'auto' : '10px',
     }}
   >
-    {focusMode ? 'FOCUS' : 'OFF'}
+    {focusMode ? t('navbar.focusMode.on') : t('navbar.focusMode.off')}
   </span>
 
   {/* Thumb */}
@@ -221,7 +225,8 @@ const Navbar = () => {
       height: '27px',
       borderRadius: '50%',
       backgroundColor: 'white',
-      top: '4px',
+      top: '50%',
+      transform: 'translateY(-50%)',  
       left: focusMode ? 'calc(100% - 36px)' : '4px',
       transition: 'left 0.3s ease',
       boxShadow: '0 2px 4px rgba(0,0,0,0.2)',

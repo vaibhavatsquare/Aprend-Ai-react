@@ -15,6 +15,8 @@ import QuestionsBank from "./questions/questionsBank";
 import Flashcards from "../flashcards/flashCards";
 import { useTranslation } from "@/src/libs/i18n";
 import { Modal } from "antd";
+import ProChip from "@/src/components/common/ProChip";
+import { usePathname } from "next/navigation";
 
 
 
@@ -29,6 +31,11 @@ const Home = () => {
   const [activeTask, setActiveTask] = useState<any>(null);
   const [isPremium, setIsPremium] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const pathname = usePathname();
+
+useEffect(() => {
+  setActiveTask(null);
+}, [pathname]);
 
   const fetched = useRef(false);
 
@@ -105,9 +112,9 @@ if (type === "FLASHCARD") return t('flashcards.title');
 
   if (loading) {
     return (
-      <div className="px-4 grid grid-cols-3 gap-2 animate-pulse">
+      <div className="px-4 grid grid-cols-1 lg:grid-cols-3 gap-2 animate-pulse">
         {/* LEFT SIDE */}
-        <div className="h-[calc(100vh-80px)] p-2 col-span-2 flex flex-col gap-4">
+        <div className="p-2 col-span-1 lg:col-span-2 flex flex-col gap-4">
           <div className="h-[120px] rounded-lg bg-gray-200" />
           <div className="flex gap-2">
             {[1, 2, 3, 4, 5, 6, 7].map((i) => (
@@ -125,9 +132,9 @@ if (type === "FLASHCARD") return t('flashcards.title');
           </div>
         </div>
         {/* RIGHT SIDE */}
-        <div className="flex flex-col gap-4 h-[calc(100vh-80px)] p-2">
-          <div className="h-[126px] rounded-xl bg-gray-200" />
-          <div className="h-[166px] rounded-xl bg-gray-200" />
+        <div className="flex flex-col gap-4 p-2">
+          <div className="h-[150px] rounded-xl bg-gray-200" />
+          <div className="h-[150px] rounded-xl bg-gray-200" />
           <div className="h-[60px] rounded-xl bg-gray-200" />
           <div className="h-[60px] rounded-xl bg-gray-200" />
         </div>
@@ -188,8 +195,8 @@ if (type === "FLASHCARD") return t('flashcards.title');
   }
 
   return (
-    <div className="px-4 grid grid-cols-3 gap-2">
-      <div className="h-[calc(100vh-80px)] p-2 overflow-y-auto scrollbar col-span-2 flex flex-col gap-4">
+    <div className="px-4 grid grid-cols-1 lg:grid-cols-3 gap-2">
+      <div className="p-2 overflow-y-auto scrollbar col-span-1 lg:col-span-2 flex flex-col gap-4">
 
         {/* STREAK */}
         <div className="relative w-full flex items-start justify-between gap-4 rounded-lg px-4 py-6 bg-linear-to-r from-[#F97316] via-[#ED482F] to-[#EF4444]">
@@ -207,8 +214,10 @@ if (type === "FLASHCARD") return t('flashcards.title');
           )}
         </div>
 
+       
+
         {/* WEEK */}
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-1 lg:gap-2 items-center overflow-x-auto scrollbar-hide">
           {week.map((date, index) => {
             const iso = date.toISOString().split("T")[0];
             const isSelected = iso === selectedDate;
@@ -229,7 +238,7 @@ if (type === "FLASHCARD") return t('flashcards.title');
               <div
                 key={index}
                 onClick={() => setSelectedDate(iso)}
-                className={`w-[56px] h-[66px] rounded-lg flex flex-col items-center justify-center cursor-pointer border
+                className={`w-[42px] lg:w-[56px] h-[60px] lg:h-[66px] shrink-0 rounded-lg flex flex-col items-center justify-center cursor-pointer border
     ${isSelected ? "text-white border-transparent reveal-from-center" : "bg-white text-black border-[#E5E5E5]"}`}
                 style={isSelected ? {
                   backgroundImage: "url('/images/buttonBg.svg')",
@@ -295,13 +304,15 @@ if (type === "FLASHCARD") return t('flashcards.title');
       </div>
 
       {/* RIGHT SIDE */}
-      <div className="flex flex-col gap-4 h-[calc(100vh-80px)] p-2 overflow-y-auto scrollbar">
+      <div className="flex flex-col gap-4 p-2 overflow-y-auto scrollbar">
         <div
           // className="relative h-[126px] border-2 border-[#3A86FF] flex flex-col justify-end gap-4 bg-primary rounded-xl p-4 cursor-pointer"
-          className="relative h-[126px] flex flex-col justify-end gap-4 rounded-xl p-4 cursor-pointer"
+          // className="relative h-[126px] flex flex-col justify-end gap-4 rounded-xl p-4 cursor-pointer"
+          className="relative h-[150px] flex flex-col justify-end gap-4 rounded-xl p-4 cursor-pointer"
+
           style={{
             backgroundImage: "url('/images/buttonBg.svg')",
-            backgroundSize: '600% 700%',
+            backgroundSize: '800% 1200%',
             backgroundPosition: 'center',
             // boxShadow: '0px 0px 50px 0px #1953CB40',
             border: '1px solid rgba(255,255,255,0.35)',
@@ -320,12 +331,16 @@ if (type === "FLASHCARD") return t('flashcards.title');
           <img
             src="/images/home/robot.svg"
             alt="AI Tutor"
-            className="w-[120px] h-[120px] absolute bottom-0 right-0"
+            // className="w-[120px] h-[120px] absolute bottom-0 right-0"
+            className="w-[80px] h-[80px] sm:w-[120px] sm:h-[120px] absolute bottom-0 right-0"
+
           />
         </div>
 
         <div
-          className="relative flex flex-col gap-3 justify-end p-4 rounded-xl h-[166px] bg-[#BDFF43] cursor-pointer"
+          // className="relative flex flex-col gap-3 justify-end p-4 rounded-xl h-[166px] bg-[#BDFF43] cursor-pointer"
+          className="relative flex flex-col gap-3 justify-end p-4 rounded-xl h-[150px] bg-[#BDFF43] cursor-pointer"
+
           onClick={() => useRedirect("/home/ai-tutor?upload=true")}
         >
           <IoArrowForwardSharp className="text-xl -rotate-45 absolute top-4 right-4 cursor-pointer" />
@@ -400,7 +415,7 @@ if (type === "FLASHCARD") return t('flashcards.title');
               borderRadius: '10px',
               overflow: 'hidden',
               backgroundImage: "url('/images/buttonBg.svg')",
-              backgroundSize: '175% 700%',
+              backgroundSize: '180% 600%',
               backgroundPosition: 'center',
               boxShadow: '0px 0px 50px 0px #1953CB40'
 

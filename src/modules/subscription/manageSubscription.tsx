@@ -9,6 +9,8 @@ const ManageSubscriptionPage = () => {
     const [subscription, setSubscription] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [cancelling, setCancelling] = useState(false);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [immediateCancel, setImmediateCancel] = useState(false);
 
     const loadSubscription = async () => {
         try {
@@ -36,17 +38,18 @@ const ManageSubscriptionPage = () => {
         return () => window.removeEventListener("pageshow", handlePageShow);
     }, []);
 
-    const handleCancel = async () => {
+    const handleCancel = async (immediate: boolean) => {
         if (cancelling) return;
         setCancelling(true);
         try {
-            await cancelSubscription();
+            await cancelSubscription(immediate);
             message.success("Subscription cancelled successfully.");
             await loadSubscription();
         } catch {
             message.error("Failed to cancel subscription. Please try again.");
         } finally {
             setCancelling(false);
+            setShowConfirmModal(false);
         }
     };
 
@@ -67,9 +70,13 @@ const ManageSubscriptionPage = () => {
         ? `Your ${subscription.price >= 100 ? "Yearly" : "Monthly"} Plan${isTrial ? " (Free Trial)" : ""}`
         : "Your Plan";
 
+    console.log("subscription status:", subscription?.subscriptionStatus);
+    console.log("isActive:", isActive);
+
     return (
-        <div className="min-h-screen bg-gray-50 px-6 py-6 flex flex-col">
-            {/* Header */}
+        // <div className="min-h-screen bg-gray-50 px-6 py-6 flex flex-col">
+<div className="min-h-screen bg-gray-50 px-6 py-6 pb-24 flex flex-col">
+        {/* Header */}
             <div className="flex items-center gap-4 mb-10">
                 <button onClick={() => useRedirect("/profile")} className="p-1">
                     <GoArrowLeft className="text-xl text-gray-900" />
@@ -176,7 +183,7 @@ const ManageSubscriptionPage = () => {
                     </div>
 
                     {/* Buttons */}
-                    <div className="w-full max-w-sm flex flex-col gap-3">
+                    {/* <div className="w-full max-w-sm flex flex-col gap-3">
                         <button
                             onClick={() => useRedirect("/home")}
                             className="w-full h-[52px] bg-gray-900 text-white rounded-[14px] text-[16px] font-semibold hover:opacity-90 transition-opacity"
@@ -192,6 +199,83 @@ const ManageSubscriptionPage = () => {
                             {cancelling && <Spin size="small" />}
                             {cancelling ? "Cancelling..." : "Cancel or change subscription"}
                         </button>
+                    </div> */}
+                    <div className="w-full max-w-sm flex flex-col gap-3">
+                        <button
+                            onClick={() => useRedirect("/home")}
+                            className="w-full h-[52px] bg-gray-900 text-white rounded-[14px] text-[16px] font-semibold hover:opacity-90 transition-opacity"
+                        >
+                            Back to Home
+                        </button>
+
+                        {/* First cancel — immediate: false */}
+                        <button
+                            onClick={() => {
+                                console.log("clicked", showConfirmModal);
+                                setImmediateCancel(false);
+                                setShowConfirmModal(true);
+                                console.log("after set", showConfirmModal);
+                            }}
+                            className="w-full text-center text-[14px] text-secondary hover:text-red-500 transition-colors underline"
+                        >
+                            Cancel subscription
+                        </button>
+
+                        {/* Second cancel — immediate: true */}
+                        <button
+                            onClick={() => { setImmediateCancel(true); setShowConfirmModal(true); }}
+                            className="w-full text-center text-[14px] text-secondary hover:text-red-500 transition-colors underline"
+                        >
+                            Immediate Cancel Subscription
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {showConfirmModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-6">
+                    <div className="bg-white rounded-[20px] p-6 w-full max-w-sm flex flex-col items-center gap-4">
+                        {/* Close */}
+                        <button
+                            onClick={() => setShowConfirmModal(false)}
+                            className="self-end text-gray-400 hover:text-gray-600"
+                        >
+                            ✕
+                        </button>
+
+                        {/* Icon */}
+                        <div className="text-red-500">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                <polyline points="3 6 5 6 21 6" />
+                                <path d="M19 6l-1 14H6L5 6" />
+                                <path d="M10 11v6M14 11v6" />
+                                <path d="M9 6V4h6v2" />
+                            </svg>
+                        </div>
+
+                        {/* Message */}
+                        <p className="text-[16px] font-bold text-gray-900 text-center">
+                            {immediateCancel
+                                ? "Are you sure you want to cancel your subscription immediately?"
+                                : "Are you sure you want to cancel your subscription?"}
+                        </p>
+
+                        {/* Buttons */}
+                        <div className="flex gap-3 w-full mt-2">
+                            <button
+                                onClick={() => setShowConfirmModal(false)}
+                                className="flex-1 h-[52px] border border-gray-200 rounded-[14px] text-[15px] font-medium text-gray-900"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => handleCancel(immediateCancel)}
+                                disabled={cancelling}
+                                className="flex-1 h-[52px] bg-red-500 text-white rounded-[14px] text-[15px] font-semibold hover:opacity-90 disabled:opacity-50"
+                            >
+                                {cancelling ? "..." : "OK"}
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

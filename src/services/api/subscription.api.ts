@@ -78,11 +78,11 @@ export const createCheckoutSession = async (
 };
 
 // POST cancel active subscription
-export const cancelSubscription = async (): Promise<void> => {
+export const cancelSubscription = async (immediate: boolean = false): Promise<void> => {
   return fetch({
     url: "/subscription/cancel",
     method: "POST",
-    data: { immediate: false },
+    data: { immediate },
   });
 };
 

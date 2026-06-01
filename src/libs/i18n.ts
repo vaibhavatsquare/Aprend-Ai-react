@@ -152,6 +152,9 @@ type TranslationKey =
     | 'quiz.option.kinesthetic' | 'quiz.option.aiGuided'
     | 'quiz.option.less15' | 'quiz.option.15to30' | 'quiz.option.30to60' | 'quiz.option.1hour'
     | 'quiz.option.morning' | 'quiz.option.afternoon' | 'quiz.option.evening' | 'quiz.option.flexible'
+
+    | 'navbar.focusMode.on'
+| 'navbar.focusMode.off'
     ;
 
 
@@ -288,7 +291,7 @@ const translations = {
         'home.tasks.noTasksScheduled': 'No tasks scheduled',
         'home.tasks.completed': 'Completed',
         'home.tasks.pending': 'Pending',
-        'home.aiTutor.ready': 'YOUR AI TUTOR IS READY TO HELP',
+        'home.aiTutor.ready': 'Ask Your AI Tutor',
         'home.aiTutor.uploadNotes': 'Upload Notes',
         'home.aiTutor.uploadDescription': 'Upload images to create new study sets.',
         'home.aiTutor.askQuestion': 'Ask Your AI Tutor',
@@ -525,6 +528,9 @@ const translations = {
         'quiz.option.afternoon': 'Afternoon',
         'quiz.option.evening': 'Evening',
         'quiz.option.flexible': 'Flexible',
+
+        'navbar.focusMode.on': 'FOCUS',
+'navbar.focusMode.off': 'OFF',
     },
 
     SPANISH: {
@@ -657,7 +663,7 @@ const translations = {
         'home.tasks.noTasksScheduled': 'No hay tareas programadas',
         'home.tasks.completed': 'Completado',
         'home.tasks.pending': 'Pendiente',
-        'home.aiTutor.ready': 'TU TUTOR IA ESTÁ LISTO PARA AYUDAR',
+        'home.aiTutor.ready': 'Pregunta a tu tutora de inteligencia artificial',
         'home.aiTutor.uploadNotes': 'Subir notas',
         'home.aiTutor.uploadDescription': 'Sube imágenes para crear nuevos conjuntos de estudio.',
         'home.aiTutor.askQuestion': 'Pregúntale a tu tutor IA',
@@ -894,6 +900,9 @@ const translations = {
         'quiz.option.afternoon': 'Tarde',
         'quiz.option.evening': 'Noche',
         'quiz.option.flexible': 'Flexible',
+
+        'navbar.focusMode.on': 'ENFOCAR',
+'navbar.focusMode.off': 'APAGADO',
     },
 
     PORTUGUESE: {
@@ -1026,7 +1035,7 @@ const translations = {
         'home.tasks.noTasksScheduled': 'Nenhuma tarefa agendada',
         'home.tasks.completed': 'Concluído',
         'home.tasks.pending': 'Pendente',
-        'home.aiTutor.ready': 'SEU TUTOR IA ESTÁ PRONTO PARA AJUDAR',
+        'home.aiTutor.ready': 'Pergunte ao seu tutor de IA',
         'home.aiTutor.uploadNotes': 'Enviar notas',
         'home.aiTutor.uploadDescription': 'Envie imagens para criar novos conjuntos de estudo.',
         'home.aiTutor.askQuestion': 'Pergunte ao seu tutor IA',
@@ -1263,6 +1272,9 @@ const translations = {
         'quiz.option.afternoon': 'Tarde',
         'quiz.option.evening': 'Noite',
         'quiz.option.flexible': 'Flexível',
+
+        'navbar.focusMode.on': 'FOCO',
+'navbar.focusMode.off': 'DESLIGADO',
     },
 } as const;
 

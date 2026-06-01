@@ -148,7 +148,8 @@ const ChooseSubjects = ({
   };
 
   return (
-    <div className="px-6">
+    // <div className="px-6">
+    <div className="px-4 sm:px-6 overflow-y-auto max-h-[calc(100vh-160px)]">
 
       {/* TITLE */}
       <h1 className="text-[30px] font-medium text-[#121212] mb-3 mt-12">
@@ -195,7 +196,7 @@ const ChooseSubjects = ({
           {/* SLIDER */}
           {/* SLIDER */}
 <div className="flex justify-start">
-  <div className="relative w-[60%] py-3">
+  <div className="relative w-full sm:w-[740px] py-3">
 
     <input
       type="range"

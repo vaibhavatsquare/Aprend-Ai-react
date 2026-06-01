@@ -265,12 +265,12 @@ const WeakSpotTracker = () => {
 
           {/* Progress Trend */}
           <div
-            className="flex-1 border border-gray-200 rounded-xl p-4 flex flex-col"
-            style={{ boxShadow: "0px 0px 1px 0px #00000040", minHeight: 420 }}
+            className="flex-1 border border-gray-200 rounded-xl p-4 flex flex-col pointer-events-none"
+            style={{ boxShadow: "0px 0px 1px 0px #00000040", minHeight: 420 }} 
           >
             <div className="flex items-center justify-between mb-3">
               <p className="font-semibold text-gray-900">Progress trend</p>
-              <div className="flex bg-gray-100 rounded-full p-0.5">
+              <div className="flex bg-gray-100 rounded-full p-0.5 pointer-events-auto">
                 {(["weekly", "monthly"] as const).map((v) => (
                   <button
                     key={v}
@@ -294,6 +294,8 @@ const WeakSpotTracker = () => {
                     data={chartData}
                     barCategoryGap="25%"
                     margin={{ top: 10, right: 8, left: 8, bottom: 5 }}
+                    style={{ outline: 'none' }}
+                     tabIndex={-1}
                   >
                     <XAxis
                       dataKey="day"

@@ -17,26 +17,12 @@ export const languages = [
 ];
 
 export const educationLevels = [
-    {
-        label: "Elementary School",
-        value: "ELEMENTARY"
-    },
-    {
-        label: "High School",
-        value: "HIGH_SCHOOL"
-    },
-    {
-        label: "Pre-Vestibular",
-        value: "PRE_VESTIBULAR"
-    },
-    {
-        label: "University",
-        value: "UNIVERSITY"
-    },
-    {
-        label: "Competitive Exam",
-        value: "COMPETITIVE_EXAMS"
-    },
+    { label: "ENEM 2026", value: "COMPETITIVE_EXAMS", icon: "🎯", subtitle: "Complete preparation for ENEM" },
+    { label: "High School", value: "HIGH_SCHOOL", icon: "📚", subtitle: "School curriculum support" },
+    { label: "Pre-University Prep", value: "PRE_VESTIBULAR", icon: "🏆", subtitle: "Intensive revision for entrance exams" },
+    { label: "Public Exams", value: "PUBLIC_EXAMS", icon: "📋", subtitle: "Preparation for government/public exams" },
+    { label: "College / University", value: "UNIVERSITY", icon: "🎓", subtitle: "Support for university content" },
+    { label: "Elementary School", value: "ELEMENTARY", icon: "✏️", subtitle: "Strong foundation for basic education" },
 ];
 
 export const step1Options = [
@@ -88,32 +74,32 @@ export const step2Options = [
 ];
 
 export const goalLabels: Record<string, string> = {
-  PREPARE_FOR_EXAM: "Prepare for Exam",
-  IMPROVE_GRADES: "Improve Grades",
-  LEARN_FROM_SCRATCH: "Learn From Scratch",
-  BUILD_LONG_TERM_MASTERY: "Build Long-term Mastery",
-  REVISE_PREVIOUS_KNOWLEDGE: "Revise Previous Knowledge",
-  IMPROVE_STUDY_HABITS: "Improve Study Habits",
+    PREPARE_FOR_EXAM: "Prepare for Exam",
+    IMPROVE_GRADES: "Improve Grades",
+    LEARN_FROM_SCRATCH: "Learn From Scratch",
+    BUILD_LONG_TERM_MASTERY: "Build Long-term Mastery",
+    REVISE_PREVIOUS_KNOWLEDGE: "Revise Previous Knowledge",
+    IMPROVE_STUDY_HABITS: "Improve Study Habits",
 };
 
 export const styleLabels: Record<string, string> = {
-  VISUAL: "Visual",
-  AI_GUIDED: "AI Guided",
-  AUDITORY: "Auditory",
-  READING_WRITING: "Reading/Writing",
-  KINESTHETIC: "Kinesthetic",
+    VISUAL: "Visual",
+    AI_GUIDED: "AI Guided",
+    AUDITORY: "Auditory",
+    READING_WRITING: "Reading/Writing",
+    KINESTHETIC: "Kinesthetic",
 };
 
 export const subjectLabels: Record<string, string> = {
-  ENGLISH: "English",
-  MATHEMATICS: "Mathematics",
-  COMPUTER_SCIENCE: "Computer Science",
-  BUSINESS_ECONOMICS: "Business & Economics",
-  SCIENCE: "Science",
-  LANGUAGES: "Languages",
-  HISTORY: "History",
-  OTHER: "Other",
-  GEOGRAPHY: "Geography",
+    ENGLISH: "English",
+    MATHEMATICS: "Mathematics",
+    COMPUTER_SCIENCE: "Computer Science",
+    BUSINESS_ECONOMICS: "Business & Economics",
+    SCIENCE: "Science",
+    LANGUAGES: "Languages",
+    HISTORY: "History",
+    OTHER: "Other",
+    GEOGRAPHY: "Geography",
 };
 
 

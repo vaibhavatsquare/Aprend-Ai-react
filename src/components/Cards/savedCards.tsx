@@ -59,14 +59,16 @@ const SavedCard = ({
       onClick={handleCardClick}
       className="flex items-center justify-between px-2 py-4 pr-5 cursor-pointer"
       style={{
-        height: "76px",
+        // height: "76px",
+        minHeight: "76px",
         boxShadow: "0px 0px 4px 0px #00000040",
         borderRadius: "20px",
         backgroundColor: "#ffffff",
       }}
     >
       {/* LEFT SECTION */}
-      <div className="flex items-center gap-4">
+      {/* <div className="flex items-center gap-4"> */}
+      <div className="flex items-center gap-4 min-w-0 flex-1">
         {/* Save Notes Icon */}
         <Image
           src={mainIcon}
@@ -75,8 +77,10 @@ const SavedCard = ({
           height={60}
         />
 
-        <div>
-          <h3 className="text-[20px] font-medium text-primaryText">
+        {/* <div>
+          <h3 className="text-[20px] font-medium text-primaryText"> */}
+          <div className="min-w-0">
+  <h3 className="text-[20px] font-medium text-primaryText line-clamp-2">
             {item.title}
           </h3>
 
@@ -87,7 +91,8 @@ const SavedCard = ({
       </div>
 
       {/* RIGHT ACTION BUTTONS */}
-      <div className="flex items-center gap-3"
+      {/* <div className="flex items-center gap-3" */}
+      <div className="flex items-center gap-3 flex-shrink-0"
         onClick={(e) => e.stopPropagation()}
       >
 

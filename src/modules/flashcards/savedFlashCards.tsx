@@ -181,7 +181,10 @@ const SavedFlashCards = ({
                             onClick={onBack}
                         />
                     )}
-                    <h1 className="text-[28px] font-semibold text-primaryText w-full text-center">
+                    <h1 
+                    // className="text-[28px] font-semibold text-primaryText w-full text-center"
+                    className="text-xl sm:text-[28px] font-semibold text-primaryText w-full text-center"
+                    >
                         {!initialLoading && flashCards.length === 0 ? "" : t('flashcards.savedFlashcards')}
                     </h1>
                 </div>
