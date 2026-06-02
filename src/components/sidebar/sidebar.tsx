@@ -99,7 +99,9 @@ useEffect(() => {
   const router = useRouter();
 
   return (
-    <div className={`hidden lg:flex relative h-full bg-white shadow-xl lg:shadow-none overflow-hidden
+    <div 
+    // className={`hidden lg:flex relative h-full bg-white shadow-xl lg:shadow-none overflow-hidden
+    className={`flex relative h-full bg-white overflow-hidden
   ${poppins.className} flex-col transition-all duration-500
   ${isCollapsed ? "w-[60px]" : "w-[230px]"}
 `}

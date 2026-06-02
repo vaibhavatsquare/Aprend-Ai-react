@@ -134,7 +134,11 @@ const handleAppleSignIn = async () => {
 
   return (
     <div className="w-full h-screen overflow-hidden bg-primary flex">
-      {isLoading && <MiniLoader />}
+      {/* {isLoading && <MiniLoader />} */}
+
+
+
+      
       {/* <div className="h-full flex justify-end">
         <Image
           src="/images/auth/loginImg.svg"
@@ -220,6 +224,7 @@ const handleAppleSignIn = async () => {
               <Button
                 onClick={handleSubmit(handleLogin)}
                 disabled={isLoading}
+                loading={isLoading}
                 // className="mt-6 w-[90%] h-[40px]! bg-primary! text-white! border-none! py-2 px-4 rounded-xl! hover:bg-primary/90! transition-all"
                 className="btn-primary mt-6 w-[90%] h-[40px]!"
               >

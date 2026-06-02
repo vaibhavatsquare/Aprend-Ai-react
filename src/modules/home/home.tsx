@@ -242,7 +242,7 @@ if (type === "FLASHCARD") return t('flashcards.title');
     ${isSelected ? "text-white border-transparent reveal-from-center" : "bg-white text-black border-[#E5E5E5]"}`}
                 style={isSelected ? {
                   backgroundImage: "url('/images/buttonBg.svg')",
-                  backgroundSize: '1700% 1400%',
+                  backgroundSize: '2000% 1600%',
                   backgroundPosition: 'center',
                   boxShadow: '0px 0px 50px 0px #1953CB40',
                   border: '1px solid rgba(255,255,255,0.35)',

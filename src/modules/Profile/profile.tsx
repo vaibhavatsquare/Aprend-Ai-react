@@ -552,9 +552,14 @@ const SubscriptionSection = ({ onBack }: { onBack?: () => void }) => {
         { icon: <BsEmojiSmile size={18} />, label: t('limits.focusModePremium') },
         { icon: <BsGraphUp size={18} />, label: "Advance analytics" },
     ];
-    const isActive = subscription?.subscriptionStatus === "ACTIVE" ||
-        subscription?.subscriptionStatus === "CANCELLED" ||
-        subscription?.subscriptionStatus === "TRIAL";
+    // After
+const now = new Date();
+const endsAt = subscription?.endsAt ? new Date(subscription.endsAt) : null;
+const isCancelledButActive = subscription?.subscriptionStatus === "CANCELLED" && endsAt !== null && endsAt > now;
+
+const isActive = subscription?.subscriptionStatus === "ACTIVE" ||
+    subscription?.subscriptionStatus === "TRIAL" ||
+    isCancelledButActive;
 
     const isTrial = subscription?.subscriptionStatus === "TRIAL";
 
@@ -562,20 +567,28 @@ const SubscriptionSection = ({ onBack }: { onBack?: () => void }) => {
         day: "numeric", month: "short", year: "numeric",
     });
 
-    const handleCancel = async (immediate: boolean = false) => {
-        if (cancelling) return;
-        setCancelling(true);
-        try {
-            await cancelSubscription(immediate);
+ const handleCancel = async (immediate: boolean = false) => {
+    if (cancelling) return;
+    setCancelling(true);
+    try {
+        await cancelSubscription(immediate);
+        
+        // Refresh subscription from API
+        const updated = await getSubscription();
+        setSubscription(updated);
+
+        if (immediate) {
+            message.success("Subscription cancelled immediately.");
+        } else {
             message.success(`Subscription cancelled. You will have access until ${formatDate(subscription.endsAt)}.`);
-            setSubscription((prev: any) => ({ ...prev, subscriptionStatus: "CANCELLED" }));
-        } catch {
-            message.error("Failed to cancel. Please try again.");
-        } finally {
-            setCancelling(false);
-            setShowConfirmModal(false);
         }
-    };
+    } catch {
+        message.error("Failed to cancel. Please try again.");
+    } finally {
+        setCancelling(false);
+        setShowConfirmModal(false);
+    }
+};
 
     // const handleUpgrade = async () => {
     //     if (upgrading) return;
