@@ -28,7 +28,10 @@ export const SocketProvider = ({ children }: any) => {
     socket.on("achievementUnlocked", (payload: any) => {
       console.log("🎉 Achievement event:", payload);
 
-      const data = payload.data;
+      // const data = payload.data;
+       const data = payload?.data ?? payload;
+
+  if (!data?.title) return;
 
       setAchievement({
         id: Date.now().toString(),

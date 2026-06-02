@@ -9,7 +9,9 @@ const SubscriptionCancelPage = () => {
 
     useEffect(() => {
         // Redirect to profile with cancel flag to open subscription panel
-        router.replace("/profile?subscription=cancel");
+        // router.replace("/profile?subscription=cancel");
+                router.replace("/home");
+
     }, []);
 
     return (

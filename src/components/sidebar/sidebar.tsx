@@ -27,13 +27,13 @@ const Sidebar = () => {
   const [selectedItem, setSelectedItem] = useState("");
   const [isPremium, setIsPremium] = useState(false);
 
-useEffect(() => {
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  setIsPremium(
-    user?.isPremium === true ||
-    user?.subscriptions?.some((s: any) => s.subscriptionStatus === "ACTIVE")
-  );
-}, []);
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    setIsPremium(
+      user?.isPremium === true ||
+      user?.subscriptions?.some((s: any) => s.subscriptionStatus === "ACTIVE")
+    );
+  }, []);
 
   const { isCollapsed, setIsCollapsed, setIsTabChangeLoading } =
     useSidebarContext();
@@ -72,22 +72,31 @@ useEffect(() => {
   }, [path]);
 
   useEffect(() => {
-  const handleResize = () => {
-    if (window.innerWidth < 1280) {
-      setIsCollapsed(true);
-    } else {
-      setIsCollapsed(false);
-    }
-  };
-  handleResize();
-  window.addEventListener("resize", handleResize);
-  return () => window.removeEventListener("resize", handleResize);
-}, []);
+    const handleResize = () => {
+      if (window.innerWidth < 1280) {
+        setIsCollapsed(true);
+      } else {
+        setIsCollapsed(false);
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
+  // const handleNavigation = (key: string) => {
+  //   if (selectedItem !== key) {
+  //     setSelectedItem(key);
+  //     setIsTabChangeLoading(true);
+  //   }
+  // };
   const handleNavigation = (key: string) => {
     if (selectedItem !== key) {
       setSelectedItem(key);
       setIsTabChangeLoading(true);
+    } else {
+      // Same page — push state to trigger popstate in home.tsx
+      window.history.pushState(null, '');
     }
   };
 
@@ -99,9 +108,9 @@ useEffect(() => {
   const router = useRouter();
 
   return (
-    <div 
-    // className={`hidden lg:flex relative h-full bg-white shadow-xl lg:shadow-none overflow-hidden
-    className={`flex relative h-full bg-white overflow-hidden
+    <div
+      // className={`hidden lg:flex relative h-full bg-white shadow-xl lg:shadow-none overflow-hidden
+      className={`flex relative h-full bg-white overflow-hidden
   ${poppins.className} flex-col transition-all duration-500
   ${isCollapsed ? "w-[60px]" : "w-[230px]"}
 `}
@@ -122,20 +131,20 @@ useEffect(() => {
 )} */}
 
 
-<Link href="/home" className={`flex flex-col items-center`}>
-  <img
-    src="/images/appLogo.svg"
-    alt="Loading"
-    className={`${isCollapsed ? "w-[50px] h-[50px]" : "w-[90px] h-[90px]"} transition-all duration-500`}
-  />
-  {!isCollapsed && <p className="text-primary font-bold">MESTRE.IA</p>}
-</Link>
+      <Link href="/home" className={`flex flex-col items-center`}>
+        <img
+          src="/images/appLogo.svg"
+          alt="Loading"
+          className={`${isCollapsed ? "w-[50px] h-[50px]" : "w-[90px] h-[90px]"} transition-all duration-500`}
+        />
+        {!isCollapsed && <p className="text-primary font-bold">MESTRE.IA</p>}
+      </Link>
 
-{isPremium && !isCollapsed && (
-  <div className="flex justify-center mt-2">
-    <ProChip />
-  </div>
-)}
+      {isPremium && !isCollapsed && (
+        <div className="flex justify-center mt-2">
+          <ProChip />
+        </div>
+      )}
 
       {/* Menu */}
       {/* <div className="flex flex-col gap-1 mt-6 overflow-y-auto scrollbar-mini pb-20"> */}
@@ -153,7 +162,12 @@ useEffect(() => {
               <img src="/images/buttonBg.svg" alt="" className="hidden" aria-hidden="true" />
               <Link
                 href={item.href}
-                onClick={() => handleNavigation(item.key)}
+                onClick={() => {
+                  handleNavigation(item.key);
+                  if (selectedItem === item.key) {
+                    router.push(item.href);
+                  }
+                }}
                 className={`flex items-center cursor-pointer
                   border border-transparent hover:border-white
                   transition-all duration-10
@@ -171,7 +185,7 @@ useEffect(() => {
                 } : { WebkitTapHighlightColor: 'transparent' }}
               >
                 <img src="/images/sidebar/curv.svg" alt="Loading" width={12} height={50} className="w-[12px] h-[50px] absolute left-0" />
-                
+
 
                 <Icon
                   className={`${isActive ? "text-white" : "text-secondary"} text-xl`}
@@ -189,14 +203,14 @@ useEffect(() => {
                 )} */}
 
 
-{!isCollapsed && (
-  <div className="flex items-center gap-2 min-w-0">
-    <span className={`${isActive ? "text-white" : "text-secondary"} text-[12px] truncate font-medium`}>
-      {item.label}
-    </span>
-    {item.key === "profile"}
-  </div>
-)}
+                {!isCollapsed && (
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className={`${isActive ? "text-white" : "text-secondary"} text-[12px] truncate font-medium`}>
+                      {item.label}
+                    </span>
+                    {item.key === "profile"}
+                  </div>
+                )}
               </Link>
             </Tooltip>
           );

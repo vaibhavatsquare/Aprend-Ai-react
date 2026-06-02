@@ -23,7 +23,7 @@ const Flashcards = ({ taskId, initialQuestions, source, onClose }: Props) => {
     initialQuestions || [],
   );
   const [loading, setLoading] = useState(!initialQuestions);
-const { t } = useTranslation();
+  const { t } = useTranslation();
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [revealed, setRevealed] = useState(false);
@@ -79,21 +79,21 @@ const { t } = useTranslation();
         prev.map((q) =>
           q.id === current.id
             ? {
-                ...q,
-                correctOptionId: res.correctOptionId,
-                stepByStepExplanation: res.explanation ?? "",
-                userQuestionAttempts: [
-                  {
-                    id: "local",
-                    userId: "",
-                    userTaskId: taskId ?? "",
-                    questionId: current.id,
-                    selectedOptionId: option.id,
-                    isCorrect: res.isCorrect,
-                    createdAt: new Date().toISOString(),
-                  },
-                ],
-              }
+              ...q,
+              correctOptionId: res.correctOptionId,
+              stepByStepExplanation: res.explanation ?? "",
+              userQuestionAttempts: [
+                {
+                  id: "local",
+                  userId: "",
+                  userTaskId: taskId ?? "",
+                  questionId: current.id,
+                  selectedOptionId: option.id,
+                  isCorrect: res.isCorrect,
+                  createdAt: new Date().toISOString(),
+                },
+              ],
+            }
             : q,
         ),
       );
@@ -168,13 +168,13 @@ const { t } = useTranslation();
       <div
         // className="h-[calc(100vh-100px)] mt-1 mb-4 py-6 rounded-[32px] flex flex-col"
         className="min-h-[calc(100vh-100px)] mt-1 mb-4 py-6 rounded-[32px] flex flex-col overflow-y-auto"
-        style={{ boxShadow: "0px 0px 4px 0px #00000040",backgroundColor: '#F7F9FC' }}
+        style={{ boxShadow: "0px 0px 4px 0px #00000040", backgroundColor: '#F7F9FC' }}
       >
         {/* HEADER */}
         <div className="relative flex justify-center items-center">
-          <h1 
-          // className="text-[26px] font-semibold"
-          className="text-xl sm:text-[26px] font-semibold"
+          <h1
+            // className="text-[26px] font-semibold"
+            className="text-xl sm:text-[26px] font-semibold"
           >{t("flashcards.title")}</h1>
 
           {streak > 0 && (
@@ -191,12 +191,13 @@ const { t } = useTranslation();
 
         {/* CARD AREA */}
         <div className="flex-1 flex flex-col items-center justify-center mb-10">
-          <div className="relative w-[640px] max-w-[90vw] right-2 mb-2 text-right text-[20px] font-medium text-gray-600">
+
+          <div className="relative w-[640px] max-w-[90vw] mb-2 text-right text-[20px] font-medium text-gray-600">
             {index + 1}/{total}
           </div>
-
           <div
             // className="relative w-[640px] max-w-[90vw] min-h-[550px] py-10 rounded-[20px] p-6 transition-all duration-400"
+            // After
             className="relative w-[640px] max-w-[90vw] min-h-[300px] sm:min-h-[550px] py-6 sm:py-10 rounded-[20px] p-4 sm:p-6"
             style={{
               background: bgColor,
@@ -208,6 +209,7 @@ const { t } = useTranslation();
                     ? "translateX(40px)"
                     : "translateX(0)",
               opacity: direction ? 0 : 1,
+              transition: "transform 0.2s ease, opacity 0.2s ease",
             }}
           >
             <div
@@ -219,13 +221,13 @@ const { t } = useTranslation();
             >
               {/* FRONT SIDE */}
               <div
-                className="absolute inset-0 flex flex-col"
+                className="absolute inset-0 flex flex-col pb-6"
                 style={{ backfaceVisibility: "hidden" }}
               >
                 {/* Question */}
-                <div 
-                // className="text-center px-12"
-                className="text-center px-4 sm:px-12"
+                <div
+                  // className="text-center px-12"
+                  className="text-center px-4 sm:px-12"
                 >
                   <h2
                     className={`${getQuestionFontSize(
@@ -237,9 +239,9 @@ const { t } = useTranslation();
                 </div>
 
                 {/* Options */}
-                <div 
-                // className="px-10 mt-14 flex flex-col gap-6"
-                className="px-4 sm:px-10 mt-6 sm:mt-14 flex flex-col gap-4 sm:gap-6"
+                <div
+                  // className="px-10 mt-14 flex flex-col gap-6"
+                  className="px-4 sm:px-10 mt-6 sm:mt-14 flex flex-col gap-4 sm:gap-6"
                 >
                   {current.options.map((option, i) => {
                     const isCorrect = option.id === current.correctOptionId;
@@ -253,9 +255,8 @@ const { t } = useTranslation();
                       >
                         <div className="flex justify-between items-center">
                           <p
-                            className={`text-[16px] ml-2 ${
-                              isSelected ? "font-semibold" : ""
-                            }`}
+                            className={`text-[16px] ml-2 ${isSelected ? "font-semibold" : ""
+                              }`}
                           >
                             {option.text}
                           </p>
@@ -280,7 +281,7 @@ const { t } = useTranslation();
                 </div>
 
                 {/* Tap to flip */}
-                {showResult && (
+                {/* {showResult && (
                   <div className="absolute bottom-4 w-full text-center">
                     <p
                       onClick={() => setRevealed(true)}
@@ -289,16 +290,29 @@ const { t } = useTranslation();
                       Tap to view explanation
                     </p>
                   </div>
+                )} */}
+
+                {/* Spacer — pushes arrows to bottom */}
+                <div className="flex-1" />
+
+                {showResult && (
+                  <div className="w-full text-center py-2">
+                    <p
+                      onClick={() => setRevealed(true)}
+                      className="text-[16px] font-medium cursor-pointer"
+                    >
+                      {t('flashcards.tapToReveal')}
+                    </p>
+                  </div>
                 )}
 
                 {/* Arrows */}
-                <div className="absolute bottom-[36px] left-0 w-full px-6 flex items-center justify-between mt-[20px]">
+                <div className="w-full px-6 flex items-center justify-between mt-4">
                   <button
                     onClick={prev}
                     disabled={isFirst}
-                    className={`w-9 h-9 rounded-full flex items-center justify-center shadow cursor-pointer ${
-                      isFirst ? "opacity-30" : ""
-                    }`}
+                    className={`w-9 h-9 rounded-full flex items-center justify-center shadow cursor-pointer ${isFirst ? "opacity-30" : ""
+                      }`}
                     style={{
                       backgroundColor: lightenColor(bgColor, 14),
                     }}
@@ -309,9 +323,8 @@ const { t } = useTranslation();
                   <button
                     onClick={next}
                     disabled={isLast}
-                    className={`w-9 h-9 rounded-full flex items-center justify-center shadow cursor-pointer ${
-                      isLast ? "opacity-30" : ""
-                    }`}
+                    className={`w-9 h-9 rounded-full flex items-center justify-center shadow cursor-pointer ${isLast ? "opacity-30" : ""
+                      }`}
                     style={{
                       backgroundColor: lightenColor(bgColor, 14),
                     }}
@@ -326,7 +339,7 @@ const { t } = useTranslation();
 
               {/* BACK SIDE */}
               <div
-                className="absolute inset-0 flex flex-col items-center justify-start px-10 pt-10"
+                className="absolute inset-0 flex flex-col px-10 pt-10 pb-6"
                 style={{
                   transform: "rotateY(180deg)",
                   backfaceVisibility: "hidden",
@@ -348,19 +361,20 @@ const { t } = useTranslation();
                   <h3 className="text-[18px] font-semibold mb-3">
                     Explanation
                   </h3>
+                  {/* ADD THIS */}
+<div className="flex-1" />
 
                   <p className="text-[16px] text-gray-700 leading-relaxed">
                     {current.stepByStepExplanation}
                   </p>
                 </div>
 
-                <div className="absolute bottom-[36px] left-0 w-full px-6 flex items-center justify-between mt-[20px]">
+               <div className="w-full px-6 flex items-center justify-between mt-4">
                   <button
                     onClick={prev}
                     disabled={isFirst}
-                    className={`w-9 h-9 rounded-full flex items-center justify-center shadow cursor-pointer ${
-                      isFirst ? "opacity-30" : ""
-                    }`}
+                    className={`w-9 h-9 rounded-full flex items-center justify-center shadow cursor-pointer ${isFirst ? "opacity-30" : ""
+                      }`}
                     style={{
                       backgroundColor: lightenColor(bgColor, 14),
                     }}
@@ -371,9 +385,8 @@ const { t } = useTranslation();
                   <button
                     onClick={next}
                     disabled={isLast}
-                    className={`w-9 h-9 rounded-full flex items-center justify-center shadow cursor-pointer ${
-                      isLast ? "opacity-30" : ""
-                    }`}
+                    className={`w-9 h-9 rounded-full flex items-center justify-center shadow cursor-pointer ${isLast ? "opacity-30" : ""
+                      }`}
                     style={{
                       backgroundColor: lightenColor(bgColor, 14),
                     }}

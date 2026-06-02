@@ -628,7 +628,8 @@ const handleCancel = async (immediate: boolean = false) => {
                 countryCode: "BR",
                 // successUrl: `${window.location.origin}/profile?subscription=success`,
                 successUrl: `${window.location.origin}/home`,
-                cancelUrl: `${window.location.origin}/profile?subscription=cancel`,
+                // cancelUrl: `${window.location.origin}/profile?subscription=cancel`,
+                cancelUrl: `${window.location.origin}/subscription/cancel`,
             });
             // console.log(window.location.origin);
             if (res?.url) {
