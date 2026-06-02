@@ -197,23 +197,30 @@ const Sidebar = () => {
 )}
 
                 {isCollapsed ? (
-                  // Tile style when collapsed
-                  <div
-                    // className="flex items-center justify-center rounded-[16px] w-[44px] h-[44px] flex-shrink-0"
-                    className="flex items-center justify-center rounded-[16px] w-[44px] h-[44px] flex-shrink-0 overflow-hidden"
-                    style={isActive ? {
-                      backgroundImage: "url('/images/buttonBg.svg')",
-                      backgroundSize: '1400% 1000%',
-                      backgroundPosition: 'center',
-                      backgroundRepeat: 'no-repeat',
-                      boxShadow: '0px 0px 20px 0px #1953CB40',
-                    } : {
-                      backgroundColor: '#EEF2FF',
-                    }}
-                  >
-                    {/* <Icon className={`${isActive ? "text-white" : "text-secondary"} text-xl`} /> */}
-                    <Icon className={`${isActive ? "text-white" : "text-secondary"} text-xl`} />
-                  </div>
+  <div
+    className="flex items-center justify-center rounded-[16px] w-[44px] h-[44px] flex-shrink-0 overflow-hidden"
+    style={isActive ? {
+    // backgroundColor: '#F7F7F8',
+    backgroundColor: '#ffffff',
+    // boxShadow: '0px 0px 20px 0px #1953CB40',
+} : { backgroundColor: '#ffffff' }}
+  >
+  <img
+  src={
+    item.key === "home"
+      ? isActive ? "/images/sidebar/homeIcon.svg" : "/images/sidebar/homeIconEmpty.svg"
+      : item.key === "flashcards"
+      ? isActive ? "/images/sidebar/flashcardsIcon.svg" : "/images/sidebar/flashcardsIconEmpty.svg"
+      : item.key === "notes"
+      ? isActive ? "/images/sidebar/notesIcon.svg" : "/images/sidebar/notesIconEmpty.svg"
+      : item.key === "profile"
+      ? isActive ? "/images/sidebar/profileIcon.svg" : "/images/sidebar/profileIconEmpty.svg"
+      : undefined
+  }
+  alt={item.label}
+  className="w-[24px] h-[24px]"
+/>
+  </div>
                 ) : (
                   // Original style when expanded
                   <>
