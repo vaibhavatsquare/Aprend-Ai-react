@@ -15,6 +15,8 @@ import UserIcon from "../icons/userIcon";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@/src/libs/i18n";
 import ProChip from "@/src/components/common/ProChip";
+import { getUserProfile } from "@/src/services/api/user.api";
+import { useSearchParams } from "next/navigation";
 
 const poppins = Poppins({
   weight: ["300", "400", "500", "600", "700"],
@@ -26,15 +28,26 @@ const Sidebar = () => {
   const { t } = useTranslation();
   const [selectedItem, setSelectedItem] = useState("");
   const [isPremium, setIsPremium] = useState(false);
+  const searchParams = useSearchParams();
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
-    setIsPremium(
-      user?.isPremium === true ||
-      user?.subscriptions?.some((s: any) => s.subscriptionStatus === "ACTIVE")
-    );
-  }, []);
+    const sub = searchParams.get("subscription");
+    const stripeRedirect = sessionStorage.getItem("stripeRedirect");
 
+    if (sub === "success" || stripeRedirect) {
+      if (stripeRedirect) sessionStorage.removeItem("stripeRedirect");
+      getUserProfile().then((res) => {
+        localStorage.setItem("user", JSON.stringify(res));
+        setIsPremium(res?.isPremium === true);
+      });
+    } else {
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      setIsPremium(
+        user?.isPremium === true ||
+        user?.subscriptions?.some((s: any) => s.subscriptionStatus === "ACTIVE")
+      );
+    }
+  }, [searchParams]);
   const { isCollapsed, setIsCollapsed, setIsTabChangeLoading } =
     useSidebarContext();
 
@@ -73,7 +86,7 @@ const Sidebar = () => {
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 1280) {
+      if (window.innerWidth < 1024) {
         setIsCollapsed(true);
       } else {
         setIsCollapsed(false);
@@ -156,7 +169,8 @@ const Sidebar = () => {
           return (
             <Tooltip
               key={item.key}
-              title={isCollapsed ? item.label : ""}
+              // title={isCollapsed ? item.label : ""}
+              title=""
               placement="right"
             >
               <img src="/images/buttonBg.svg" alt="" className="hidden" aria-hidden="true" />
@@ -168,48 +182,48 @@ const Sidebar = () => {
                     router.push(item.href);
                   }
                 }}
-                className={`flex items-center cursor-pointer
-                  border border-transparent hover:border-white
-                  transition-all duration-10
-                  gap-2 pl-8 h-[50px] relative
-                  outline-none focus:outline-none
-                `}
-                style={isActive ? {
+                className={`flex items-center cursor-pointer gap-2 h-[50px] relative outline-none focus:outline-none ${isCollapsed ? "justify-center px-2" : "pl-8"}`}
+                style={!isCollapsed && isActive ? {
                   backgroundImage: "url('/images/buttonBg.svg')",
                   backgroundSize: '1200% 800%',
                   backgroundPosition: 'center',
                   boxShadow: '0px 0px 50px 0px #1953CB40',
                   border: '1px solid rgba(255,255,255,0.35)',
                   WebkitTapHighlightColor: 'transparent',
-
                 } : { WebkitTapHighlightColor: 'transparent' }}
               >
-                <img src="/images/sidebar/curv.svg" alt="Loading" width={12} height={50} className="w-[12px] h-[50px] absolute left-0" />
+                {!isCollapsed && isActive && (
+    <img src="/images/sidebar/curv.svg" alt="" width={12} height={50} className="w-[12px] h-[50px] absolute left-0" />
+)}
 
-
-                <Icon
-                  className={`${isActive ? "text-white" : "text-secondary"} text-xl`}
-                />
-
-                {/* {!isCollapsed && (
-                  <span
-                    className={`${isActive
-                      ? "text-white"
-                      : "text-secondary"
-                      } text-[12px] truncate font-medium`}
+                {isCollapsed ? (
+                  // Tile style when collapsed
+                  <div
+                    // className="flex items-center justify-center rounded-[16px] w-[44px] h-[44px] flex-shrink-0"
+                    className="flex items-center justify-center rounded-[16px] w-[44px] h-[44px] flex-shrink-0 overflow-hidden"
+                    style={isActive ? {
+                      backgroundImage: "url('/images/buttonBg.svg')",
+                      backgroundSize: '1400% 1000%',
+                      backgroundPosition: 'center',
+                      backgroundRepeat: 'no-repeat',
+                      boxShadow: '0px 0px 20px 0px #1953CB40',
+                    } : {
+                      backgroundColor: '#EEF2FF',
+                    }}
                   >
-                    {item.label}
-                  </span>
-                )} */}
-
-
-                {!isCollapsed && (
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span className={`${isActive ? "text-white" : "text-secondary"} text-[12px] truncate font-medium`}>
-                      {item.label}
-                    </span>
-                    {item.key === "profile"}
+                    {/* <Icon className={`${isActive ? "text-white" : "text-secondary"} text-xl`} /> */}
+                    <Icon className={`${isActive ? "text-white" : "text-secondary"} text-xl`} />
                   </div>
+                ) : (
+                  // Original style when expanded
+                  <>
+                    <Icon className={`${isActive ? "text-white" : "text-secondary"} text-xl`} />
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className={`${isActive ? "text-white" : "text-secondary"} text-[12px] truncate font-medium`}>
+                        {item.label}
+                      </span>
+                    </div>
+                  </>
                 )}
               </Link>
             </Tooltip>

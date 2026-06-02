@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { FiEdit2 } from "react-icons/fi";
 import { IoChevronForward } from "react-icons/io5";
-import { Image as AntImage, Spin, Switch, message } from "antd";
+import { Image as AntImage, Spin, Switch, message, Button } from "antd";
 import { signOutUser } from "@/src/services/auth/auth.firebase.service";
 import { backendDeleteUser } from "@/src/services/api/auth.api";
 import ConfirmModal from "./confirmModal";
@@ -336,7 +336,7 @@ const UserProfile = () => {
                                     onClick={() => handleSelect("achievements")}
                                 />
 
-                                <ProfileItem
+                                {/* <ProfileItem
                                     title={t('profile.mySubscription')}
                                     onClick={() => handleSelect("subscription")}
                                     rightContent={
@@ -344,8 +344,19 @@ const UserProfile = () => {
                                             {isPremium ? "Premium" : ""}
                                         </span>
                                     }
+                                /> */}
+                                <ProfileItem
+                                    title={t('profile.mySubscription')}
+                                    onClick={() => handleSelect("subscription")}
+                                    rightContent={
+                                        <div className="flex items-center gap-1">
+                                            {isPremium && (
+                                                <span className="text-[12px] text-secondary">Premium</span>
+                                            )}
+                                            <IoChevronForward size={18} />
+                                        </div>
+                                    }
                                 />
-
                                 <ProfileItem
                                     title={t('profile.termsConditions')}
                                     onClick={() => window.open("https://docs.google.com/document/d/1-OmXZFvKtQd6qt0AjgEz7yBJNn7rG6yYXgOiePxneHc/edit?usp=drivesdk", "_blank")}
@@ -553,13 +564,13 @@ const SubscriptionSection = ({ onBack }: { onBack?: () => void }) => {
         { icon: <BsGraphUp size={18} />, label: "Advance analytics" },
     ];
     // After
-const now = new Date();
-const endsAt = subscription?.endsAt ? new Date(subscription.endsAt) : null;
-const isCancelledButActive = subscription?.subscriptionStatus === "CANCELLED" && endsAt !== null && endsAt > now;
+    const now = new Date();
+    const endsAt = subscription?.endsAt ? new Date(subscription.endsAt) : null;
+    const isCancelledButActive = subscription?.subscriptionStatus === "CANCELLED" && endsAt !== null && endsAt > now;
 
-const isActive = subscription?.subscriptionStatus === "ACTIVE" ||
-    subscription?.subscriptionStatus === "TRIAL" ||
-    isCancelledButActive;
+    const isActive = subscription?.subscriptionStatus === "ACTIVE" ||
+        subscription?.subscriptionStatus === "TRIAL" ||
+        isCancelledButActive;
 
     const isTrial = subscription?.subscriptionStatus === "TRIAL";
 
@@ -568,32 +579,32 @@ const isActive = subscription?.subscriptionStatus === "ACTIVE" ||
     });
 
 
-const handleCancel = async (immediate: boolean = false) => {
-    if (cancelling) return;
-    setCancelling(true);
-    try {
-        await cancelSubscription(immediate);
+    const handleCancel = async (immediate: boolean = false) => {
+        if (cancelling) return;
+        setCancelling(true);
+        try {
+            await cancelSubscription(immediate);
 
-        const updated = await getSubscription();
-        setSubscription(updated);
+            const updated = await getSubscription();
+            setSubscription(updated);
 
-        if (immediate) {
-            const profileRes = await getUserProfile();
-            localStorage.setItem("user", JSON.stringify(profileRes));
-            message.success("Subscription cancelled immediately.");
-            setTimeout(() => {
-                window.location.replace("/home");
-            }, 1000);
-        } else {
-            message.success(`Subscription cancelled. You will have access until ${formatDate(subscription.endsAt)}.`);
+            if (immediate) {
+                const profileRes = await getUserProfile();
+                localStorage.setItem("user", JSON.stringify(profileRes));
+                message.success("Subscription cancelled immediately.");
+                setTimeout(() => {
+                    window.location.replace("/home");
+                }, 1000);
+            } else {
+                message.success(`Subscription cancelled. You will have access until ${formatDate(subscription.endsAt)}.`);
+            }
+        } catch {
+            message.error("Failed to cancel. Please try again.");
+        } finally {
+            setCancelling(false);
+            setShowConfirmModal(false);
         }
-    } catch {
-        message.error("Failed to cancel. Please try again.");
-    } finally {
-        setCancelling(false);
-        setShowConfirmModal(false);
-    }
-};
+    };
 
     // const handleUpgrade = async () => {
     //     if (upgrading) return;
@@ -764,13 +775,23 @@ const handleCancel = async (immediate: boolean = false) => {
                                 >
                                     Cancel
                                 </button>
-                                <button
-                                    onClick={() => handleCancel(immediateCancel)}
+                                <Button
+                                    loading={cancelling}
                                     disabled={cancelling}
-                                    className="flex-1 h-[52px] bg-red-500 text-white rounded-[14px] text-[15px] font-semibold hover:opacity-90 disabled:opacity-50"
+                                    onClick={() => handleCancel(immediateCancel)}
+                                    style={{
+                                        height: '52px',
+                                        backgroundColor: '#ef4444',
+                                        color: 'white',
+                                        borderRadius: '14px',
+                                        fontSize: '15px',
+                                        fontWeight: '600',
+                                        border: 'none',
+                                        flex: 1,
+                                    }}
                                 >
-                                    {cancelling ? "..." : "OK"}
-                                </button>
+                                    OK
+                                </Button>
                             </div>
                         </div>
                     </div>
@@ -904,21 +925,27 @@ const handleCancel = async (immediate: boolean = false) => {
                 </div>
             </div>
 
-            <button
-                onClick={handleUpgrade}
+            <Button
+                loading={upgrading}
                 disabled={upgrading}
-                // className="mt-6 w-full h-[52px] bg-primary text-white rounded-[12px] text-[16px] font-semibold hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                className="mt-6 w-full h-[52px] text-white rounded-[12px] text-[16px] font-semibold hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                onClick={handleUpgrade}
                 style={{
+                    marginTop: '24px',
+                    width: '100%',
+                    height: '52px',
+                    color: 'white',
+                    borderRadius: '12px',
+                    fontSize: '16px',
+                    fontWeight: '600',
                     backgroundImage: "url('/images/buttonBg.svg')",
-                    backgroundSize: '350% 700%', backgroundPosition: 'center',
+                    backgroundSize: '350% 700%',
+                    backgroundPosition: 'center',
                     boxShadow: '0px 0px 50px 0px #1953CB40',
                     border: '1px solid rgba(255,255,255,0.35)',
                 }}
             >
-                {upgrading && <Spin size="small" />}
-                {upgrading ? t('common.loading') : t('subscription.upgradeToPremium')}
-            </button>
+                {t('subscription.upgradeToPremium')}
+            </Button>
         </div>
     );
 };
