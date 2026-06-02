@@ -21,7 +21,8 @@ const SubscriptionSuccessPage = () => {
                 // Even if profile fetch fails, still redirect
             } finally {
                 // Redirect to profile with success flag to open subscription panel
-                router.replace("/profile?subscription=success");
+                // router.replace("/profile?subscription=success");
+                router.replace("/home");
             }
         };
 

@@ -567,18 +567,23 @@ const isActive = subscription?.subscriptionStatus === "ACTIVE" ||
         day: "numeric", month: "short", year: "numeric",
     });
 
- const handleCancel = async (immediate: boolean = false) => {
+
+const handleCancel = async (immediate: boolean = false) => {
     if (cancelling) return;
     setCancelling(true);
     try {
         await cancelSubscription(immediate);
-        
-        // Refresh subscription from API
+
         const updated = await getSubscription();
         setSubscription(updated);
 
         if (immediate) {
+            const profileRes = await getUserProfile();
+            localStorage.setItem("user", JSON.stringify(profileRes));
             message.success("Subscription cancelled immediately.");
+            setTimeout(() => {
+                window.location.replace("/home");
+            }, 1000);
         } else {
             message.success(`Subscription cancelled. You will have access until ${formatDate(subscription.endsAt)}.`);
         }
@@ -621,7 +626,8 @@ const isActive = subscription?.subscriptionStatus === "ACTIVE" ||
                 plan: selectedPlan.toUpperCase() as "MONTHLY" | "YEARLY",
                 planType: selectedPlan.toUpperCase() as "MONTHLY" | "YEARLY",
                 countryCode: "BR",
-                successUrl: `${window.location.origin}/profile?subscription=success`,
+                // successUrl: `${window.location.origin}/profile?subscription=success`,
+                successUrl: `${window.location.origin}/home`,
                 cancelUrl: `${window.location.origin}/profile?subscription=cancel`,
             });
             // console.log(window.location.origin);
