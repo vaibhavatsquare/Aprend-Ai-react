@@ -114,7 +114,7 @@ const ChooseSubjects = ({
       console.log("isSimulado", subjectsForApi, selectedDifficulty)
       if (isSimulado) {
         res = await generateSimuladoQuestions({
-          subject: subjectsForApi,
+          subjectIds: subjectsForApi,
           numberOfQuestions: value,
           difficulty: selectedDifficulty!,
         });
@@ -122,7 +122,7 @@ const ChooseSubjects = ({
 
       if (isExplore) {
         res = await questionBankSimuladoQuestions({
-          subject: Array.isArray(subjectsForApi)
+          subjectIds: Array.isArray(subjectsForApi)
             ? subjectsForApi
             : [subjectsForApi],
           numberOfQuestions: value,
