@@ -9,6 +9,7 @@ import {
 } from "recharts";
 import { LuChevronDown, LuChevronUp } from "react-icons/lu";
 import { getWeakSpotTracker } from "@/src/services/api/weakSpotTracker.api";
+import { useRouter } from "next/navigation";
 
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -83,8 +84,8 @@ const fetchWeakSpotData = async (): Promise<WeakSpotTrackerData> => {
         s.accuracyPercent < 40
           ? "#EF4444"
           : s.accuracyPercent < 65
-          ? "#EAB308"
-          : "#22C55E",
+            ? "#EAB308"
+            : "#22C55E",
       commonMistakes: s.commonMistakes,
       recommendedLessons: s.recommendedLessons,
     })),
@@ -183,6 +184,7 @@ const WeakSpotTracker = () => {
   const [data, setData] = useState<WeakSpotTrackerData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     setLoading(true);
@@ -252,7 +254,16 @@ const WeakSpotTracker = () => {
                 <p className="font-semibold text-gray-900 text-[15px]">{card.subject}</p>
                 <p className="text-sm text-secondary flex-1 line-clamp-2">{card.tip}</p>
                 {/* <button className="self-start px-4 py-1.5 rounded-full text-sm font-medium text-white bg-primary"> */}
-                <button className="self-start px-4 py-1.5 rounded-full text-sm font-medium text-white bg-[#2563EB]">
+                <button
+                  className="self-start px-4 py-1.5 rounded-full text-sm font-medium text-white bg-[#2563EB]"
+                  onClick={() => {
+                    if (card.actionType === "quiz") {
+                      router.push("/home/questions");
+                    } else {
+                      router.push("/notes");
+                    }
+                  }}
+                >
                   {card.actionLabel}
                 </button>
               </div>
@@ -266,7 +277,7 @@ const WeakSpotTracker = () => {
           {/* Progress Trend */}
           <div
             className="flex-1 border border-gray-200 rounded-xl p-4 flex flex-col pointer-events-none"
-            style={{ boxShadow: "0px 0px 1px 0px #00000040", minHeight: 420 }} 
+            style={{ boxShadow: "0px 0px 1px 0px #00000040", minHeight: 420 }}
           >
             <div className="flex items-center justify-between mb-3">
               <p className="font-semibold text-gray-900">Progress trend</p>
@@ -278,7 +289,7 @@ const WeakSpotTracker = () => {
                     className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
                       // chartView === v ? "bg-primary text-white shadow" : "text-secondary"
                       chartView === v ? "bg-[#2563EB] text-white shadow" : "text-secondary"
-                    }`}
+                      }`}
                   >
                     {v.charAt(0).toUpperCase() + v.slice(1)}
                   </button>
@@ -295,7 +306,7 @@ const WeakSpotTracker = () => {
                     barCategoryGap="25%"
                     margin={{ top: 10, right: 8, left: 8, bottom: 5 }}
                     style={{ outline: 'none' }}
-                     tabIndex={-1}
+                    tabIndex={-1}
                   >
                     <XAxis
                       dataKey="day"

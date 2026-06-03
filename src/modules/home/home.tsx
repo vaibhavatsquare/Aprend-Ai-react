@@ -312,7 +312,7 @@ if (type === "FLASHCARD") return t('flashcards.title');
 
           style={{
             backgroundImage: "url('/images/buttonBg.svg')",
-            backgroundSize: '800% 1200%',
+            backgroundSize: '900% 1200%',
             backgroundPosition: 'center',
             // boxShadow: '0px 0px 50px 0px #1953CB40',
             border: '1px solid rgba(255,255,255,0.35)',
