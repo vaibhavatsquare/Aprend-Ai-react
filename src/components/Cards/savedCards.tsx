@@ -56,8 +56,8 @@ const SavedCard = ({
 
   return (
     <div
-      onClick={handleCardClick}
-      className="flex items-center justify-between px-2 py-4 pr-5 cursor-pointer"
+  onClick={handleCardClick}
+  className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-2 py-4 pr-5 cursor-pointer gap-2"
       style={{
         // height: "76px",
         minHeight: "76px",
@@ -75,16 +75,24 @@ const SavedCard = ({
           alt="saved item"
           width={60}
           height={60}
+          unoptimized
+          className="w-[40px] h-[40px] sm:w-[60px] sm:h-[60px]"
         />
 
         {/* <div>
           <h3 className="text-[20px] font-medium text-primaryText"> */}
-          <div className="min-w-0">
-  <h3 className="text-[20px] font-medium text-primaryText line-clamp-2">
-            {item.title}
-          </h3>
+        <div className="min-w-0">
+          {/* <h3 className="text-[20px] font-medium text-primaryText line-clamp-2"> */}
 
-          <p className="text-[14px] text-secondary mt-1">
+          {/* <div className="overflow-x-auto scrollbar-hide w-full"> */}
+            {/* <h3 className="text-[14px] sm:text-[20px] font-medium text-primaryText whitespace-nowrap"> */}
+            <h3 className="text-[14px] sm:text-[20px] font-medium text-primaryText line-clamp-2">
+              {item.title}
+            </h3>
+          {/* </div> */}
+
+          {/* <p className="text-[14px] text-secondary mt-1"> */}
+          <p className="text-[12px] sm:text-[14px] text-secondary mt-1">
             {formatDate(item.createdAt)}
           </p>
         </div>
@@ -92,7 +100,7 @@ const SavedCard = ({
 
       {/* RIGHT ACTION BUTTONS */}
       {/* <div className="flex items-center gap-3" */}
-      <div className="flex items-center gap-3 flex-shrink-0"
+      <div className="flex items-center gap-3 flex-shrink-0 self-end sm:self-auto"
         onClick={(e) => e.stopPropagation()}
       >
 
@@ -137,7 +145,7 @@ const ActionButton = ({
   return (
     <button
       onClick={onClick}
-      className="flex items-center gap-2 px-3 h-[36px] rounded-[12px] bg-white hover:shadow-md transition-all duration-200 ease-in-out cursor-pointer"
+      className="flex items-center gap-2 px-2 sm:px-3 h-[36px] rounded-[12px] bg-white hover:shadow-md transition-all duration-200 ease-in-out cursor-pointer"
       style={{
         boxShadow: "0px 0px 10px rgba(0,0,0,0.10)",
       }}
@@ -147,8 +155,9 @@ const ActionButton = ({
         alt={label}
         width={20}
         height={20}
+        unoptimized
       />
-      <span className="text-[14px] font-normal text-primaryText">
+      <span className="hidden sm:block text-[14px] font-normal text-primaryText">
         {label}
       </span>
     </button>

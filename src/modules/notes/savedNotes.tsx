@@ -148,7 +148,7 @@ const SavedNotes = ({ showBack = false, onBack }: SavedNotesProps) => {
                             onClick={onBack}
                         />
                     )}
-                    <h1 className="text-[28px] font-semibold text-primaryText w-full text-center">
+                    <h1 className="text-xl sm:text-[28px] font-semibold text-primaryText w-full text-center">
                         {!initialLoading && notes.length === 0 ? "" : t('notes.savedNotes')}
                     </h1>
                 </div>

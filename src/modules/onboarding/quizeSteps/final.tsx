@@ -11,6 +11,7 @@ import React from "react";
 
 const Final = ({ quiz }: { quiz: any }) => {
 
+  const subjectNames = JSON.parse(localStorage.getItem("selectedSubjectNames") || "[]");
   const { t } = useTranslation();
     const getSubjectLabel = (value: string) => {
     const map: Record<string, string> = {
@@ -75,7 +76,8 @@ const Final = ({ quiz }: { quiz: any }) => {
           <div className="flex flex-col">
             <p className="text-secondary">{t('quiz.subject' as any)}</p>
             <p className="text-primary">
-               {quiz.subjects.map((s: string) => getSubjectLabel(s)).join(", ")}
+               {/* {quiz.subjects.map((s: string) => getSubjectLabel(s)).join(", ")} */}
+               {subjectNames.length > 0 ? subjectNames.join(", ") : quiz.subjects.join(", ")}
             </p>
           </div>
         </div>

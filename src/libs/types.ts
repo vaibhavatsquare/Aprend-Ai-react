@@ -37,6 +37,7 @@ export interface UserDetail {
   status: UserStatus;
   user_language: UserLanguage;
   user_EducationLevel: UserEducationLevel;
+  educationLevelId?: string; 
   notificationsEnabled: boolean
   isDeleted: boolean;
   isEmailVerified: boolean;

@@ -2,7 +2,7 @@ import { fetch } from "@/src/libs/helpers";
 import { Question } from "@/src/libs/types/dashboard.types";
 
 type GenerateSimuladoRequest = {
-  subject: string[];
+  subjectIds: string[];
   numberOfQuestions: number;
   difficulty: string;
 };
@@ -31,7 +31,11 @@ export const generateSimuladoQuestions = async (
   const res = await fetch<SimuladoResponse>({
     url: "/question-simulados/generate",
     method: "POST",
-    data: payload,
+    data: {
+      subjectIds: payload.subjectIds,
+      numberOfQuestions: payload.numberOfQuestions,
+      difficulty: payload.difficulty,
+    },
   });
 
   return {
@@ -106,17 +110,17 @@ export const questionBankSimuladoQuestions = async (
     url: "/question-simulados/question-bank",
     method: "GET",
     params: {
-      subject: payload.subject, // ✅ pass array directly
+      subjectIds: payload.subjectIds,
       difficulty: payload.difficulty,
       skip: 0,
       take: payload.numberOfQuestions,
     },
     paramsSerializer: (params) => {
       const searchParams = new URLSearchParams();
-      if (Array.isArray(params.subject)) {
-        params.subject.forEach((s: string) => searchParams.append('subject', s));
+      if (Array.isArray(params.subjectIds)) {
+        params.subjectIds.forEach((s: string) => searchParams.append('subjectIds', s));
       } else {
-        searchParams.append('subject', params.subject);
+        searchParams.append('subjectIds', params.subjectIds);
       }
       searchParams.append('difficulty', params.difficulty);
       searchParams.append('skip', String(params.skip));

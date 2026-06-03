@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Progress } from "antd";
 import { useSearchParams } from "next/navigation";
 
@@ -20,18 +20,26 @@ const PlacementQuize = () => {
   // ✅ MUST be inside component
   const [quiz, setQuiz] = useState({
     subjects: [] as string[],
+     subjectNames: [] as string[],
     learningGoal: "",
     learningStyles: [] as string[],
     studyTimePerDay: "",
     preferredTime: "",
   });
+  const [educationLevelId, setEducationLevelId] = useState<string>("");
+useEffect(() => {
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  if (user?.educationLevelId) setEducationLevelId(user.educationLevelId);
+}, []);
 
   const renderStep = () => {
+    console.log("Current quiz state:", quiz);
     const props = { setCurrentStep, quiz, setQuiz };
+
 
     switch (currentStep) {
       case 1:
-        return <Step1 {...props} />;
+        return <Step1 key="step1" {...props} educationLevelId={educationLevelId} />;
       case 2:
         return <Step2 {...props} />;
       case 3:

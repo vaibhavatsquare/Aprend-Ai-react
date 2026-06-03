@@ -1,13 +1,12 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { UserDetail, UserEducationLevel } from "@/src/libs/types";
 import { uploadImage } from "@/src/services/api/upload.api";
-import { Image as AntImage, message, Spin } from "antd";
-import { updateUserProfile } from "@/src/services/api/user.api";
+import { Image as AntImage, Button, message, Spin } from "antd";
+import { updateUserProfile, getEducationLevels } from "@/src/services/api/user.api";
 import { getInitials } from "@/src/libs/helpers";
 import { FiCamera } from "react-icons/fi";
-import { educationLevels } from "@/src/libs/constants/onboarding.constants";
 
 interface Props {
     user: UserDetail | null;
@@ -18,9 +17,16 @@ interface Props {
 const EditProfileSection = ({ user, onUpdated, onCancel }: Props) => {
 
     const [name, setName] = useState(user?.name || "");
-    const [education, setEducation] = useState<UserEducationLevel>(
-        user?.user_EducationLevel || "HIGH_SCHOOL"
-    );
+    const [education, setEducation] = useState<string>(
+    user?.educationLevelId || ""
+);
+const [educationLevels, setEducationLevels] = useState<any[]>([]);
+
+useEffect(() => {
+    getEducationLevels()
+        .then(setEducationLevels)
+        .catch(() => {});
+}, []);
     const [image, setImage] = useState<string | null>(user?.image || null);
     const [loading, setLoading] = useState(false);
     const [imageFile, setImageFile] = useState<File | null>(null);
@@ -37,7 +43,7 @@ const EditProfileSection = ({ user, onUpdated, onCancel }: Props) => {
     const hasChanges = useMemo(() => {
         return (
             name !== user?.name ||
-            education !== user?.user_EducationLevel ||
+            education !== (user?.educationLevelId || "") ||
             !!imageFile
         );
     }, [name, education, image, user]);
@@ -57,13 +63,13 @@ const EditProfileSection = ({ user, onUpdated, onCancel }: Props) => {
 
             await updateUserProfile({
                 name,
-                user_EducationLevel: education,
+                educationLevelId: education,
                 image: imageUrl,
             });
 
             onUpdated({
                 name,
-                user_EducationLevel: education,
+                educationLevelId: education,
                 image: imageUrl,
             });
 
@@ -81,6 +87,7 @@ const EditProfileSection = ({ user, onUpdated, onCancel }: Props) => {
 
     return (
         <div className="w-full h-full flex flex-col px-6">
+           
 
             {/* TITLE */}
             <h1 className="text-[24px] font-semibold text-center mb-6 mt-6">
@@ -177,14 +184,12 @@ const EditProfileSection = ({ user, onUpdated, onCancel }: Props) => {
                         > */}
                         <select
                             value={education}
-                            onChange={(e) =>
-                                setEducation(e.target.value as UserEducationLevel)
-                            }
+                             onChange={(e) => setEducation(e.target.value)}
                             className="w-full h-[48px] px-4 bg-[#F5F5F6] rounded-[12px] outline-none appearance-none border border-transparent focus:border-2 focus:border-[#2563EB] transition-all"
                         >
                             {educationLevels.map((level) => (
-                                <option key={level.value} value={level.value}>
-                                    {level.label}
+                                <option key={level.id} value={level.id}>
+                                    {level.name}
                                 </option>
                             ))}
                         </select>
@@ -206,7 +211,7 @@ const EditProfileSection = ({ user, onUpdated, onCancel }: Props) => {
                         Cancel
                     </button>
 
-                    <button
+                    {/* <button
                         disabled={!hasChanges || loading}
                         onClick={handleSave}
                         className="w-full h-[48px] rounded-[12px] text-white flex items-center justify-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
@@ -220,7 +225,23 @@ const EditProfileSection = ({ user, onUpdated, onCancel }: Props) => {
                     >
                         {loading && <Spin size="small" className="[&_.ant-spin-dot-item]:bg-white" />}
                         {loading ? "Saving..." : "Save"}
-                    </button>
+                    </button> */}
+
+                    <Button
+    disabled={!hasChanges || loading}
+    loading={loading}
+    onClick={handleSave}
+    className="w-full h-[48px]! rounded-[12px]! text-white!"
+    style={hasChanges ? {
+        backgroundImage: "url('/images/buttonBg.svg')",
+        backgroundSize: '350% 700%',
+        backgroundPosition: 'center',
+        boxShadow: '0px 0px 50px 0px #1953CB40',
+        border: '1px solid rgba(255,255,255,0.35)',
+    } : { backgroundColor: '#D1D5DB' }}
+>
+    {loading ? "Saving..." : "Save"}
+</Button>
 
                 </div>
             </div>

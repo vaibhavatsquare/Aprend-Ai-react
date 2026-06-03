@@ -32,7 +32,10 @@ const Step5 = ({
 
   const handleFinish = async () => {
     try {
-      await savePlacementQuiz(quiz);
+      await savePlacementQuiz({
+      ...quiz,
+      subjectIds: quiz.subjects,
+    });
       setCurrentStep(6);
       setSearchParam("step", 6);
     } catch (e: any) {

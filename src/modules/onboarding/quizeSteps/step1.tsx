@@ -1,22 +1,38 @@
 "use client";
-import { step1Options } from "@/src/libs/constants/onboarding.constants";
-import { Button, Input } from "antd";
+import { Button, Input, Spin } from "antd";
 import { FaArrowLeft } from "react-icons/fa";
 import { canGoBack, setSearchParam, useBack } from "@/src/hooks/router.hooks";
 import { useEffect, useState } from "react";
 import { useTranslation } from "@/src/libs/i18n";
+import { getSubjectsByLevel } from "@/src/services/api/user.api";
+import FullScreenLoader from "@/src/components/loaders/fullScreenLoader";
 
 const Step1 = ({
   setCurrentStep,
   quiz,
   setQuiz,
+  educationLevelId,
 }: {
   setCurrentStep: (step: number) => void;
   quiz: any;
   setQuiz: (fn: any) => void;
+  educationLevelId: string;
 }) => {
   
   const [showBack, setShowBack] = useState(false);
+  const [subjectOptions, setSubjectOptions] = useState<any[]>([]);
+const [loadingSubjects, setLoadingSubjects] = useState(true);
+
+
+useEffect(() => {
+  console.log("educationLevelId in step1:", educationLevelId);
+  if (!educationLevelId) return;
+  setLoadingSubjects(true);
+  getSubjectsByLevel(educationLevelId)
+    .then(setSubjectOptions)
+    .catch(() => {})
+    .finally(() => setLoadingSubjects(false));
+}, [educationLevelId]);
 const { t } = useTranslation();
 
 const getSubjectLabel = (value: string) => {
@@ -43,42 +59,68 @@ const getSubjectLabel = (value: string) => {
     setCurrentStep(2);
   };
 
-  const toggle = (val: string) => {
-    setQuiz((p: any) => ({
-      ...p,
-      subjects: p.subjects.includes(val)
-        ? p.subjects.filter((v: string) => v !== val)
-        : [...p.subjects, val],
-    }));
-  };
+// const toggle = (val: string) => {
+//   setQuiz((p: any) => ({
+//     ...p,
+//     subjects: p.subjects.includes(val)
+//       ? p.subjects.filter((v: string) => v !== val)
+//       : [...p.subjects, val],
+//   }));
+// };
 
+const toggle = (val: string, name: string) => {
+  setQuiz((p: any) => {
+    const isSelected = p.subjects.includes(val);
+    const newSubjects = isSelected
+      ? p.subjects.filter((v: string) => v !== val)
+      : [...p.subjects, val];
+    const newSubjectNames = isSelected
+      ? (p.subjectNames || []).filter((_: string, i: number) => p.subjects[i] !== val)
+      : [...(p.subjectNames || []), name];
+
+    localStorage.setItem("selectedSubjectNames", JSON.stringify(newSubjectNames));
+
+    return {
+      ...p,
+      subjects: newSubjects,
+      subjectNames: newSubjectNames,
+    };
+  });
+};
   return (
+  <>
+    {loadingSubjects && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
+        <FullScreenLoader />
+      </div>
+    )}
     <div className="flex flex-col gap-6 items-center">
       <div className="flex flex-col items-center gap-3">
         <h1 className="text-xl font-semibold">{t('onboarding.placementQuiz')}</h1>
         <p>{t('quiz.q1' as any)}</p>
       </div>
 
-      <div className="w-[650px] grid grid-cols-2 gap-3 mt-4">
-        {step1Options.map((level: any) => (
+     <div className="w-[650px] grid grid-cols-2 gap-3 mt-4">
+  {subjectOptions.map((level: any) => (
+
           <div
-            key={level.value}
-            className={`w-full h-11 px-3 border rounded-xl flex justify-between items-center gap-3 cursor-pointer transition-all ${quiz.subjects.includes(level.value)
+            key={level.id}
+            className={`w-full h-11 px-3 border rounded-xl flex justify-between items-center gap-3 cursor-pointer transition-all ${quiz.subjects.includes(level.id)
               ? "border-[#2563EB] bg-[#2563EB]"
                 : "border-[#DADADA] hover:border-gray-400"
               }`}
-            onClick={() => toggle(level.value)}
-            style={quiz.subjects.includes(level.value) ? { boxShadow: '0px 4px 16px 0px #2563EB40' } : undefined}
+            onClick={() => toggle(level.id,level.name)}
+            style={quiz.subjects.includes(level.id) ? { boxShadow: '0px 4px 16px 0px #2563EB40' } : undefined}
           >
             {/* <p className="text-sm">{level.label}</p> */}
-            <p className={`text-sm ${quiz.subjects.includes(level.value) ? "text-white" : "text-[#121212]"}`}>{getSubjectLabel(level.value)}</p>
+            <p className={`text-sm ${quiz.subjects.includes(level.id) ? "text-white" : "text-[#121212]"}`}>{level.name}</p>
             <div
-              className={`w-4 h-4 flex justify-center items-center border-2 rounded-[4px] transition-all ${quiz.subjects.includes(level.value)
+              className={`w-4 h-4 flex justify-center items-center border-2 rounded-[4px] transition-all ${quiz.subjects.includes(level.id)
                 ? "border-white bg-white"
                 : "border-[#DADADA]"
                 }`}
             >
-              {quiz.subjects.includes(level.value) && (
+              {quiz.subjects.includes(level.id) && (
                 <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
                   <path d="M1 4L3.5 6.5L9 1" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
@@ -121,6 +163,8 @@ const getSubjectLabel = (value: string) => {
         </Button>
       </div>
     </div>
+    </>
+
   );
 };
 

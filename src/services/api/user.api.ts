@@ -12,7 +12,7 @@ export const saveLanguage = async (data: {
 };
 
 export const saveEducationlevel = async (data: {
-  user_EducationLevel: string;
+  educationLevelId: string;
 }) => {
   return await fetch({
     url: "/onboarding/educationlevel",
@@ -25,7 +25,7 @@ export const savePlacementQuiz = async (data: {
   learningGoal: string;
   studyTimePerDay: string;
   preferredTime: string;
-  subjects: string[];
+  subjectIds: string[];
   learningStyles: string[];
 }) => {
   return await fetch({
@@ -65,12 +65,27 @@ export const getUserProfile = async (): Promise<UserDetail> => {
 
 export const updateUserProfile = async (data: {
   name?: string;
-  user_EducationLevel?: string;
+  educationLevelId?: string;
   image?: string | null;
 }) => {
   return fetch({
     url: "/profile/edit",
     method: "PATCH",
     data,
+  });
+};
+
+export const getEducationLevels = async () => {
+  return fetch<{ id: string; code: string; name: string; description: string; sortOrder: number }[]>({
+    url: "/onboarding/education-levels",
+    method: "GET",
+  });
+};
+
+export const getSubjectsByLevel = async (educationLevelId: string) => {
+  return fetch<{ id: string; code: string; name: string; description: string }[]>({
+    url: "/onboarding/subjects",
+    method: "GET",
+    params: { educationLevelId },
   });
 };

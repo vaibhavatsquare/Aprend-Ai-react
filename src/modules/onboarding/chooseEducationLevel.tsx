@@ -1,11 +1,12 @@
 "use client";
 import Image from "next/image";
-import { educationLevels } from "@/src/libs/constants/onboarding.constants";
-import { useState } from "react";
-import { Button, message } from "antd";
+import { useState, useEffect } from "react";
+import { Button, message, Spin } from "antd";
 import { useRedirect } from "@/src/hooks/router.hooks";
-import { saveEducationlevel } from "@/src/services/api/user.api";
 import { useTranslation } from "@/src/libs/i18n";
+import { saveEducationlevel, getEducationLevels } from "@/src/services/api/user.api";
+import FullScreenLoader from "@/src/components/loaders/fullScreenLoader";
+import { useRouter } from "next/navigation";
 
 
 const ChooseEducationLevel = () => {
@@ -13,33 +14,58 @@ const ChooseEducationLevel = () => {
 
   const [selectedEducationLevel, setSelectedEducationLevel] =
     useState<string | null>(null);
+  const [educationLevels, setEducationLevels] = useState<any[]>([]);
+  const [loadingLevels, setLoadingLevels] = useState(true);
+  const router = useRouter();
 
-    const getEducationLabel = (value: string) => {
-    const map: Record<string, string> = {
-        'ELEMENTARY': t('onboarding.elementary' as any),
-        'HIGH_SCHOOL': t('onboarding.highSchool' as any),
-        'PRE_VESTIBULAR': t('onboarding.preUniversity' as any),
-        'UNIVERSITY': t('onboarding.university' as any),
-        'COMPETITIVE_EXAMS': t('onboarding.competitiveExams' as any),
-        
-    };
-    return map[value] || value;
+
+
+useEffect(() => {
+  getEducationLevels()
+    .then((data) => {
+      setEducationLevels(data);
+    })
+    .catch(() => {})
+    .finally(() => setLoadingLevels(false));
+}, []);
+
+const levelIcons: Record<string, string> = {
+  "ENEM_2026": "🎯",
+  "HIGH_SCHOOL": "📚",
+  "PRE_UNIVERSITY_PREP": "🏆",
+  "PUBLIC_EXAMS": "📋",
+  "COLLEGE_UNIVERSITY": "🎓",
+  "ELEMENTARY_SCHOOL": "✏️",
 };
 
-  const handleContinue = async () => {
-    if (!selectedEducationLevel) return;
+  const getEducationLabel = (value: string) => {
+    const map: Record<string, string> = {
+      'ELEMENTARY': t('onboarding.elementary' as any),
+      'HIGH_SCHOOL': t('onboarding.highSchool' as any),
+      'PRE_VESTIBULAR': t('onboarding.preUniversity' as any),
+      'UNIVERSITY': t('onboarding.university' as any),
+      'COMPETITIVE_EXAMS': t('onboarding.competitiveExams' as any),
 
-    try {
-      await saveEducationlevel({
-        user_EducationLevel: selectedEducationLevel
-      });
-
-      useRedirect("/onboarding/placement-quize");
-    } catch {
-      message.error("Failed to save profile");
-    }
+    };
+    return map[value] || value;
   };
 
+ const handleContinue = async () => {
+  if (!selectedEducationLevel) return;
+  try {
+    await saveEducationlevel({
+      educationLevelId: selectedEducationLevel
+    });
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    user.educationLevelId = selectedEducationLevel;
+    localStorage.setItem("user", JSON.stringify(user));
+    router.push("/onboarding/placement-quize");
+  } catch {
+    message.error("Failed to save profile");
+  }
+};
+
+  if (loadingLevels) return <FullScreenLoader />;
   return (
     <div className="w-full h-full flex justify-center items-center">
       <div className="flex flex-col gap-6 items-center">
@@ -74,40 +100,38 @@ const ChooseEducationLevel = () => {
             //   </div>
             // </div>
             <div
-  key={level.value}
-  onClick={() => setSelectedEducationLevel(level.value)}
-  className={`w-[380px] max-w-[90vw] h-[64px] px-3 py-3 border rounded-xl
-    flex items-center gap-3 cursor-pointer transition-all ${
-    selectedEducationLevel === level.value
-      ? "border-[#2563EB] bg-[#2563EB]"
-      : "border-[#DADADA] hover:border-[#2563EB]"
-  }`}
-  style={selectedEducationLevel === level.value ? { boxShadow: '0px 4px 16px 0px #2563EB40' } : undefined}
->
-  {/* Icon */}
- <div className="w-10 h-10 rounded-2xl bg-gray-100 flex items-center justify-center flex-shrink-0 text-lg overflow-hidden">
-    {level.icon}
-  </div>
+              key={level.id}
+              onClick={() => setSelectedEducationLevel(level.id)}
+              className={`w-[380px] max-w-[90vw] h-[64px] px-3 py-3 border rounded-xl
+    flex items-center gap-3 cursor-pointer transition-all ${selectedEducationLevel === level.id
+                  ? "border-[#2563EB] bg-[#2563EB]"
+                  : "border-[#DADADA] hover:border-[#2563EB]"
+                }`}
+              style={selectedEducationLevel === level.id ? { boxShadow: '0px 4px 16px 0px #2563EB40' } : undefined}
+            >
+              {/* Icon */}
+              <div className="w-10 h-10 rounded-2xl bg-gray-100 flex items-center justify-center flex-shrink-0 text-lg overflow-hidden">
+                {levelIcons[level.code] || "📖"}
+              </div>
 
-  {/* Title + subtitle */}
-  <div className="flex flex-col flex-1 min-w-0">
-    <p className={`text-sm font-semibold ${selectedEducationLevel === level.value ? "text-white" : "text-[#121212]"}`}>
-      {level.label}
-    </p>
-    <p className={`text-xs mt-0.5 ${selectedEducationLevel === level.value ? "text-white/80" : "text-[#555555]"}`}>
-      {level.subtitle}
-    </p>
-  </div>
+              {/* Title + subtitle */}
+              <div className="flex flex-col flex-1 min-w-0">
+                <p className={`text-sm font-semibold ${selectedEducationLevel === level.id ? "text-white" : "text-[#121212]"}`}>
+                  {level.name}
+                </p>
+                <p className={`text-xs mt-0.5 ${selectedEducationLevel === level.id ? "text-white/80" : "text-[#555555]"}`}>
+                  {level.description}
+                </p>
+              </div>
 
-  {/* Radio */}
-  <div className={`w-4 h-4 flex justify-center items-center border-2 rounded-full flex-shrink-0 ${
-    selectedEducationLevel === level.value ? "border-white" : "border-[#DADADA]"
-  }`}>
-    {selectedEducationLevel === level.value && (
-      <div className="w-2 h-2 bg-white rounded-full" />
-    )}
-  </div>
-</div>
+              {/* Radio */}
+              <div className={`w-4 h-4 flex justify-center items-center border-2 rounded-full flex-shrink-0 ${selectedEducationLevel === level.id ? "border-white" : "border-[#DADADA]"
+                }`}>
+                {selectedEducationLevel === level.id && (
+                  <div className="w-2 h-2 bg-white rounded-full" />
+                )}
+              </div>
+            </div>
           ))}
         </div>
 
