@@ -20,7 +20,7 @@ import LanguageSection from "./chooseLanguage";
 import { useTranslation } from "@/src/libs/i18n";
 import AchievementsSection from "./achievementsSection";
 import { updateNotificationPreference } from "@/src/services/api/notification.api";
-import { getUserProfile } from "@/src/services/api/user.api";
+import { getUserProfile,getEducationLevels } from "@/src/services/api/user.api";
 import EditProfileSection from "./editProfileSection";
 import { educationLevels, languages } from "@/src/libs/constants/onboarding.constants";
 import { LuChevronDown, LuChevronUp } from "react-icons/lu";
@@ -47,6 +47,11 @@ const UserProfile = () => {
     const storedUser = getStoredUser();
     const fetched = useRef(false);
     const searchParams = useSearchParams();
+    const [logoutLoading, setLogoutLoading] = useState(false);
+   const [deleteLoading, setDeleteLoading] = useState(false);
+const [educationLevelName, setEducationLevelName] = useState(
+        typeof window !== "undefined" ? localStorage.getItem("educationLevelName") || "" : ""
+    );
 
     const handleSelect = (section: string) => {
         window.history.pushState({ section }, '');
@@ -99,6 +104,14 @@ const UserProfile = () => {
                 setSelectedLanguage(res.user_language);
                 setNotifications(res.notificationsEnabled);
 
+                // if (res.educationLevelId) {
+                //     const levels = await getEducationLevels(res.user_language || "ENGLISH");
+                //     const level = levels.find((l: any) => l.id === res.educationLevelId);
+                //     if (level) setEducationLevelName(level.name);
+                // } else if (res.user_EducationLevel) {
+                //     setEducationLevelName(getEducationLabel(res.user_EducationLevel));
+                // }
+
                 // Check subscription status
                 // const sub = await getSubscription();
                 setIsPremium((res as any)?.isPremium === true);
@@ -124,26 +137,50 @@ const UserProfile = () => {
     // const educationLabel = educationLevels.find(
     //     (e) => e.value === user?.user_EducationLevel
     // )?.label || "—";
+   useEffect(() => {
+        if (!user) return;
+        if (!user.educationLevelId) {
+            if (user.user_EducationLevel) setEducationLevelName(getEducationLabel(user.user_EducationLevel));
+            return;
+        }
+        getEducationLevels(user.user_language || "ENGLISH")
+            .then(levels => {
+                const level = levels.find((l: any) => l.id === user.educationLevelId);
+               if (level) {
+                setEducationLevelName(level.name);
+                localStorage.setItem("educationLevelName", level.name);
+            }
+            })
+            .catch(() => {});
+    }, [user?.user_language, user?.educationLevelId]);
+
     const educationLabel = getEducationLabel(user?.user_EducationLevel || "");
 
     const handleLogout = async () => {
         try {
+            setLogoutLoading(true);
             await signOutUser();
             message.success(t('auth.logoutSuccess'));
             router.replace("/login");
         } catch {
             message.error(t('auth.logoutFailed'));
+        } finally {
+            setLogoutLoading(false);
         }
     };
 
+
     const handleDeleteAccount = async () => {
         try {
-            await backendDeleteUser();        // delete from backend
-            await signOutUser();              // sign out Firebase + clear localStorage + cookie
+            setDeleteLoading(true);
+            await backendDeleteUser();
+            await signOutUser();
             message.success("Account deleted successfully.");
             router.replace("/login");
         } catch {
             message.error("Failed to delete account. Please try again.");
+        } finally {
+            setDeleteLoading(false);
         }
     };
 
@@ -224,7 +261,8 @@ const UserProfile = () => {
                                         {t('profile.educationLevel')}
                                     </span>{" "}
                                     <span className="text-[16px] font-medium text-secondary">
-                                        {educationLabel}
+                                        {/* {educationLabel} */}
+                                        {educationLevelName || ""}
                                     </span>
                                 </div>
                             </div>
@@ -425,14 +463,17 @@ const UserProfile = () => {
                 {logoutOpen && (
                     <ConfirmModal
                         type="logout"
+                        loading={logoutLoading}
                         onClose={() => setLogoutOpen(false)}
                         onConfirm={handleLogout}
                     />
                 )}
 
+
                 {deleteOpen && (
                     <ConfirmModal
                         type="delete"
+                        loading={deleteLoading}
                         onClose={() => setDeleteOpen(false)}
                         onConfirm={handleDeleteAccount}
                     />

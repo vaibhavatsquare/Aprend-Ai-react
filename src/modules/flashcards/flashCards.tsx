@@ -362,10 +362,19 @@ const Flashcards = ({ taskId, initialQuestions, source, onClose }: Props) => {
                     Explanation
                   </h3>
                   {/* ADD THIS */}
-<div className="flex-1" />
+                  <div className="flex-1" />
 
                   <p className="text-[16px] text-gray-700 leading-relaxed">
                     {current.stepByStepExplanation}
+                  </p>
+                </div>
+
+                <div className="w-full text-center py-2">
+                  <p
+                    onClick={() => setRevealed(false)}
+                    className="text-[16px] font-medium cursor-pointer"
+                  >
+                    {t('flashcards.tapToFlipBack')}
                   </p>
                 </div>
 

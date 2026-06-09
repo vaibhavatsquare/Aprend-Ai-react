@@ -144,14 +144,18 @@ if (type === "FLASHCARD") return t('flashcards.title');
 
   const streak = dashboard?.currentStreak ?? 0;
   localStorage.setItem("streak", streak);
-  const streakTitle =
+const streakTitle =
     streak === 0
       ? t('home.streak.startJourney')
+      : streak >= 7
+      ? t('home.streak.milestone', { count: streak })
       : t('home.streak.studiedDays', { count: streak });
 
   const streakSub =
     streak === 0
       ? t('home.streak.consistencyMessage')
+      : streak >= 7
+      ? t('home.streak.milestoneSubtext')
       : t('home.streak.keepItUp');
 
   const tasksForDate =
@@ -209,7 +213,7 @@ if (type === "FLASHCARD") return t('flashcards.title');
           {streak >= 0 && (
             <div className="absolute -bottom-3 right-5 flex gap-2 items-center text-[#FFFFFF80] font-medium">
               <h2 className="text-5xl">{streak}</h2>
-              <p className="text-xl">days</p>
+              <p className="text-xl">{t('home.streak.days')}</p>
             </div>
           )}
         </div>

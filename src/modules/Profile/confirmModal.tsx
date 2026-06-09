@@ -2,21 +2,24 @@ import Image from "next/image";
 import { FiLogOut, FiTrash2 } from "react-icons/fi";
 import { useTranslation } from "@/src/libs/i18n";
 import { Achievement } from "@/src/libs/types";
+import { Button } from "antd";
 
 const ConfirmModal = ({
   type,
   onClose,
   onConfirm,
   achievement,
+  loading = false,
 }: {
   type: "logout" | "delete" | "achievement";
   onClose: () => void;
   onConfirm?: () => void;
   achievement?: Achievement | null;
+  loading?: boolean;
 }) => {
   const isDelete = type === "delete";
   const isAchievement = type === "achievement";
-const { t } = useTranslation();
+  const { t } = useTranslation();
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-[2px]">
       <div className="bg-white w-[400px] rounded-[12px] p-4 relative">
@@ -37,7 +40,7 @@ const { t } = useTranslation();
               <img
                 src={achievement.image}
                 alt="achievement"
-                 className="w-50 h-50 object-contain"
+                className="w-50 h-50 object-contain"
               />
             </div>
 
@@ -83,7 +86,7 @@ const { t } = useTranslation();
                 {t("common.cancel")}
               </button>
 
-              <button
+              {/* <button
                 onClick={onConfirm}
                className={`flex-1 h-[40px] rounded-[8px] text-white ${isDelete ? "bg-red-500" : ""}`}
               style={!isDelete ? {
@@ -94,7 +97,21 @@ const { t } = useTranslation();
               } : {}}
               >
                 {isDelete ? t("common.delete") : t("nav.logout")}
-              </button>
+              </button> */}
+              <Button
+                onClick={onConfirm}
+                loading={loading}
+                disabled={loading}
+                className={`flex-1 h-[40px]! rounded-[8px]! text-white! ${isDelete ? "bg-red-500!" : ""}`}
+                style={!isDelete ? {
+                  backgroundImage: "url('/images/buttonBg.svg')",
+                  backgroundSize: '350% 700%', backgroundPosition: 'center',
+                  boxShadow: '0px 0px 50px 0px #1953CB40',
+                  border: '1px solid rgba(255,255,255,0.35)',
+                } : {}}
+              >
+                {isDelete ? t("common.delete") : t("nav.logout")}
+              </Button>
             </div>
           </>
         )}

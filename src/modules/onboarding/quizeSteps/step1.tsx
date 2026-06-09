@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "@/src/libs/i18n";
 import { getSubjectsByLevel } from "@/src/services/api/user.api";
 import FullScreenLoader from "@/src/components/loaders/fullScreenLoader";
+import Loader from "@/src/components/loaders/loader";
+import MiniLoader from "@/src/components/loaders/MiniLoader";
 
 const Step1 = ({
   setCurrentStep,
@@ -22,14 +24,22 @@ const Step1 = ({
   const [showBack, setShowBack] = useState(false);
   const [subjectOptions, setSubjectOptions] = useState<any[]>([]);
 const [loadingSubjects, setLoadingSubjects] = useState(true);
+const [otherSubjectId, setOtherSubjectId] = useState<string | null>(null);
+const [customSubjectText, setCustomSubjectText] = useState("");
 
 
 useEffect(() => {
   console.log("educationLevelId in step1:", educationLevelId);
   if (!educationLevelId) return;
   setLoadingSubjects(true);
-  getSubjectsByLevel(educationLevelId)
-    .then(setSubjectOptions)
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const language = user?.user_language || "ENGLISH";
+  getSubjectsByLevel(educationLevelId, language)
+    .then((data) => {
+      setSubjectOptions(data);
+      const other = data.find((s: any) => s.name === "Other");
+      if (other) setOtherSubjectId(other.id);
+    })
     .catch(() => {})
     .finally(() => setLoadingSubjects(false));
 }, [educationLevelId]);
@@ -59,16 +69,11 @@ const getSubjectLabel = (value: string) => {
     setCurrentStep(2);
   };
 
-// const toggle = (val: string) => {
-//   setQuiz((p: any) => ({
-//     ...p,
-//     subjects: p.subjects.includes(val)
-//       ? p.subjects.filter((v: string) => v !== val)
-//       : [...p.subjects, val],
-//   }));
-// };
 
 const toggle = (val: string, name: string) => {
+  if (val === otherSubjectId && quiz.subjects.includes(val)) {
+    setCustomSubjectText("");
+  }
   setQuiz((p: any) => {
     const isSelected = p.subjects.includes(val);
     const newSubjects = isSelected
@@ -87,13 +92,29 @@ const toggle = (val: string, name: string) => {
     };
   });
 };
+
+const handleCustomSubjectChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const text = e.target.value;
+    setCustomSubjectText(text);
+    setQuiz((p: any) => {
+      const otherIndex = p.subjects.indexOf(otherSubjectId);
+      if (otherIndex === -1) return p;
+      const newSubjectNames = [...(p.subjectNames || [])];
+      newSubjectNames[otherIndex] = text || "Other";
+      localStorage.setItem("selectedSubjectNames", JSON.stringify(newSubjectNames));
+      return { ...p, subjectNames: newSubjectNames };
+    });
+  };
+
+  const isOtherSelected = otherSubjectId !== null && quiz.subjects.includes(otherSubjectId);
   return (
   <>
-    {loadingSubjects && (
+    {/* {loadingSubjects && (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
-        <FullScreenLoader />
+        <Loader />
       </div>
-    )}
+    )} */}
+    {loadingSubjects && <MiniLoader />}
     <div className="flex flex-col gap-6 items-center">
       <div className="flex flex-col items-center gap-3">
         <h1 className="text-xl font-semibold">{t('onboarding.placementQuiz')}</h1>
@@ -129,12 +150,16 @@ const toggle = (val: string, name: string) => {
           </div>
         ))}
 
-        <div className="w-full h-11">
-          <Input
-            placeholder={t('quiz.writeSubjectHere' as any)}
-            className="w-full h-full border-t-0! border-r-0! border-l-0! border-b! rounded-none! outline-none! shadow-none! hover:border-primary! focus-within:border-primary!"
-          />
-        </div>
+        {isOtherSelected && (
+            <div className="col-span-2 w-full h-11">
+              <Input
+                placeholder={t('quiz.writeSubjectHere' as any)}
+                value={customSubjectText}
+                onChange={handleCustomSubjectChange}
+                className="w-full h-full border-t-0! border-r-0! border-l-0! border-b! rounded-none! outline-none! shadow-none! hover:border-primary! focus-within:border-primary!"
+              />
+            </div>
+          )}
       </div>
 
       <div className="w-[300px] flex gap-3 items-center mt-6">
@@ -148,7 +173,10 @@ const toggle = (val: string, name: string) => {
           </Button>
         )}
         <Button
-          disabled={quiz.subjects.length === 0}
+          disabled={
+            quiz.subjects.length === 0 ||
+            (isOtherSelected && customSubjectText.trim() === "")
+          }
           onClick={handleContinue}
           // className="w-[180px] h-10! rounded-xl! text-white! bg-primary! mt-4"
           className="w-[180px] h-10! rounded-xl! text-white! mt-4"

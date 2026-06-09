@@ -23,7 +23,9 @@ const EditProfileSection = ({ user, onUpdated, onCancel }: Props) => {
 const [educationLevels, setEducationLevels] = useState<any[]>([]);
 
 useEffect(() => {
-    getEducationLevels()
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const language = user?.user_language || "ENGLISH";
+    getEducationLevels(language)
         .then(setEducationLevels)
         .catch(() => {});
 }, []);

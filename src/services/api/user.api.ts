@@ -75,17 +75,18 @@ export const updateUserProfile = async (data: {
   });
 };
 
-export const getEducationLevels = async () => {
+export const getEducationLevels = async (language?: string) => {
   return fetch<{ id: string; code: string; name: string; description: string; sortOrder: number }[]>({
     url: "/onboarding/education-levels",
     method: "GET",
+    params: { language },
   });
 };
 
-export const getSubjectsByLevel = async (educationLevelId: string) => {
+export const getSubjectsByLevel = async (educationLevelId: string, language?: string) => {
   return fetch<{ id: string; code: string; name: string; description: string }[]>({
     url: "/onboarding/subjects",
     method: "GET",
-    params: { educationLevelId },
+    params: { educationLevelId, language },
   });
 };

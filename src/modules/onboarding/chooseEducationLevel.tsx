@@ -5,9 +5,10 @@ import { Button, message, Spin } from "antd";
 import { useRedirect } from "@/src/hooks/router.hooks";
 import { useTranslation } from "@/src/libs/i18n";
 import { saveEducationlevel, getEducationLevels } from "@/src/services/api/user.api";
-import FullScreenLoader from "@/src/components/loaders/fullScreenLoader";
+// import FullScreenLoader from "@/src/components/loaders/fullScreenLoader";
 import { useRouter } from "next/navigation";
-
+import Loader from "@/src/components/loaders/loader";
+import MiniLoader from "@/src/components/loaders/MiniLoader";
 
 const ChooseEducationLevel = () => {
   const { t } = useTranslation();
@@ -21,7 +22,9 @@ const ChooseEducationLevel = () => {
 
 
 useEffect(() => {
-  getEducationLevels()
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const language = user?.user_language || "ENGLISH";
+  getEducationLevels(language)
     .then((data) => {
       setEducationLevels(data);
     })
@@ -65,7 +68,11 @@ const levelIcons: Record<string, string> = {
   }
 };
 
-  if (loadingLevels) return <FullScreenLoader />;
+  // if (loadingLevels) return <FullScreenLoader />;
+  if (loadingLevels) return <MiniLoader />;
+
+
+
   return (
     <div className="w-full h-full flex justify-center items-center">
       <div className="flex flex-col gap-6 items-center">

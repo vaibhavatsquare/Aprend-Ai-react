@@ -391,7 +391,11 @@ const SignUp = () => {
     } catch (error: any) {
       // Clean up Firebase user if something fails
       if (auth.currentUser) {
-        await auth.currentUser.delete();
+        try {
+          await auth.currentUser.delete();
+        } catch {
+          // delete() requires recent login — if it fails, sign out anyway
+        }
         await signOut(auth);
         document.cookie = "idToken=; max-age=0";
       }
@@ -405,7 +409,7 @@ const SignUp = () => {
   const handleVerifyOtp = async () => {
     const otp = otpValues.join("");
     if (otp.length < 4) {
-      message.error("Please enter the complete 6-digit OTP");
+      message.error("Please enter the complete 4-digit OTP");
       return;
     }
 
@@ -418,7 +422,7 @@ const SignUp = () => {
     } catch (error: any) {
       message.error(error?.message || "Invalid OTP. Please try again.");
       // Clear OTP inputs on error
-      setOtpValues(["", "", "", "", "", ""]);
+      setOtpValues(["", "", "", "",]);
       otpRefs.current[0]?.focus();
     } finally {
       setVerifyLoading(false);
@@ -431,7 +435,7 @@ const SignUp = () => {
     try {
       await resendOtp(currentEmail);
       setResendTimer(60);
-      setOtpValues(["", "", "", "", "", ""]);
+      setOtpValues(["", "", "", "",]);
       otpRefs.current[0]?.focus();
       message.success("OTP resent!");
     } catch (error: any) {
@@ -448,7 +452,7 @@ const SignUp = () => {
     setOtpValues(newValues);
 
     // Auto-advance to next input
-    if (value && index < 5) {
+    if (value && index < 3) {
       otpRefs.current[index + 1]?.focus();
     }
   };
@@ -529,7 +533,7 @@ const SignUp = () => {
             className="absolute top-5 left-5 cursor-pointer text-xl"
             onClick={() => {
               setStep("form");
-              setOtpValues(["", "", "", "", "", ""]);
+              setOtpValues(["", "", "", "",]);
             }}
           />
 

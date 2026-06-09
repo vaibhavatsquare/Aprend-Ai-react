@@ -68,7 +68,7 @@ type TranslationKey =
 
     // Flashcards
     | 'flashcards.title' | 'flashcards.savedFlashcards' | 'flashcards.noSavedFlashcards'
-    | 'flashcards.noSavedFlashcardsDesc' | 'flashcards.tapToReveal' | 'flashcards.rename'
+    | 'flashcards.noSavedFlashcardsDesc' | 'flashcards.tapToReveal' | 'flashcards.tapToFlipBack' | 'flashcards.rename'
     | 'flashcards.remove' | 'flashcards.delete' | 'flashcards.areYouSureDelete'
 
     // Notes
@@ -137,7 +137,7 @@ type TranslationKey =
 
     | 'aiTutor.uploadImage' | 'aiTutor.camera' | 'aiTutor.gallery'
     | 'common.premiumFeature'
-    | 'home.streak.consistencyMessage'
+    | 'home.streak.consistencyMessage' | 'home.streak.milestone' | 'home.streak.milestoneSubtext'
 
     // Add to TranslationKey
     | 'quiz.q1' | 'quiz.q2' | 'quiz.q3' | 'quiz.q4' | 'quiz.q5'
@@ -154,7 +154,10 @@ type TranslationKey =
     | 'quiz.option.morning' | 'quiz.option.afternoon' | 'quiz.option.evening' | 'quiz.option.flexible'
 
     | 'navbar.focusMode.on'
-| 'navbar.focusMode.off'
+    | 'navbar.focusMode.off'
+
+
+
     ;
 
 
@@ -285,6 +288,8 @@ const translations = {
         'home.streak.startJourney': 'Start your learning journey today 🚀',
         'home.streak.studiedDays': 'You\'ve studied {count} days in a row!',
         'home.streak.keepItUp': 'Keep it up 💪',
+        'home.streak.milestone': 'Incredible! {count} days of pure focus in a row! 🧠⚡',
+        'home.streak.milestoneSubtext': "You're officially above average. Protect your streak!",
         'home.streak.days': 'days',
         'home.tasks.todaysTask': 'Today\'s Task',
         'home.tasks.progress': 'Progress',
@@ -343,6 +348,7 @@ const translations = {
         'flashcards.noSavedFlashcards': 'No Saved Flashcards Yet',
         'flashcards.noSavedFlashcardsDesc': 'You haven\'t saved any flashcards. Save one to see it here.',
         'flashcards.tapToReveal': 'Tap to reveal the answer',
+        'flashcards.tapToFlipBack': 'Tap to flip back',
         'flashcards.rename': 'Rename',
         'flashcards.remove': 'Remove',
         'flashcards.delete': 'Delete',
@@ -530,7 +536,7 @@ const translations = {
         'quiz.option.flexible': 'Flexible',
 
         'navbar.focusMode.on': 'FOCUS',
-'navbar.focusMode.off': 'OFF',
+        'navbar.focusMode.off': 'OFF',
     },
 
     SPANISH: {
@@ -657,6 +663,8 @@ const translations = {
         'home.streak.startJourney': 'Comienza tu viaje de aprendizaje hoy 🚀',
         'home.streak.studiedDays': '¡Has estudiado {count} días seguidos!',
         'home.streak.keepItUp': '¡Sigue así 💪',
+        'home.streak.milestone': '¡Increíble! ¡{count} días seguidos de puro enfoque! 🧠⚡',
+        'home.streak.milestoneSubtext': '¡Estás por encima del promedio. Protege tu racha!',
         'home.streak.days': 'días',
         'home.tasks.todaysTask': 'Tarea de hoy',
         'home.tasks.progress': 'Progreso',
@@ -715,6 +723,7 @@ const translations = {
         'flashcards.noSavedFlashcards': 'No hay tarjetas guardadas aún',
         'flashcards.noSavedFlashcardsDesc': 'No has guardado ninguna tarjeta. Guarda una para verla aquí.',
         'flashcards.tapToReveal': 'Toca para revelar la respuesta',
+        'flashcards.tapToFlipBack': 'Toca para voltear',
         'flashcards.rename': 'Renombrar',
         'flashcards.remove': 'Quitar',
         'flashcards.delete': 'Eliminar',
@@ -902,7 +911,7 @@ const translations = {
         'quiz.option.flexible': 'Flexible',
 
         'navbar.focusMode.on': 'ENFOCAR',
-'navbar.focusMode.off': 'APAGADO',
+        'navbar.focusMode.off': 'APAGADO',
     },
 
     PORTUGUESE: {
@@ -1026,9 +1035,11 @@ const translations = {
         'home.greeting.afternoon': 'Boa tarde',
         'home.greeting.evening': 'Boa noite',
         'home.readyToStart': 'Pronto para começar sua jornada de aprendizado hoje',
-        'home.streak.startJourney': 'Comece sua jornada de aprendizado hoje 🚀',
-        'home.streak.studiedDays': 'Você estudou {count} dias seguidos!',
-        'home.streak.keepItUp': 'Continue assim 💪',
+        'home.streak.startJourney': 'Que tal começar a sua sequência de estudos hoje? 🚀',
+        'home.streak.studiedDays': 'Você está numa sequência de {count} dias! Continue assim! 🔥',
+        'home.streak.keepItUp': 'O seu cérebro agradece a consistência. Cada dia conta!',
+        'home.streak.milestone': 'Incrível! {count} dias seguidos de puro foco! 🧠⚡',
+        'home.streak.milestoneSubtext': 'Você está oficialmente acima da média. Proteja a sua ofensiva!',
         'home.streak.days': 'dias',
         'home.tasks.todaysTask': 'Tarefa de hoje',
         'home.tasks.progress': 'Progresso',
@@ -1087,6 +1098,7 @@ const translations = {
         'flashcards.noSavedFlashcards': 'Nenhum flashcard salvo ainda',
         'flashcards.noSavedFlashcardsDesc': 'Você não salvou nenhum flashcard. Salve um para ver aqui.',
         'flashcards.tapToReveal': 'Toque para revelar a resposta',
+        'flashcards.tapToFlipBack': 'Toque para virar',
         'flashcards.rename': 'Renomear',
         'flashcards.remove': 'Remover',
         'flashcards.delete': 'Excluir',
@@ -1231,7 +1243,7 @@ const translations = {
         'aiTutor.camera': 'Câmera',
         'aiTutor.gallery': 'Galeria',
         'common.premiumFeature': 'Recurso Premium',
-        'home.streak.consistencyMessage': 'A consistência constrói o domínio. Vamos começar!',
+        'home.streak.consistencyMessage': 'Ative a sua mente e não deixe a chama apagar.',
 
         'quiz.q1': 'Qual matéria você quer aprender?',
         'quiz.q2': 'Qual é seu principal objetivo de aprendizado?',
@@ -1274,7 +1286,7 @@ const translations = {
         'quiz.option.flexible': 'Flexível',
 
         'navbar.focusMode.on': 'FOCO',
-'navbar.focusMode.off': 'DESLIGADO',
+        'navbar.focusMode.off': 'DESLIGADO',
     },
 } as const;
 
