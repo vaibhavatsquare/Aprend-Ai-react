@@ -4,11 +4,9 @@ import { useState, useEffect } from "react";
 import { Button, message, Spin } from "antd";
 import { useRedirect } from "@/src/hooks/router.hooks";
 import { useTranslation } from "@/src/libs/i18n";
-import { saveEducationlevel, getEducationLevels } from "@/src/services/api/user.api";
+import { saveEducationlevel, getEducationLevels, getSubjectsByLevel } from "@/src/services/api/user.api";
 // import FullScreenLoader from "@/src/components/loaders/fullScreenLoader";
 import { useRouter } from "next/navigation";
-import Loader from "@/src/components/loaders/loader";
-import MiniLoader from "@/src/components/loaders/MiniLoader";
 
 const ChooseEducationLevel = () => {
   const { t } = useTranslation();
@@ -17,16 +15,25 @@ const ChooseEducationLevel = () => {
     useState<string | null>(null);
   const [educationLevels, setEducationLevels] = useState<any[]>([]);
   const [loadingLevels, setLoadingLevels] = useState(true);
+    const [saving, setSaving] = useState(false);
+
   const router = useRouter();
 
 
 
 useEffect(() => {
+  const cached = localStorage.getItem("educationLevels");
+  if (cached) {
+    setEducationLevels(JSON.parse(cached));
+    setLoadingLevels(false);
+    return;
+  }
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const language = user?.user_language || "ENGLISH";
   getEducationLevels(language)
     .then((data) => {
       setEducationLevels(data);
+      localStorage.setItem("educationLevels", JSON.stringify(data));
     })
     .catch(() => {})
     .finally(() => setLoadingLevels(false));
@@ -53,8 +60,9 @@ const levelIcons: Record<string, string> = {
     return map[value] || value;
   };
 
- const handleContinue = async () => {
+  const handleContinue = async () => {
   if (!selectedEducationLevel) return;
+  setSaving(true);
   try {
     await saveEducationlevel({
       educationLevelId: selectedEducationLevel
@@ -62,14 +70,19 @@ const levelIcons: Record<string, string> = {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     user.educationLevelId = selectedEducationLevel;
     localStorage.setItem("user", JSON.stringify(user));
+    const language = user?.user_language || "ENGLISH";
+    const subjects = await getSubjectsByLevel(selectedEducationLevel, language);
+    localStorage.setItem("subjectsByLevel", JSON.stringify(subjects));
     router.push("/onboarding/placement-quize");
   } catch {
     message.error("Failed to save profile");
+  } finally {
+    setSaving(false);
   }
 };
 
   // if (loadingLevels) return <FullScreenLoader />;
-  if (loadingLevels) return <MiniLoader />;
+
 
 
 
@@ -81,7 +94,11 @@ const levelIcons: Record<string, string> = {
         </h1>
 
         <div className="flex flex-col gap-3">
-          {educationLevels.map((level: any) => (
+          {loadingLevels ? (
+            [...Array(4)].map((_, i) => (
+              <div key={i} className="w-[380px] max-w-[90vw] h-[64px] rounded-xl bg-gray-100 animate-pulse" />
+            ))
+          ) : educationLevels.map((level: any) => (
             // <div
             //   key={level.value}
             //   className={`w-[280px] h-11 px-3 border rounded-xl flex justify-between items-center gap-3 cursor-pointer transition-all ${
@@ -142,10 +159,11 @@ const levelIcons: Record<string, string> = {
           ))}
         </div>
 
-        {selectedEducationLevel && (
+        {selectedEducationLevel && !loadingLevels && (
           <Button
             onClick={handleContinue}
-            // className="w-[280px] h-10! rounded-xl! text-white! bg-primary! mt-4"
+            loading={saving}
+            disabled={saving}
             className="w-[280px] h-10! rounded-xl! text-white! mt-4"
             style={{
               backgroundImage: "url('/images/buttonBg.svg')",

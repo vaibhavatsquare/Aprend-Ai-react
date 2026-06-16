@@ -148,7 +148,7 @@ const handleAppleSignIn = async () => {
           className="object-contain w-auto h-full"
         />
       </div> */}
-      <div className="h-full w-[35%] flex-shrink-0 flex items-center justify-center overflow-hidden">
+      <div className="h-full w-[37%] -mr-6 flex-shrink-0 flex items-center justify-center overflow-hidden relative z-0">
               <Image
                 src="/images/auth/loginImg.svg"
                 alt="Login background"
@@ -157,7 +157,7 @@ const handleAppleSignIn = async () => {
                 className="object-cover w-full h-full "
               />
             </div>
-      <form className="relative flex-1 h-full bg-white rounded-tl-4xl rounded-bl-4xl flex items-center justify-center">
+      <form className="relative z-10 flex-1 h-full bg-white rounded-tl-4xl rounded-bl-4xl flex items-center justify-center">
         <div className="w-[90%] sm:w-[80%] md:w-[60%] xl:w-[50%] h-full overflow-y-auto scrollbar-hide py-10 flex flex-col justify-center gap-8">
           <div className="flex flex-col gap-1 text-primary">
             <h1 className="text-2xl font-bold">Welcome Back</h1>

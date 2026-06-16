@@ -601,7 +601,7 @@ const SignUp = () => {
   // ── Signup Form ────────────────────────────────────────────────────────────
   return (
     <div className="w-full h-screen overflow-hidden bg-primary flex">
-      <div className="h-full w-[35%] flex-shrink-0 flex items-center justify-center overflow-hidden">
+      <div className="h-full w-[37%] -mr-6 flex-shrink-0 flex items-center justify-center overflow-hidden relative z-0">
         <Image
           src="/images/auth/loginImg.svg"
           alt="Login background"
@@ -612,13 +612,13 @@ const SignUp = () => {
       </div>
 
       <form
-        className="relative flex-1 h-full bg-white rounded-tl-4xl rounded-bl-4xl flex items-center justify-center"
+        className="relative z-10 flex-1 h-full bg-white rounded-tl-4xl rounded-bl-4xl flex items-center justify-center"
         onSubmit={handleSubmit(handleSignUp)}
       >
-        <GoArrowLeft
+        {/* <GoArrowLeft
           className="absolute top-5 left-5 cursor-pointer text-xl"
           onClick={() => useRedirect("/login")}
-        />
+        /> */}
 
         <div className="w-[90%] sm:w-[80%] md:w-[60%] xl:w-[50%] h-full overflow-y-auto scrollbar-hide py-20 flex flex-col justify-center gap-8">
           <div className="flex flex-col gap-1 text-primary">

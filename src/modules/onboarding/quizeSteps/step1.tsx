@@ -5,9 +5,6 @@ import { canGoBack, setSearchParam, useBack } from "@/src/hooks/router.hooks";
 import { useEffect, useState } from "react";
 import { useTranslation } from "@/src/libs/i18n";
 import { getSubjectsByLevel } from "@/src/services/api/user.api";
-import FullScreenLoader from "@/src/components/loaders/fullScreenLoader";
-import Loader from "@/src/components/loaders/loader";
-import MiniLoader from "@/src/components/loaders/MiniLoader";
 
 const Step1 = ({
   setCurrentStep,
@@ -31,6 +28,15 @@ const [customSubjectText, setCustomSubjectText] = useState("");
 useEffect(() => {
   console.log("educationLevelId in step1:", educationLevelId);
   if (!educationLevelId) return;
+  const cached = localStorage.getItem("subjectsByLevel");
+  if (cached) {
+    const data = JSON.parse(cached);
+    setSubjectOptions(data);
+    const other = data.find((s: any) => s.name === "Other");
+    if (other) setOtherSubjectId(other.id);
+    setLoadingSubjects(false);
+    return;
+  }
   setLoadingSubjects(true);
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const language = user?.user_language || "ENGLISH";
@@ -39,10 +45,13 @@ useEffect(() => {
       setSubjectOptions(data);
       const other = data.find((s: any) => s.name === "Other");
       if (other) setOtherSubjectId(other.id);
+      localStorage.setItem("subjectsByLevel", JSON.stringify(data));
     })
     .catch(() => {})
     .finally(() => setLoadingSubjects(false));
 }, [educationLevelId]);
+
+
 const { t } = useTranslation();
 
 const getSubjectLabel = (value: string) => {
@@ -114,7 +123,7 @@ const handleCustomSubjectChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         <Loader />
       </div>
     )} */}
-    {loadingSubjects && <MiniLoader />}
+    {/* {loadingSubjects && <MiniLoader />} */}
     <div className="flex flex-col gap-6 items-center">
       <div className="flex flex-col items-center gap-3">
         <h1 className="text-xl font-semibold">{t('onboarding.placementQuiz')}</h1>
@@ -122,7 +131,11 @@ const handleCustomSubjectChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       </div>
 
      <div className="w-[650px] grid grid-cols-2 gap-3 mt-4">
-  {subjectOptions.map((level: any) => (
+  {loadingSubjects ? (
+    [...Array(6)].map((_, i) => (
+      <div key={i} className="w-full h-11 rounded-xl bg-gray-100 animate-pulse" />
+    ))
+  ) : subjectOptions.map((level: any) => (
 
           <div
             key={level.id}
@@ -174,11 +187,11 @@ const handleCustomSubjectChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         )}
         <Button
           disabled={
+            loadingSubjects ||
             quiz.subjects.length === 0 ||
             (isOtherSelected && customSubjectText.trim() === "")
           }
           onClick={handleContinue}
-          // className="w-[180px] h-10! rounded-xl! text-white! bg-primary! mt-4"
           className="w-[180px] h-10! rounded-xl! text-white! mt-4"
           style={{
             backgroundImage: "url('/images/buttonBg.svg')",

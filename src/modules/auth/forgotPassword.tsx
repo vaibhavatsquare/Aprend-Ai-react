@@ -106,7 +106,7 @@ const ForgotPassword = () => {
     <div className="w-full h-full bg-primary flex">
       {isLoading && <MiniLoader />}
       {/* <div className="h-full flex justify-end"> */}
-      <div className="h-full w-[35%] flex-shrink-0 relative overflow-hidden">
+     <div className="h-full w-[37%] -mr-6 flex-shrink-0 relative overflow-hidden z-0">
         <Image
           src="/images/auth/loginImg.svg"
           alt="Login background"
@@ -116,7 +116,7 @@ const ForgotPassword = () => {
         />
       </div>
 
-      <form className="relative flex-1 h-full bg-white rounded-tl-4xl rounded-bl-4xl flex items-center justify-center">
+      <form className="relative z-10 flex-1 h-full bg-white rounded-tl-4xl rounded-bl-4xl flex items-center justify-center">
         <GoArrowLeft
           className="absolute top-5 left-5 cursor-pointer text-xl"
           onClick={() => useRedirect("/login")}

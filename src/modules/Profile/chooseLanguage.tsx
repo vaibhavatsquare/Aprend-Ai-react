@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { languages } from "@/src/libs/constants/onboarding.constants";
 import Image from "next/image";
-import { message } from "antd";
+import { message, Button } from "antd";
 import { useLanguageStore } from "@/src/store/language.store";
 import { saveLanguage } from "@/src/services/api/user.api";
 // import { useTranslation } from "@/src/libs/i18n";
@@ -19,6 +19,7 @@ const LanguageSection = ({
 }) => {
 
     const [selectedLang, setSelectedLang] = useState<UserLanguage | null>(null);
+    const [loading, setLoading] = useState(false);
     const { t } = useTranslation();
     const setLanguage = useLanguageStore((s) => s.setLanguage);
 
@@ -27,15 +28,14 @@ const LanguageSection = ({
         setSelectedLang(currentLanguage);
     }, [currentLanguage]);
 
-   const handleSave = async () => {
+  const handleSave = async () => {
     if (!selectedLang) return;
-
+    setLoading(true);
     try {
         await saveLanguage({ user_language: selectedLang });
 
         setLanguage(selectedLang);
 
-        // 👇 Update user in localStorage so useLanguageInit picks up new language
         const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
         localStorage.setItem('user', JSON.stringify({ 
             ...storedUser, 
@@ -46,9 +46,10 @@ const LanguageSection = ({
         onClose(selectedLang);
     } catch {
         message.error(t('profile.languageUpdateFailed'));
+    } finally {
+        setLoading(false);
     }
 };
-
     return (
         <div className="w-full h-full flex flex-col justify-between">
 
@@ -85,12 +86,11 @@ const LanguageSection = ({
 
             {/* BOTTOM */}
             <div className="flex justify-center mb-6">
-                <button
+                 <Button
                     onClick={handleSave}
-                    disabled={!selectedLang}
-                    // className="w-[280px] h-10 rounded-xl text-white bg-primary disabled:opacity-50"
-                    // className="w-[280px] h-10 rounded-xl text-white bg-[#2563EB] disabled:opacity-50"
-                    className="w-[280px] h-10 rounded-xl text-white disabled:opacity-50"
+                    loading={loading}
+                    disabled={!selectedLang || loading}
+                    className="w-[280px] h-10! rounded-xl! text-white!"
                     style={{
                         backgroundImage: "url('/images/buttonBg.svg')",
                         backgroundSize: '350% 700%', backgroundPosition: 'center',
@@ -99,7 +99,7 @@ const LanguageSection = ({
                     }}
                 >
                     {t('onboarding.completeProfile')}
-                </button>
+                </Button>
             </div>
         </div>
     );

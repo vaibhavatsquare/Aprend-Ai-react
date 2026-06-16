@@ -21,7 +21,14 @@ import { usePathname } from "next/navigation";
 
 
 const Home = () => {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
+
+  const localeMap: Record<string, string> = {
+    ENGLISH: "en-US",
+    SPANISH: "es-ES",
+    PORTUGUESE: "pt-BR",
+  };
+  const dateLocale = localeMap[language] || "en-US";
   const [dashboard, setDashboard] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<string>("");
@@ -253,7 +260,7 @@ const streakTitle =
                 } : { boxShadow: "0px 2px 6px rgba(0,0,0,0.06)" }}
               >
                 <p className={`text-[16px] font-regular ${isSelected ? "text-white" : "text-secondary"}`}>
-                  {date.toLocaleDateString("en-US", { weekday: "short" }).toUpperCase()}
+                  {date.toLocaleDateString(dateLocale, { weekday: "short" }).toUpperCase()}
                 </p>
                 <p className="text-[16px] font-medium">{date.getDate()}</p>
               </div>

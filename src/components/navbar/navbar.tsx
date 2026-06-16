@@ -206,12 +206,25 @@ const Navbar = () => {
   )}
 
   {/* Text */}
-  <span
+  {/* <span
     className="font-bold text-[11px] tracking-wider absolute z-10"
     style={{
       color: focusMode ? 'white' : '#374151',
       left: focusMode ? '10px' : 'auto',
       right: focusMode ? 'auto' : '10px',
+    }}
+  >
+    {focusMode ? t('navbar.focusMode.on') : t('navbar.focusMode.off')}
+  </span> */}
+
+  <span
+    className="font-bold text-[11px] tracking-wider absolute z-10 overflow-hidden whitespace-nowrap"
+    style={{
+      color: focusMode ? 'white' : '#374151',
+      left: focusMode ? '10px' : 'auto',
+      right: focusMode ? 'auto' : '10px',
+      maxWidth: focusMode ? '46px' : '50px',
+      textOverflow: 'ellipsis',
     }}
   >
     {focusMode ? t('navbar.focusMode.on') : t('navbar.focusMode.off')}

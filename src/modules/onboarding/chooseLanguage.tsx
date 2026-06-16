@@ -5,13 +5,14 @@ import { useEffect, useState } from "react";
 import { Button, message } from "antd";
 import { useRedirect } from "@/src/hooks/router.hooks";
 import { useLanguageStore } from "@/src/store/language.store";
-import { saveLanguage } from "@/src/services/api/user.api";
+import { saveLanguage, getEducationLevels } from "@/src/services/api/user.api";
 import { UserLanguage } from "@/src/libs/types";
 import { useTranslation } from "@/src/libs/i18n";
 import { useRouter } from "next/navigation";
 import { signOutUser } from "@/src/services/auth/auth.firebase.service";
 const ChooseLanguage = () => {
-  const [selectedLanguage, setSelectedLanguage] = useState<UserLanguage | null>(null);
+const [selectedLanguage, setSelectedLanguage] = useState<UserLanguage | null>(null);
+const [loading, setLoading] = useState(false);
   const setLanguage = useLanguageStore((s) => s.setLanguage);
   const { t } = useTranslation();
 const router = useRouter();
@@ -33,14 +34,19 @@ const router = useRouter();
 const handleContinue = async () => {
   if (!selectedLanguage) return;
   setLanguage(selectedLanguage);
+  setLoading(true);
   try {
     await saveLanguage({ user_language: selectedLanguage });
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     user.user_language = selectedLanguage;
     localStorage.setItem("user", JSON.stringify(user));
+    const levels = await getEducationLevels(selectedLanguage);
+    localStorage.setItem("educationLevels", JSON.stringify(levels));
     useRedirect("/onboarding/choose-education-level");
   } catch {
     message.error("Failed to save language");
+  } finally {
+    setLoading(false);
   }
 };
 
@@ -70,7 +76,8 @@ const handleContinue = async () => {
         {selectedLanguage && (
           <Button
             onClick={handleContinue}
-            // className="w-[280px] h-10! rounded-xl! text-white! bg-primary! mt-4"
+            loading={loading}
+            disabled={loading}
             className="w-[280px] h-10! rounded-xl! text-white! mt-4"
             style={{
               backgroundImage: "url('/images/buttonBg.svg')",
