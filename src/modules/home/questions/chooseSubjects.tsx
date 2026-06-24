@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { GoArrowLeft } from "react-icons/go";
 import { useTranslation } from "@/src/libs/i18n";
 import { generateSimuladoQuestions, questionBankSimuladoQuestions } from "@/src/services/api/question.api";
@@ -8,6 +8,7 @@ import { useRedirect } from "@/src/hooks/router.hooks";
 import { Question } from "@/src/libs/types/dashboard.types";
 import { difficulties, QuestionSource, subjects } from "@/src/libs/helpers";
 import { message } from "antd";
+import { getSubjectsByLevel, getEducationLevels } from "@/src/services/api/user.api";
 
 const ChooseSubjects = ({
   onBack,
@@ -26,6 +27,96 @@ const ChooseSubjects = ({
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  // Map from subject code → actual UUID from backend
+const [subjectIdMap, setSubjectIdMap] = useState<Record<string, string>>({});
+  const [apiSubjects, setApiSubjects] = useState<{ id: string; code: string; name: string }[]>([]);
+
+  // Fetch real subject IDs on mount
+  // Fetch real subject IDs on mount
+  useEffect(() => {
+    const fetchSubjectIds = async () => {
+      try {
+        const user = JSON.parse(localStorage.getItem("user") || "{}");
+        const language = user?.user_language || "ENGLISH";
+        const userCode = user?.user_EducationLevel; // e.g. "HIGH_SCHOOL" — language independent
+
+        // ALWAYS fetch education levels for current language
+        let educationLevelId = null;
+
+        try {
+          const allLevels = await getEducationLevels(language);
+
+          console.log("🌐 Language:", language);
+          console.log("🎓 user_EducationLevel code:", userCode);
+          console.log("📋 All levels from API:", allLevels.map((l: any) => ({ id: l.id, code: l.code, name: l.name })));
+
+          // Map old stored codes → new API codes
+          const codeMap: Record<string, string> = {
+            'ELEMENTARY': 'ELEMENTARY_SCHOOL',
+            'HIGH_SCHOOL': 'HIGH_SCHOOL',
+            'PRE_VESTIBULAR': 'PRE_UNIVERSITY_PREP',
+            'UNIVERSITY': 'COLLEGE_UNIVERSITY',
+            'COMPETITIVE_EXAMS': 'PUBLIC_EXAMS',
+          };
+
+          // Match by code — language-independent
+          if (userCode) {
+            const mappedCode = codeMap[userCode] || userCode;
+            const match = allLevels.find((l: any) =>
+              l.code === mappedCode ||
+              l.code === userCode
+            );
+            console.log("✅ Match by code:", match);
+            if (match) educationLevelId = match.id;
+          }
+
+          // If no code match, try name match
+          if (!educationLevelId) {
+            const storedName = localStorage.getItem("educationLevelName") || "";
+            console.log("🏫 Trying name match:", storedName);
+            const nameMatch = allLevels.find((l: any) =>
+              l.name === storedName ||
+              l.name?.toUpperCase() === storedName?.toUpperCase()
+            );
+            if (nameMatch) {
+              educationLevelId = nameMatch.id;
+              console.log("✅ Match by name:", nameMatch);
+            }
+          }
+
+          console.log("🆔 Resolved educationLevelId:", educationLevelId);
+        } catch (e) {
+          console.error("❌ getEducationLevels failed:", e);
+          educationLevelId = user?.educationLevelId || user?.educationLevel?.id || null;
+        }
+
+        if (!educationLevelId) {
+          console.warn("⚠️ Could not resolve educationLevelId for language:", language);
+          return;
+        }
+
+        // Fetch subjects for current language with correct education level ID
+        const fetchedSubjects = await getSubjectsByLevel(educationLevelId, language);
+
+        if (!fetchedSubjects?.length) return;
+
+        setApiSubjects(fetchedSubjects);
+
+        // Build code → UUID map for this language
+        const map: Record<string, string> = {};
+        fetchedSubjects.forEach((s: any) => {
+          if (s.code && s.id) {
+            map[s.code] = s.id;
+            map[s.code.toUpperCase()] = s.id;
+          }
+        });
+        setSubjectIdMap(map);
+      } catch (err) {
+        console.error("❌ Failed to fetch subject IDs", err);
+      }
+    };
+    fetchSubjectIds();
+  }, []);
 
   const isSimulado = source === QuestionSource.SIMULADO;
   const isExplore = source === QuestionSource.EXPLORE_QUESTION;
@@ -102,16 +193,46 @@ const ChooseSubjects = ({
     try {
       setLoading(true);
 
-      let subjectsForApi = selectedSubjects;
+      let subjectCodes = selectedSubjects;
 
       if (selectedSubjects.includes("ALL")) {
-        subjectsForApi = subjects
-          .filter((s) => s.value !== "ALL")
-          .map((s) => s.value);
+        // Use all fetched subject IDs directly
+        if (apiSubjects.length > 0) {
+          const subjectsForApi = apiSubjects.map((s: any) => s.id);
+          console.log("Sending ALL subject IDs:", subjectsForApi);
+          // proceed with these
+          let res;
+          if (isSimulado) {
+            res = await generateSimuladoQuestions({
+              subjectIds: subjectsForApi,
+              numberOfQuestions: value,
+              difficulty: selectedDifficulty!,
+            });
+          }
+          if (isExplore) {
+            res = await questionBankSimuladoQuestions({
+              subjectIds: subjectsForApi,
+              numberOfQuestions: value,
+              difficulty: selectedDifficulty || "EASY",
+            });
+          }
+          onStartQuestions?.({ id: res?.id || "", questions: res?.questions || [] });
+          return;
+        }
+        subjectCodes = subjects.filter((s) => s.value !== "ALL").map((s) => s.value);
       }
 
+      // Map codes → actual UUIDs
+      const subjectsForApi = subjectCodes.map(
+        (code) => subjectIdMap[code] || code
+      );
+      console.log("Sending subject IDs:", subjectsForApi);
+
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      const language = user?.user_language || "ENGLISH";
+
       let res;
-      console.log("isSimulado", subjectsForApi, selectedDifficulty)
+      console.log("isSimulado", subjectsForApi, selectedDifficulty, language);
       if (isSimulado) {
         res = await generateSimuladoQuestions({
           subjectIds: subjectsForApi,
@@ -158,29 +279,39 @@ const ChooseSubjects = ({
 
       {/* SUBJECT BUTTONS */}
       <div className="flex gap-3 flex-wrap">
-        {subjects
-          // .filter((item) => !(isExplore && item.value === "ALL"))
-          .map((item) => {
-            const isSelected = selectedSubjects.includes(item.value);
+        {/* ALL option */}
+        <div
+          onClick={() => handleSubject("ALL")}
+          className="h-[36px] px-4 flex items-center rounded-[4px] border text-[18px] cursor-pointer transition-all"
+          style={{
+            borderColor: selectedSubjects.includes("ALL") ? "#0F3057" : "#DADADA",
+            color: selectedSubjects.includes("ALL") ? "#fff" : "#121212",
+            background: selectedSubjects.includes("ALL") ? "#2563EB" : "white",
+          }}
+        >
+          {getSubjectLabel("ALL")}
+        </div>
 
-            return (
-              <div
-                key={item.value}
-                onClick={() => handleSubject(item.value)}
-                className="h-[36px] px-4 flex items-center rounded-[4px] border text-[18px] cursor-pointer transition-all"
-                style={{
-                  borderColor: isSelected ? "#0F3057" : "#DADADA",
-                  // color: isSelected ? "#0F3057" : "#121212",
-                  color: isSelected ? "#fff" : "#121212",
-                  // background: isSelected ? "#F5F9FF" : "white",
-                  background: isSelected ? "#2563EB" : "white",
-                }}
-              >
-                {/* {item.label} */}
-                {getSubjectLabel(item.value)}
-              </div>
-            );
-          })}
+        {/* API subjects */}
+        {apiSubjects.map((item: any) => {
+          const code = item.code || item.value;
+          const isSelected = selectedSubjects.includes(code);
+
+          return (
+            <div
+              key={code}
+              onClick={() => handleSubject(code)}
+              className="h-[36px] px-4 flex items-center rounded-[4px] border text-[18px] cursor-pointer transition-all"
+              style={{
+                borderColor: isSelected ? "#0F3057" : "#DADADA",
+                color: isSelected ? "#fff" : "#121212",
+                background: isSelected ? "#2563EB" : "white",
+              }}
+            >
+              {item.name || getSubjectLabel(code)}
+            </div>
+          );
+        })}
       </div>
 
       {(isSimulado || isExplore) && (

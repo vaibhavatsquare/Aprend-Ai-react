@@ -195,9 +195,9 @@ const [educationLevelName, setEducationLevelName] = useState(
             setUser((prev) =>
                 prev ? { ...prev, notificationsEnabled: value } : prev
             );
-            message.success("Notification preference updated");
-        } catch (err) {
-            message.error("Failed to update notification preference");
+            message.success(t('profile.notificationUpdated'));
+    } catch (err) {
+        message.error(t('profile.notificationUpdateFailed'));
         } finally {
             setNotificationLoading(false);
         }
@@ -225,9 +225,9 @@ const [educationLevelName, setEducationLevelName] = useState(
                 {/* LEFT PANEL */}
                 <div className={`transition-all duration-300 ${isSplit ? "w-1/2" : "w-full"} h-full overflow-hidden`}>
                     <div className="bg-white h-full flex flex-col">
-                        <div className="p-4">
+                        <div className="p-2 sm:p-4">
                             <div className="flex flex-col items-center text-center">
-                                <div className="relative w-[110px] h-[110px]">
+                                <div className="relative w-[70px] h-[70px] sm:w-[90px] sm:h-[90px] md:w-[110px] md:h-[110px]">
                                     {user?.image ? (
                                         <AntImage
                                             src={user.image}
@@ -250,17 +250,17 @@ const [educationLevelName, setEducationLevelName] = useState(
                                     </div>
                                 </div>
 
-                                <h2 className="text-[32px] font-semibold text-primaryText mt-4">
+                                <h2 className="text-[20px] sm:text-[26px] md:text-[32px] font-semibold text-primaryText mt-2 sm:mt-4">
                                     {displayName}
                                 </h2>
-                                <p className="text-[16px] underline text-primaryText mt-1">
+                                <p className="text-[12px] sm:text-[14px] md:text-[16px] underline text-primaryText mt-1">
                                     {user?.email}
                                 </p>
-                                <div className="mt-2">
-                                    <span className="text-[16px] font-semibold text-primaryText">
-                                        {t('profile.educationLevel')}
-                                    </span>{" "}
-                                    <span className="text-[16px] font-medium text-secondary">
+                                <div className="mt-1 sm:mt-2">
+                    <span className="text-[12px] sm:text-[14px] md:text-[16px] font-semibold text-primaryText">
+                        {t('profile.educationLevel')}
+                    </span>{" "}
+                    <span className="text-[12px] sm:text-[14px] md:text-[16px] font-medium text-secondary">
                                         {/* {educationLabel} */}
                                         {educationLevelName || ""}
                                     </span>
@@ -269,7 +269,7 @@ const [educationLevelName, setEducationLevelName] = useState(
                         </div>
 
                         <div className="flex-1 overflow-y-auto scrollbar px-3">
-                            <div className="mt-6 space-y-3">
+                            <div className="mt-2 sm:mt-4 md:mt-6 space-y-1 sm:space-y-2 md:space-y-3">
 
                                 <ProfileItem
                                     title={t('profile.preferredLanguage')}
@@ -354,7 +354,7 @@ const [educationLevelName, setEducationLevelName] = useState(
                                     }
                                 />
 
-                                <ProfileItem
+                                {/* <ProfileItem
                                     title={t('profile.savedNotes')}
                                     onClick={() => handleSelect("notes")}
                                 />
@@ -362,12 +362,12 @@ const [educationLevelName, setEducationLevelName] = useState(
                                 <ProfileItem
                                     title={t('profile.savedFlashcards')}
                                     onClick={() => handleSelect("flashcards")}
-                                />
+                                /> */}
 
-                                <ProfileItem
+                                {/* <ProfileItem
                                     title={t('profile.savedSummaries')}
                                     onClick={() => handleSelect("Summaries")}
-                                />
+                                /> */}
 
                                 <ProfileItem
                                     title={t('profile.achievements')}
@@ -672,24 +672,27 @@ const SubscriptionSection = ({ onBack }: { onBack?: () => void }) => {
 
     const handleUpgrade = async () => {
         if (upgrading) return;
+
+        // Show friendly message if Free plan is selected
+        if (selectedPlan === "free") {
+            message.info("You are already on the Free plan. Please select Monthly or Yearly to upgrade to Premium.");
+            return;
+        }
+
         setUpgrading(true);
         try {
             const res = await createCheckoutSession({
                 plan: selectedPlan.toUpperCase() as "MONTHLY" | "YEARLY",
                 planType: selectedPlan.toUpperCase() as "MONTHLY" | "YEARLY",
                 countryCode: "BR",
-                // successUrl: `${window.location.origin}/profile?subscription=success`,
                 successUrl: `${window.location.origin}/home`,
-                // cancelUrl: `${window.location.origin}/profile?subscription=cancel`,
                 cancelUrl: `${window.location.origin}/subscription/cancel`,
             });
-            // console.log(window.location.origin);
             if (res?.url) {
-                // ✅ Save flag before leaving
                 sessionStorage.setItem("stripeRedirect", "true");
                 window.location.href = res.url;
             } else {
-                message.error("Failed to create checkout session.");
+                message.error("Failed to create checkout session. Please try again.");
                 setUpgrading(false);
             }
         } catch {
@@ -972,11 +975,15 @@ const SubscriptionSection = ({ onBack }: { onBack?: () => void }) => {
                 onClick={handleUpgrade}
                 style={{
                     marginTop: '24px',
-                    width: '100%',
-                    height: '52px',
+                    marginLeft: '16px',
+                    marginRight: '16px',
+                    width: 'calc(100% - 32px)',
+                    height: '48px',
+                    minHeight: '48px',
+                    flexShrink: 0,
                     color: 'white',
                     borderRadius: '12px',
-                    fontSize: '16px',
+                    fontSize: '15px',
                     fontWeight: '600',
                     backgroundImage: "url('/images/buttonBg.svg')",
                     backgroundSize: '350% 700%',
@@ -1074,9 +1081,9 @@ const ProfileItem = ({
 }) => (
     <div
         onClick={onClick}
-        className="h-[50px] bg-[#F7F7F8] rounded-[8px] px-4 flex items-center justify-between cursor-pointer"
+        className="h-[40px] sm:h-[46px] md:h-[50px] bg-[#F7F7F8] rounded-[8px] px-3 sm:px-4 flex items-center justify-between cursor-pointer"
     >
-        <p className={`text-[16px] ${titleClass || "text-primaryText"}`}>
+        <p className={`text-[13px] sm:text-[14px] md:text-[16px] ${titleClass || "text-primaryText"}`}>
             {title}
         </p>
         {rightContent ? rightContent : <IoChevronForward size={18} />}

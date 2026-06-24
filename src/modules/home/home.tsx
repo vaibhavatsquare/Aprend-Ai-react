@@ -182,13 +182,28 @@ const streakTitle =
   if (activeTask) {
     const type = activeTask.task.taskType;
 
+    const handleTaskClose = () => {
+      // Close immediately — no delay
+      setActiveTask(null);
+
+      // Refresh dashboard in background after short delay
+      setTimeout(async () => {
+        try {
+          const res = await getDashboard();
+          setDashboard(res);
+        } catch (err) {
+          console.error("Dashboard refresh error", err);
+        }
+      }, 500);
+    };
+
     if (type === "PRACTICE_QUESTION" || type === "CONCEPT_EXPLANATION") {
       return (
         <QuestionsBank
           taskId={activeTask.id}
           initialQuestions={activeTask.task.questions}
           source={type === "PRACTICE_QUESTION" ? QuestionSource.HOME_PRACTICE_QUESTION : QuestionSource.HOME_CONCEPT_EXPLANATION}
-          onClose={() => setActiveTask(null)}
+          onClose={handleTaskClose}
         />
       );
     }
@@ -199,7 +214,7 @@ const streakTitle =
           taskId={activeTask.id}
           initialQuestions={activeTask.task.questions}
           source={QuestionSource.HOME_PRACTICE_QUESTION}
-          onClose={() => setActiveTask(null)}
+          onClose={handleTaskClose}
         />
       );
     }
@@ -301,10 +316,14 @@ const streakTitle =
                   </h3>
                   <p className="text-[15px] text-secondary flex gap-2 items-center font-normal">
                     {formatTaskType(task.task.taskType)}
-                    <GoDotFill className="text-primary" />
-                    <span className="text-primary font-normal">
-                      {task.status === "COMPLETED" ? t('home.tasks.completed') : t('home.tasks.pending')}
-                    </span>
+                    {task.status === "COMPLETED" && (
+                      <>
+                        <GoDotFill className="text-primary" />
+                        <span className="text-primary font-normal">
+                          {t('home.tasks.completed')}
+                        </span>
+                      </>
+                    )}
                   </p>
                 </div>
                 <LuChevronRight className="text-2xl text-secondary" />

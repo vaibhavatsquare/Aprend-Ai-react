@@ -199,10 +199,10 @@ const WeakSpotTracker = () => {
     : data?.monthlyChart ?? [];
 
   return (
-    <div className="px-4 h-[calc(100vh-80px)] overflow-y-auto scrollbar py-4">
+    <div className="px-4 h-[calc(100vh-80px)] overflow-y-auto scrollbar py-4" style={{ backgroundColor: '#F7F9FC' }}>
       <div
-        className="bg-white border border-gray-200 p-6 flex flex-col gap-4"
-        style={{ borderRadius: 32, boxShadow: "0px 0px 1px 0px #00000040" }}
+        className="border border-gray-200 p-6 flex flex-col gap-4"
+        style={{ borderRadius: 32, boxShadow: "0px 0px 1px 0px #00000040", backgroundColor: '#F7F9FC' }}
       >
         <h1 className="text-xl font-bold text-gray-900">Weak Spot Tracker</h1>
 
@@ -249,7 +249,7 @@ const WeakSpotTracker = () => {
               <div
                 key={card.id}
                 className="flex-1 border border-gray-200 rounded-xl p-4 flex flex-col gap-2"
-                style={{ boxShadow: "0px 0px 1px 0px #00000040" }}
+                style={{ boxShadow: "0px 0px 1px 0px #00000040", backgroundColor: '#ffffff' }}
               >
                 <p className="font-semibold text-gray-900 text-[15px]">{card.subject}</p>
                 <p className="text-sm text-secondary flex-1 line-clamp-2">{card.tip}</p>
@@ -277,7 +277,7 @@ const WeakSpotTracker = () => {
           {/* Progress Trend */}
           <div
             className="flex-1 border border-gray-200 rounded-xl p-4 flex flex-col pointer-events-none"
-            style={{ boxShadow: "0px 0px 1px 0px #00000040", minHeight: 420 }}
+            style={{ boxShadow: "0px 0px 1px 0px #00000040", backgroundColor: '#ffffff' }}
           >
             <div className="flex items-center justify-between mb-3">
               <p className="font-semibold text-gray-900">Progress trend</p>
@@ -325,7 +325,7 @@ const WeakSpotTracker = () => {
           {/* All Weak Spots */}
           <div
             className="flex-1 rounded-xl p-4 overflow-y-auto scrollbar"
-            style={{ boxShadow: "0px 0px 1px 0px #00000040" }}
+            style={{ boxShadow: "0px 0px 1px 0px #00000040", backgroundColor: '#ffffff' }}
           >
             <p className="font-semibold text-gray-900 mb-3">All weak spots</p>
             {loading ? (

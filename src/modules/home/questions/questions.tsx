@@ -43,7 +43,7 @@ const Questions = () => {
             {step === "question" && (
                 <div className="px-4">
                     <div
-                        className="h-[calc(100vh-100px)] mt-1 mb-4 py-4 rounded-[32px] col-span-2 flex flex-col gap-4"
+                        className="h-[calc(100vh-100px)] mt-1 mb-4 py-4 rounded-[32px] col-span-2 flex flex-col gap-4 overflow-y-auto"
                         style={{
                             boxShadow: "0px 0px 4px 0px #00000040",backgroundColor: '#F7F9FC'
                         }}
@@ -67,7 +67,7 @@ const Questions = () => {
                         </p>
 
                         <div className="w-full flex justify-center mt-14">
-                            <div className="grid grid-cols-2 gap-16 w-full max-w-[900px]">
+                            <div className="grid grid-cols-2 gap-4 w-full max-w-[900px] items-stretch">
 
                                 {/* Question Bank */}
                                 <div
@@ -76,7 +76,7 @@ const Questions = () => {
                                         boxShadow: "0px 0px 4px 0px #00000040",
                                     }}
                                 >
-                                    <div className="p-4 flex flex-col items-start">
+                                    <div className="p-4 flex flex-col items-start h-full">
 
                                         <div className="w-[90px] h-[90px] mb-4">
                                             <Image
@@ -95,12 +95,14 @@ const Questions = () => {
                                             {t('questions.practiceTopicWise')}
                                         </p>
 
-                                        <div style={{ borderRadius: '10px', boxShadow: '0px 0px 50px 0px #1953CB40' }}>
+                                        <div className="flex-1" />
+
+                                        <div style={{ borderRadius: '10px', boxShadow: '0px 0px 50px 0px #1953CB40', width: '100%' }}>
                                             <div style={{
-                                                position: 'relative', width: '380px', height: '48px',
+                                                position: 'relative', width: '100%', height: '48px',
                                                 borderRadius: '12px', overflow: 'hidden',
                                                 backgroundImage: "url('/images/buttonBg.svg')",
-                                                backgroundSize: '350% 700%', backgroundPosition: 'center',
+                                                backgroundSize: '800% 700%', backgroundPosition: 'center',
                                             }}>
                                                 <button
                                                     onClick={() => {
@@ -137,7 +139,7 @@ const Questions = () => {
                                         boxShadow: "0px 0px 4px 0px #00000040",
                                     }}
                                 >
-                                    <div className="p-4 flex flex-col items-start">
+                                    <div className="p-4 flex flex-col items-start h-full">
 
                                         <div className="w-[90px] h-[90px] mb-4">
                                             <Image
@@ -156,12 +158,14 @@ const Questions = () => {
                                             {t('questions.buildCustomMockTest')}
                                         </p>
 
-                                        <div style={{ borderRadius: '10px', boxShadow: '0px 0px 50px 0px #1953CB40' }}>
+                                        <div className="flex-1" />
+
+                                        <div style={{ borderRadius: '10px', boxShadow: '0px 0px 50px 0px #1953CB40', width: '100%' }}>
                                             <div style={{
-                                                position: 'relative', width: '380px', height: '48px',
+                                                position: 'relative', width: '100%', height: '48px',
                                                 borderRadius: '12px', overflow: 'hidden',
                                                 backgroundImage: "url('/images/buttonBg.svg')",
-                                                backgroundSize: '350% 700%', backgroundPosition: 'center',
+                                                backgroundSize: '800% 700%', backgroundPosition: 'center',
                                             }}>
                                                 <button
                                                     onClick={() => {

@@ -136,7 +136,11 @@ type TranslationKey =
     | 'limits.weakSpotTracker' | 'limits.flashcardLimit'
 
     | 'aiTutor.uploadImage' | 'aiTutor.camera' | 'aiTutor.gallery'
+    | 'aiTutor.notesSaved' | 'aiTutor.flashcardsGenerated'
     | 'common.premiumFeature'
+    | 'profile.saveToProfile'
+    | 'profile.notificationUpdated'
+    | 'profile.notificationUpdateFailed'
     | 'home.streak.consistencyMessage' | 'home.streak.milestone' | 'home.streak.milestoneSubtext'
 
     // Add to TranslationKey
@@ -296,7 +300,7 @@ const translations = {
         'home.tasks.noTasksScheduled': 'No tasks scheduled',
         'home.tasks.completed': 'Completed',
         'home.tasks.pending': 'Pending',
-        'home.aiTutor.ready': 'Ask Your AI Tutor',
+        'home.aiTutor.ready': 'Your AI Tutor is Ready to Help',
         'home.aiTutor.uploadNotes': 'Upload Notes',
         'home.aiTutor.uploadDescription': 'Upload images to create new study sets.',
         'home.aiTutor.askQuestion': 'Ask Your AI Tutor',
@@ -304,7 +308,7 @@ const translations = {
         'home.questionBank.exploreQuestions': 'Explore Questions',
         'home.questionBank.description': 'Practice topic wise questions',
         'home.simulados.title': 'Create your own simulados',
-        'home.simulados.description': 'Build A custom mock test your way',
+        'home.simulados.description': 'Build a custom mock test your way',
         'home.simulados.createSimulados': 'Create simulados',
         'home.simulados.chooseSubject': 'Choose Subject',
         'home.simulados.numberOfQuestions': 'Number of Questions',
@@ -322,7 +326,7 @@ const translations = {
         'questions.practiceTopicWise': 'Practice topic wise questions',
         'questions.exploreQuestions': 'Explore Questions',
         'questions.createSimulados': 'Create your own simulados',
-        'questions.buildCustomMockTest': 'Build A custom mock test your way',
+        'questions.buildCustomMockTest': 'Build a custom mock test your way',
         'questions.chooseSubject': 'Choose Subject',
         'questions.customiseYourSimulados': 'Customize your simulados',
         'questions.allSubjects': 'All Subjects',
@@ -492,7 +496,12 @@ const translations = {
         'aiTutor.uploadImage': 'Upload image',
         'aiTutor.camera': 'Camera',
         'aiTutor.gallery': 'Gallery',
+        'aiTutor.notesSaved': 'Notes saved successfully',
+        'aiTutor.flashcardsGenerated': 'Flashcards generated successfully',
         'common.premiumFeature': 'Premium Feature',
+        'profile.saveToProfile': 'Save to Profile',
+        'profile.notificationUpdated': 'Notification preference updated',
+        'profile.notificationUpdateFailed': 'Failed to update notification preference',
         'home.streak.consistencyMessage': 'Consistency builds mastery. Let\'s begin!',
 
         'quiz.q1': 'What subject do you want to learn?',
@@ -671,7 +680,7 @@ const translations = {
         'home.tasks.noTasksScheduled': 'No hay tareas programadas',
         'home.tasks.completed': 'Completado',
         'home.tasks.pending': 'Pendiente',
-        'home.aiTutor.ready': 'Pregunta a tu tutora de inteligencia artificial',
+        'home.aiTutor.ready': 'Tu tutor de IA está listo para ayudarte',
         'home.aiTutor.uploadNotes': 'Subir notas',
         'home.aiTutor.uploadDescription': 'Sube imágenes para crear nuevos conjuntos de estudio.',
         'home.aiTutor.askQuestion': 'Pregúntale a tu tutor IA',
@@ -697,7 +706,7 @@ const translations = {
         'questions.practiceTopicWise': 'Practica preguntas por tema',
         'questions.exploreQuestions': 'Explorar preguntas',
         'questions.createSimulados': 'Crear simulados',
-        'questions.buildCustomMockTest': 'Construye una prueba personalizada',
+        'questions.buildCustomMockTest': 'Construye una prueba personalizada a tu manera',
         'questions.chooseSubject': 'Elegir materia',
         'questions.customiseYourSimulados': 'Personaliza tus simulados',
         'questions.allSubjects': 'Todas las materias',
@@ -867,7 +876,12 @@ const translations = {
         'aiTutor.uploadImage': 'Subir imagen',
         'aiTutor.camera': 'Cámara',
         'aiTutor.gallery': 'Galería',
+        'aiTutor.notesSaved': 'Notas guardadas exitosamente',
+        'aiTutor.flashcardsGenerated': 'Tarjetas generadas exitosamente',
         'common.premiumFeature': 'Función Premium',
+        'profile.saveToProfile': 'Guardar en perfil',
+        'profile.notificationUpdated': 'Preferencia de notificación actualizada',
+        'profile.notificationUpdateFailed': 'Error al actualizar la preferencia de notificación',
         'home.streak.consistencyMessage': 'La constancia construye el dominio. ¡Comencemos!',
 
         'quiz.q1': '¿Qué materia quieres aprender?',
@@ -1046,7 +1060,7 @@ const translations = {
         'home.tasks.noTasksScheduled': 'Nenhuma tarefa agendada',
         'home.tasks.completed': 'Concluído',
         'home.tasks.pending': 'Pendente',
-        'home.aiTutor.ready': 'Pergunte ao seu tutor de IA',
+        'home.aiTutor.ready': 'Seu tutor de IA está pronto para ajudar',
         'home.aiTutor.uploadNotes': 'Enviar notas',
         'home.aiTutor.uploadDescription': 'Envie imagens para criar novos conjuntos de estudo.',
         'home.aiTutor.askQuestion': 'Pergunte ao seu tutor IA',
@@ -1072,7 +1086,7 @@ const translations = {
         'questions.practiceTopicWise': 'Pratique questões por tópico',
         'questions.exploreQuestions': 'Explorar questões',
         'questions.createSimulados': 'Criar simulados',
-        'questions.buildCustomMockTest': 'Construa uma prova personalizada',
+        'questions.buildCustomMockTest': 'Construa uma prova personalizada do seu jeito',
         'questions.chooseSubject': 'Escolher matéria',
         'questions.customiseYourSimulados': 'Personalize seus simulados',
         'questions.allSubjects': 'Todas as matérias',
@@ -1242,7 +1256,12 @@ const translations = {
         'aiTutor.uploadImage': 'Enviar imagem',
         'aiTutor.camera': 'Câmera',
         'aiTutor.gallery': 'Galeria',
+        'aiTutor.notesSaved': 'Notas salvas com sucesso',
+        'aiTutor.flashcardsGenerated': 'Flashcards gerados com sucesso',
         'common.premiumFeature': 'Recurso Premium',
+        'profile.saveToProfile': 'Salvar no perfil',
+        'profile.notificationUpdated': 'Preferência de notificação atualizada',
+        'profile.notificationUpdateFailed': 'Falha ao atualizar preferência de notificação',
         'home.streak.consistencyMessage': 'Ative a sua mente e não deixe a chama apagar.',
 
         'quiz.q1': 'Qual matéria você quer aprender?',

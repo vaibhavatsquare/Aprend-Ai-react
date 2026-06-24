@@ -3,7 +3,7 @@ import { useRedirect } from "@/src/hooks/router.hooks";
 import { Button, Input, message } from "antd";
 import { OTPProps } from "antd/es/input/OTP";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { GoArrowLeft } from "react-icons/go";
 import { sendOtp, verifyOtp, resendOtp, changePassword } from "@/src/services/api/auth.api";
@@ -15,6 +15,47 @@ interface ForgotPasswordFormData {
   password?: string;
   confirmPassword?: string;
 }
+
+// Helper function to get user-friendly error messages
+const getErrorMessage = (error: any): string => {
+  // Check if error has a response with data
+  if (error?.response?.data?.message) {
+    const message = error.response.data.message.toLowerCase();
+    
+    // Check for user not found / email not registered errors
+    if (message.includes("not found") || 
+        message.includes("no account") || 
+        message.includes("not registered") ||
+        message.includes("user does not exist") ||
+        message.includes("invalid email") ||
+        message.includes("email not exist")) {
+      return "No account exists with this email address. Please check and try again.";
+    }
+    
+    // Check for OTP-related errors
+    if (message.includes("too many attempts")) {
+      return "Too many attempts. Please try again later.";
+    }
+    
+    if (message.includes("invalid otp")) {
+      return "The verification code you entered is incorrect. Please try again.";
+    }
+    
+    // Return the actual message if it's user-friendly
+    return error.response.data.message;
+  }
+  
+  // Check if error message directly contains our keywords
+  if (error?.message) {
+    const msg = error.message.toLowerCase();
+    if (msg.includes("not found") || msg.includes("no account")) {
+      return "No account exists with this email address. Please check and try again.";
+    }
+    return error.message;
+  }
+  
+  return "An error occurred. Please try again.";
+};
 
 const ForgotPassword = () => {
   const {
@@ -30,30 +71,35 @@ const ForgotPassword = () => {
   const [otp, setOtp] = useState("");
   const [verificationId, setVerificationId] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
+  const [resendTimer, setResendTimer] = useState(0);
 
   // 1) SEND OTP (BE)
   const handleForgotPassword = async (data: ForgotPasswordFormData) => {
     try {
       setIsLoading(true);
-      await sendOtp(data.email!, true)
+      await sendOtp(data.email!, true);
       setEmailValue(data.email!);
       setIsOtpSent(true);
-      message.success("Verification code sent");
-    } catch {
-      message.error("Failed to send OTP");
+      message.success("Verification code sent to your email");
+    } catch (error: any) {
+      const errorMessage = getErrorMessage(error);
+      message.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // RESEND
+// RESEND
   const handleResendOtp = async () => {
+    if (resendTimer > 0) return;
     try {
       setIsLoading(true);
       await resendOtp(emailValue);
-      message.success("OTP resent");
-    } catch {
-      message.error("Failed to resend OTP");
+      setResendTimer(60);
+      message.success("Verification code resent");
+    } catch (error: any) {
+      const errorMessage = getErrorMessage(error);
+      message.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -69,13 +115,23 @@ const ForgotPassword = () => {
       setVerificationId(res.data.id);
 
       setIsResetOpen(true);
-      message.success("OTP verified");
-    } catch {
-      message.error("Invalid OTP");
+      message.success("Verification successful");
+    } catch (error: any) {
+      const errorMessage = getErrorMessage(error);
+      message.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Timer countdown effect
+  useEffect(() => {
+    if (resendTimer <= 0) return;
+    const interval = setInterval(() => {
+      setResendTimer((prev) => prev - 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [resendTimer]);
 
   const sharedProps: OTPProps = {
     onChange: (v) => setOtp(v),
@@ -95,8 +151,9 @@ const ForgotPassword = () => {
 
       message.success("Password updated successfully");
       useRedirect("/login");
-    } catch {
-      message.error("Failed to reset password");
+    } catch (error: any) {
+      const errorMessage = getErrorMessage(error);
+      message.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -161,14 +218,18 @@ const ForgotPassword = () => {
                   </button>
                 </div>
 
-                <div className="mt-8 text-center text-sm text-gray-600">
-                  Didn’t receive?{" "}
-                  <span
-                    className="text-primary cursor-pointer"
-                    onClick={handleResendOtp}
-                  >
-                    Resend
-                  </span>
+                <div className="mt-8 text-center">
+                  <p className="text-sm text-gray-600">Didn't you receive any code?</p>
+                  {resendTimer > 0 ? (
+                    <p className="text-sm text-gray-400 mt-2">Resend in {resendTimer}s</p>
+                  ) : (
+                    <p
+                      className="text-primary cursor-pointer hover:underline mt-2 text-sm font-medium"
+                      onClick={handleResendOtp}
+                    >
+                      Resend OTP
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

@@ -5,9 +5,8 @@ import { languages } from "@/src/libs/constants/onboarding.constants";
 import Image from "next/image";
 import { message, Button } from "antd";
 import { useLanguageStore } from "@/src/store/language.store";
-import { saveLanguage } from "@/src/services/api/user.api";
-// import { useTranslation } from "@/src/libs/i18n";
-import { useTranslation } from "@/src/libs/i18n";
+import { saveLanguage, getEducationLevels } from "@/src/services/api/user.api";
+import { useTranslation, translations } from "@/src/libs/i18n";
 import { UserLanguage } from "@/src/libs/types";
 
 const LanguageSection = ({
@@ -34,15 +33,43 @@ const LanguageSection = ({
     try {
         await saveLanguage({ user_language: selectedLang });
 
+        // Get success message in the NEW language before switching
+        const successMsg = (translations as any)[selectedLang]?.['profile.languageUpdated'] || 'Language updated';
+
         setLanguage(selectedLang);
 
         const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
-        localStorage.setItem('user', JSON.stringify({ 
-            ...storedUser, 
-            user_language: selectedLang 
-        }));
 
-        message.success(t('profile.languageUpdated'));
+        // Fetch education levels for new language → cache educationLevelId
+        try {
+            const allLevels = await getEducationLevels(selectedLang);
+            const storedName = localStorage.getItem("educationLevelName") || "";
+            const match = allLevels.find((l: any) =>
+                l.code === storedUser?.user_EducationLevel ||
+                (storedName && l.name === storedName) ||
+                (storedName && l.name?.toUpperCase() === storedName?.toUpperCase())
+            );
+            if (match) {
+                localStorage.setItem("educationLevelName", match.name);
+                localStorage.setItem('user', JSON.stringify({
+                    ...storedUser,
+                    user_language: selectedLang,
+                    educationLevelId: match.id,
+                }));
+            } else {
+                localStorage.setItem('user', JSON.stringify({
+                    ...storedUser,
+                    user_language: selectedLang,
+                }));
+            }
+        } catch {
+            localStorage.setItem('user', JSON.stringify({
+                ...storedUser,
+                user_language: selectedLang,
+            }));
+        }
+
+        message.success(successMsg);
         onClose(selectedLang);
     } catch {
         message.error(t('profile.languageUpdateFailed'));
@@ -98,7 +125,7 @@ const LanguageSection = ({
                         border: '1px solid rgba(255,255,255,0.35)',
                     }}
                 >
-                    {t('onboarding.completeProfile')}
+                    {t('profile.saveToProfile')}
                 </Button>
             </div>
         </div>

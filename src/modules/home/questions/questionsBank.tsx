@@ -8,6 +8,7 @@ import {
   validateSimuladoAnswer,
 } from "@/src/services/api/question.api";
 import { QuestionSource } from "@/src/libs/helpers";
+import { message } from "antd";
 // import { getTaskQuestions } from "@/src/services/api/dashboard.api";
 
 type Props = {
@@ -32,7 +33,8 @@ const QuestionsBank = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [status, setStatus] = useState<Status>("idle");
-  const [submitting, setSubmitting] = useState(false);
+const [submitting, setSubmitting] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
   // ================= FETCH IF NO DATA =================
 
@@ -95,7 +97,7 @@ const QuestionsBank = ({
 
   const currentQuestion = questions[currentIndex];
   const isLast = currentIndex === questions.length - 1;
-  const progress = ((currentIndex + 1) / questions.length) * 100;
+  const progress = (currentIndex / questions.length) * 100;
 
   // ================= ACTIONS =================
 
@@ -105,7 +107,10 @@ const QuestionsBank = ({
   };
 
   const handleSubmit = async () => {
-    if (!selectedOption) return;
+    if (!selectedOption) {
+      message.error("Please select an answer before submitting.");
+      return;
+    }
 
     try {
       setSubmitting(true);
@@ -139,6 +144,7 @@ const QuestionsBank = ({
   useEffect(() => {
     if (!currentQuestion) return;
 
+    setRetryCount(0);
     const attempt = currentQuestion.userQuestionAttempts?.[0];
 
     if (!attempt) {
@@ -156,12 +162,16 @@ const QuestionsBank = ({
     }
   }, [currentQuestion]);
 
-  const resetState = () => {
+  const resetState = (isNextQuestion = false) => {
     setSelectedOption(null);
     setStatus("idle");
+    if (isNextQuestion) setRetryCount(0);
   };
 
-  const handleTryAgain = () => resetState();
+  const handleTryAgain = () => {
+    setRetryCount((prev) => prev + 1);
+    resetState();
+  };
 
   const handleSeeAnswer = () => {
     setSelectedOption(currentQuestion.correctOptionId);
@@ -176,7 +186,7 @@ const QuestionsBank = ({
       return;
     }
 
-    resetState();
+    resetState(true);
     setCurrentIndex((prev) => prev + 1);
   };
 
@@ -208,10 +218,10 @@ const QuestionsBank = ({
     (status === "explanation" && selectedOption === optionId);
 
   const getQuestionFontSize = (text: string) => {
-    if (text.length > 220) return "text-[20px]";
-    if (text.length > 150) return "text-[22px]";
-    if (text.length > 80) return "text-[24px]";
-    return "text-[28px]";
+    if (text.length > 220) return "text-[13px] sm:text-[16px] md:text-[20px]";
+    if (text.length > 150) return "text-[14px] sm:text-[17px] md:text-[22px]";
+    if (text.length > 80) return "text-[15px] sm:text-[18px] md:text-[24px]";
+    return "text-[16px] sm:text-[20px] md:text-[28px]";
   };
 
   // ================= RENDER =================
@@ -219,11 +229,11 @@ const QuestionsBank = ({
   return (
     <div className="px-4">
       <div
-        className="h-[calc(100vh-100px)] mt-1 mb-4 py-6 rounded-[32px] flex flex-col overflow-hidden"
+        className="h-[calc(100vh-100px)] mt-1 mb-4 py-4 rounded-[32px] flex flex-col"
         style={{ boxShadow: "0px 0px 4px 0px #00000040", backgroundColor: '#F7F9FC' }}
       >
         {/* TOP BAR */}
-        <div className="px-6 flex items-center gap-4">
+        <div className="px-6 flex items-center gap-4 flex-shrink-0">
           <GoX className="text-[24px] cursor-pointer" onClick={onClose} />
 
           <div className="flex-1 h-[6px] bg-[#0F305729] rounded-full overflow-hidden">
@@ -235,7 +245,7 @@ const QuestionsBank = ({
         </div>
 
         {/* QUESTION */}
-        <div className="mt-[40px] text-center px-10">
+        <div className="mt-[10px] sm:mt-[16px] md:mt-[30px] text-center px-4 sm:px-6 md:px-10 flex-shrink-0">
           <h2
             className={`${getQuestionFontSize(
               currentQuestion.questionText,
@@ -245,8 +255,8 @@ const QuestionsBank = ({
           </h2>
         </div>
 
-        {/* OPTIONS */}
-        <div className="mt-[45px] flex flex-col items-center gap-5 flex-1 overflow-y-auto px-2">
+       {/* OPTIONS */}
+        <div className="mt-[16px] flex flex-col items-center gap-3 flex-1 overflow-y-auto px-4 pb-2 min-h-0">
           {currentQuestion.options.map((option) => {
             const isCorrectOption =
               option.id === currentQuestion.correctOptionId;
@@ -257,7 +267,7 @@ const QuestionsBank = ({
               <div
                 key={option.id}
                 onClick={() => handleSelect(option.id)}
-                className="w-[50%] min-h-[56px] rounded-[14px] px-6 py-4 flex items-center justify-between cursor-pointer transition-all"
+className="w-full max-w-2xl rounded-[14px] px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 flex items-center justify-between cursor-pointer transition-all"
                 // style={{
                 //   border: `1px solid ${borderColor}`,
                 //   background: status === "idle" && selectedOption === option.id ? "#2563EB" : "white",
@@ -290,7 +300,7 @@ const QuestionsBank = ({
               >
                 {/* <span className="text-[18px] text-[#121212] leading-6 pr-4"> */}
                 {/* <span className="text-[18px] leading-6 pr-4" style={{ color: status === "idle" && selectedOption === option.id ? "#fff" : "#121212" }}> */}
-                <span className="text-[18px] leading-6 pr-4"
+<span className="text-[13px] sm:text-[15px] md:text-[18px] leading-5 md:leading-6 pr-2 sm:pr-3 md:pr-4"
                   style={{
                     color:
                       (status === "idle" && selectedOption === option.id) ||
@@ -306,7 +316,7 @@ const QuestionsBank = ({
                 </span>
 
                 <div
-                  className="w-6 h-6 rounded-full border flex items-center justify-center flex-shrink-0"
+                  className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 rounded-full border flex items-center justify-center flex-shrink-0"
                   // style={{ borderColor: status === "idle" && selectedOption === option.id ? "white" : borderColor }}
                   style={{
                     borderColor:
@@ -328,7 +338,7 @@ const QuestionsBank = ({
                     //   }}
                     // />
                     <div
-                      className="w-3 h-3 rounded-full"
+                      className="w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 rounded-full"
                       style={{
                         background:
                           (status === "idle" && selectedOption === option.id) ||
@@ -349,13 +359,13 @@ const QuestionsBank = ({
         </div>
 
         {/* BOTTOM PANEL */}
-        <div className="px-16 pb-6">
+        <div className="px-8 pb-4 pt-2 flex-shrink-0">
           {status === "idle" && (
             <button
               onClick={handleSubmit}
               disabled={submitting}
               // className="w-[60%] h-[48px] mx-auto bg-[#0F3057] text-white rounded-xl flex justify-center items-center gap-2"
-              className="w-[60%] h-[48px] mx-auto text-white rounded-xl flex justify-center items-center gap-2"
+className="w-full max-w-sm h-[48px] mx-auto text-white rounded-xl flex justify-center items-center gap-2"
               style={{
                 backgroundImage: "url('/images/buttonBg.svg')",
                 backgroundSize: '350% 900%', backgroundPosition: 'center',
@@ -375,11 +385,11 @@ const QuestionsBank = ({
           )}
 
           {status === "correct" && (
-            <div className="bg-green-50 p-5 rounded-xl">
-              <p className="text-green-600 font-medium mb-4">
+            <div className="bg-green-50 p-4 rounded-xl">
+              <p className="text-green-600 font-medium mb-3">
                 🎉 Correct Answer
               </p>
-              <div className="flex gap-4">
+              <div className="flex gap-3 flex-col sm:flex-row">
                 <button
                   onClick={handleWhy}
                   className="px-6 h-[48px] bg-white border rounded-xl"
@@ -397,31 +407,47 @@ const QuestionsBank = ({
           )}
 
           {status === "wrong" && (
-            <div className="bg-red-50 p-5 rounded-xl">
-              <p className="text-red-600 font-medium mb-4">❌ Wrong Answer</p>
-              <div className="flex gap-4">
+            <div className="bg-red-50 p-4 rounded-xl">
+              <p className="text-red-600 font-medium mb-3">❌ Wrong Answer</p>
+              <div className="flex gap-3 flex-col sm:flex-row">
                 <button
                   onClick={handleSeeAnswer}
                   className="px-6 h-[48px] bg-white border rounded-xl"
                 >
                   See answer
                 </button>
-                <button
-                  onClick={handleTryAgain}
-                  className="flex-1 h-[48px] bg-red-600 text-white rounded-xl"
-                >
-                  Try Again
-                </button>
+                {retryCount < 1 ? (
+                  <button
+                    onClick={handleTryAgain}
+                    className="flex-1 h-[48px] bg-red-600 text-white rounded-xl"
+                  >
+                    Try Again
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleNext}
+                    className="flex-1 h-[48px] text-white rounded-xl"
+                    style={{
+                      backgroundImage: "url('/images/buttonBg.svg')",
+                      backgroundSize: '1200% 1400%',
+                      backgroundPosition: 'center',
+                      boxShadow: '0px 0px 50px 0px #1953CB40',
+                      border: '1px solid rgba(255,255,255,0.35)',
+                    }}
+                  >
+                    {isLast ? "Finish" : "Continue"}
+                  </button>
+                )}
               </div>
             </div>
           )}
 
           {status === "showAnswer" && (
-            <div className="bg-blue-50 p-5 rounded-xl">
-              <p className="text-[#0F3057] font-medium mb-4">
-                🧠 Here’s the solution
+            <div className="bg-blue-50 p-4 rounded-xl">
+              <p className="text-[#0F3057] font-medium mb-3">
+                🧠 Here's the solution
               </p>
-              <div className="flex gap-4">
+              <div className="flex gap-3 flex-col sm:flex-row">
                 <button
                   onClick={handleWhy}
                   className="px-6 h-[48px] bg-white border rounded-xl"
@@ -445,24 +471,24 @@ const QuestionsBank = ({
           )}
 
           {status === "explanation" && (
-            <div className="bg-white p-6 rounded-xl border mt-4">
-              <h3 className="font-semibold mb-3">Explanation:</h3>
-              <p className="text-[#555] mb-6">
+            <div className="bg-white p-4 rounded-xl border">
+              <h3 className="font-semibold mb-2 text-sm">Explanation:</h3>
+              <p className="text-[#555] mb-4 text-sm">
                 {currentQuestion.stepByStepExplanation}
               </p>
-             <button
-  onClick={handleNext}
-  className="w-full h-[50px] text-white rounded-xl font-semibold"
-  style={{
-    backgroundImage: "url('/images/buttonBg.svg')",
-    backgroundSize: '800% 1400%',
-    backgroundPosition: 'center',
-    boxShadow: '0px 0px 50px 0px #1953CB40',
-    border: '1px solid rgba(255,255,255,0.35)',
-  }}
->
-  {isLast ? "Finish" : "Got it"}
-</button>
+              <button
+                onClick={handleNext}
+                className="w-full h-[48px] text-white rounded-xl font-semibold text-sm"
+                style={{
+                  backgroundImage: "url('/images/buttonBg.svg')",
+                  backgroundSize: '800% 1400%',
+                  backgroundPosition: 'center',
+                  boxShadow: '0px 0px 50px 0px #1953CB40',
+                  border: '1px solid rgba(255,255,255,0.35)',
+                }}
+              >
+                {isLast ? "Finish" : "Got it"}
+              </button>
             </div>
           )}
         </div>

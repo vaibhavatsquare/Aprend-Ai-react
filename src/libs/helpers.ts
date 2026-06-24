@@ -95,17 +95,39 @@ const fetch = async <T>(config: AxiosRequestConfig): Promise<T> => {
                 const response: AxiosResponse<T> = await axios.request<T>(config);
                 return response.data;
             } catch (refreshError: any) {
+                if (!refreshError.response) {
+                    throw new Error("No internet connection. Please check your network and try again.");
+                }
                 if (refreshError?.response?.data?.message) {
                     throw new Error(refreshError.response.data.message);
                 } else {
-                    throw new Error("Token refresh failed.");
+                    throw new Error("Session expired. Please log in again.");
                 }
             }
         } else {
+            // Network unavailable or no response from server
+            if (!error.response) {
+                if (
+                    error.code === 'ERR_NETWORK' ||
+                    error.message === 'Network Error' ||
+                    error.code === 'ECONNABORTED'
+                ) {
+                    throw new Error("No internet connection. Please check your network and try again.");
+                }
+                throw new Error("Unable to reach the server. Please try again later.");
+            }
+
+            // Server responded with an error
             if (error?.response?.data?.message) {
                 throw new Error(error.response.data.message);
+            } else if (error?.response?.status === 500) {
+                throw new Error("Server error. Please try again later.");
+            } else if (error?.response?.status === 403) {
+                throw new Error("You do not have permission to perform this action.");
+            } else if (error?.response?.status === 404) {
+                throw new Error("The requested resource was not found.");
             } else {
-                throw new Error("Bad response from server");
+                throw new Error("Something went wrong. Please try again.");
             }
         }
     }

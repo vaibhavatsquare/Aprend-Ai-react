@@ -19,9 +19,16 @@ type Props = {
 };
 
 const Flashcards = ({ taskId, initialQuestions, source, onClose }: Props) => {
-  const [questions, setQuestions] = useState<Question[]>(
-    initialQuestions || [],
-  );
+  const [questions, setQuestions] = useState<Question[]>(() => {
+    // Restore cached questions with attempt data if available
+    if (taskId) {
+      try {
+        const cached = sessionStorage.getItem(`flashcard_questions_${taskId}`);
+        if (cached) return JSON.parse(cached);
+      } catch { }
+    }
+    return initialQuestions || [];
+  });
   const [loading, setLoading] = useState(!initialQuestions);
   const { t } = useTranslation();
   const [index, setIndex] = useState(0);
@@ -34,6 +41,15 @@ const Flashcards = ({ taskId, initialQuestions, source, onClose }: Props) => {
   useEffect(() => {
     setLoading(false);
   }, []);
+
+  // Cache questions with attempt data so they persist on re-open
+  useEffect(() => {
+    if (taskId && questions.length) {
+      try {
+        sessionStorage.setItem(`flashcard_questions_${taskId}`, JSON.stringify(questions));
+      } catch { }
+    }
+  }, [questions, taskId]);
 
   if (!questions.length) return null;
 
@@ -157,17 +173,17 @@ const Flashcards = ({ taskId, initialQuestions, source, onClose }: Props) => {
   };
 
   const getQuestionFontSize = (text: string) => {
-    if (text.length > 220) return "text-[14px]";
-    if (text.length > 150) return "text-[16px]";
-    if (text.length > 80) return "text-[18px]";
-    return "text-[20px]";
+    if (text.length > 220) return "text-[11px] sm:text-[13px] md:text-[14px]";
+    if (text.length > 150) return "text-[12px] sm:text-[14px] md:text-[16px]";
+    if (text.length > 80) return "text-[13px] sm:text-[15px] md:text-[18px]";
+    return "text-[14px] sm:text-[17px] md:text-[20px]";
   };
 
   return (
     <div className="px-4">
       <div
         // className="h-[calc(100vh-100px)] mt-1 mb-4 py-6 rounded-[32px] flex flex-col"
-        className="min-h-[calc(100vh-100px)] mt-1 mb-4 py-6 rounded-[32px] flex flex-col overflow-y-auto"
+        className="h-[calc(100vh-100px)] mt-1 mb-4 py-6 rounded-[32px] flex flex-col overflow-hidden"
         style={{ boxShadow: "0px 0px 4px 0px #00000040", backgroundColor: '#F7F9FC' }}
       >
         {/* HEADER */}
@@ -190,15 +206,13 @@ const Flashcards = ({ taskId, initialQuestions, source, onClose }: Props) => {
         </div>
 
         {/* CARD AREA */}
-        <div className="flex-1 flex flex-col items-center justify-center mb-10">
+        <div className="flex-1 flex flex-col items-center justify-center mb-2 sm:mb-6 md:mb-10 px-2 sm:px-0">
 
-          <div className="relative w-[640px] max-w-[90vw] mb-2 text-right text-[20px] font-medium text-gray-600">
+         <div className="w-full sm:w-[380px] md:w-[440px] lg:w-[480px] mb-1 text-right text-[14px] sm:text-[16px] font-medium text-gray-600">
             {index + 1}/{total}
           </div>
           <div
-            // className="relative w-[640px] max-w-[90vw] min-h-[550px] py-10 rounded-[20px] p-6 transition-all duration-400"
-            // After
-            className="relative w-[640px] max-w-[90vw] min-h-[300px] sm:min-h-[550px] py-6 sm:py-10 rounded-[20px] p-4 sm:p-6"
+            className="relative w-full sm:w-[380px] md:w-[440px] lg:w-[480px] h-[380px] sm:h-[440px] md:h-[500px] lg:h-[550px] rounded-[20px] p-3 sm:p-4 md:p-6"
             style={{
               background: bgColor,
               perspective: "1000px",
@@ -212,6 +226,26 @@ const Flashcards = ({ taskId, initialQuestions, source, onClose }: Props) => {
               transition: "transform 0.2s ease, opacity 0.2s ease",
             }}
           >
+            {/* Shared arrows — inside yellow card, outside rotating div
+            <div className="absolute left-6 right-6 flex items-center justify-between z-10" style={{ bottom: '36px' }}>
+              <button
+                onClick={prev}
+                disabled={isFirst}
+                className={`w-9 h-9 rounded-full flex items-center justify-center shadow cursor-pointer ${isFirst ? "opacity-30" : ""}`}
+                style={{ backgroundColor: lightenColor(bgColor, 14) }}
+              >
+                <GoChevronLeft size={24} color={darkenColor(bgColor, 64)} />
+              </button>
+
+              <button
+                onClick={next}
+                className="w-9 h-9 rounded-full flex items-center justify-center shadow cursor-pointer"
+                style={{ backgroundColor: lightenColor(bgColor, 14) }}
+              >
+                <GoChevronRight size={24} color={darkenColor(bgColor, 64)} />
+              </button>
+            </div> */}
+
             <div
               className="relative w-full h-full transition-transform duration-500"
               style={{
@@ -241,7 +275,7 @@ const Flashcards = ({ taskId, initialQuestions, source, onClose }: Props) => {
                 {/* Options */}
                 <div
                   // className="px-10 mt-14 flex flex-col gap-6"
-                  className="px-4 sm:px-10 mt-6 sm:mt-14 flex flex-col gap-4 sm:gap-6"
+                  className="px-2 sm:px-6 md:px-10 mt-3 sm:mt-8 md:mt-14 flex flex-col gap-2 sm:gap-4 md:gap-6"
                 >
                   {current.options.map((option, i) => {
                     const isCorrect = option.id === current.correctOptionId;
@@ -255,7 +289,7 @@ const Flashcards = ({ taskId, initialQuestions, source, onClose }: Props) => {
                       >
                         <div className="flex justify-between items-center">
                           <p
-                            className={`text-[16px] ml-2 ${isSelected ? "font-semibold" : ""
+                            className={`text-[12px] sm:text-[14px] md:text-[16px] ml-1 sm:ml-2 ${isSelected ? "font-semibold" : ""
                               }`}
                           >
                             {option.text}
@@ -292,30 +326,16 @@ const Flashcards = ({ taskId, initialQuestions, source, onClose }: Props) => {
                   </div>
                 )} */}
 
-                {/* Spacer — pushes arrows to bottom */}
+                {/* Spacer — pushes content to bottom */}
                 <div className="flex-1" />
 
-                {showResult && (
-                  <div className="w-full text-center py-2">
-                    <p
-                      onClick={() => setRevealed(true)}
-                      className="text-[16px] font-medium cursor-pointer"
-                    >
-                      {t('flashcards.tapToReveal')}
-                    </p>
-                  </div>
-                )}
-
                 {/* Arrows */}
-                <div className="w-full px-6 flex items-center justify-between mt-4">
+                <div className="w-full px-2 flex items-center justify-between mt-4">
                   <button
                     onClick={prev}
                     disabled={isFirst}
-                    className={`w-9 h-9 rounded-full flex items-center justify-center shadow cursor-pointer ${isFirst ? "opacity-30" : ""
-                      }`}
-                    style={{
-                      backgroundColor: lightenColor(bgColor, 14),
-                    }}
+                    className={`w-9 h-9 rounded-full flex items-center justify-center shadow cursor-pointer ${isFirst ? "opacity-30" : ""}`}
+                    style={{ backgroundColor: lightenColor(bgColor, 14) }}
                   >
                     <GoChevronLeft size={24} color={darkenColor(bgColor, 64)} />
                   </button>
@@ -323,33 +343,37 @@ const Flashcards = ({ taskId, initialQuestions, source, onClose }: Props) => {
                   <button
                     onClick={next}
                     disabled={isLast}
-                    className={`w-9 h-9 rounded-full flex items-center justify-center shadow cursor-pointer ${isLast ? "opacity-30" : ""
-                      }`}
-                    style={{
-                      backgroundColor: lightenColor(bgColor, 14),
-                    }}
+                    className={`w-9 h-9 rounded-full flex items-center justify-center shadow cursor-pointer ${isLast ? "opacity-30" : ""}`}
+                    style={{ backgroundColor: lightenColor(bgColor, 14) }}
                   >
-                    <GoChevronRight
-                      size={24}
-                      color={darkenColor(bgColor, 64)}
-                    />
+                    <GoChevronRight size={24} color={darkenColor(bgColor, 64)} />
                   </button>
+                </div>
+
+                {/* Tap to reveal — very bottom */}
+                <div className="w-full text-center pt-3 pb-1">
+                  <p
+                    onClick={() => setRevealed(true)}
+                    className="text-[14px] font-medium cursor-pointer"
+                  >
+                    {t('flashcards.tapToReveal')}
+                  </p>
                 </div>
               </div>
 
               {/* BACK SIDE */}
               <div
-                className="absolute inset-0 flex flex-col px-10 pt-10 pb-6"
+                className="absolute inset-0 flex flex-col px-4 sm:px-7 md:px-10 pt-3 sm:pt-4 pb-4 sm:pb-6"
                 style={{
                   transform: "rotateY(180deg)",
                   backfaceVisibility: "hidden",
                 }}
               >
-                <h2 className="text-[22px] font-semibold text-center">
+                <h2 className="text-[14px] sm:text-[18px] md:text-[22px] font-semibold text-center">
                   Correct Answer
                 </h2>
 
-                <p className="mt-3 text-[18px] font-medium text-green-600 text-center">
+                <p className="mt-2 sm:mt-3 text-[12px] sm:text-[15px] md:text-[18px] font-medium text-green-600 text-center">
                   {
                     current.options.find(
                       (o) => o.id === current.correctOptionId,
@@ -357,36 +381,25 @@ const Flashcards = ({ taskId, initialQuestions, source, onClose }: Props) => {
                   }
                 </p>
 
-                <div className="mt-10 text-center">
-                  <h3 className="text-[18px] font-semibold mb-3">
+                <div className="mt-3 sm:mt-6 md:mt-4 text-center">
+                  <h3 className="text-[13px] sm:text-[15px] md:text-[18px] font-semibold mb-2 sm:mb-3">
                     Explanation
                   </h3>
-                  {/* ADD THIS */}
-                  <div className="flex-1" />
-
-                  <p className="text-[16px] text-gray-700 leading-relaxed">
+                  <p className="text-[11px] sm:text-[13px] md:text-[16px] text-gray-700 leading-relaxed">
                     {current.stepByStepExplanation}
                   </p>
                 </div>
 
-                <div className="w-full text-center py-2">
-                  <p
-                    onClick={() => setRevealed(false)}
-                    className="text-[16px] font-medium cursor-pointer"
-                  >
-                    {t('flashcards.tapToFlipBack')}
-                  </p>
-                </div>
+                {/* Spacer — pushes arrows to bottom (same as front side) */}
+                <div className="flex-1" />
 
-               <div className="w-full px-6 flex items-center justify-between mt-4">
+                {/* Arrows */}
+                <div className="w-full px-2 flex items-center justify-between mt-4">
                   <button
                     onClick={prev}
                     disabled={isFirst}
-                    className={`w-9 h-9 rounded-full flex items-center justify-center shadow cursor-pointer ${isFirst ? "opacity-30" : ""
-                      }`}
-                    style={{
-                      backgroundColor: lightenColor(bgColor, 14),
-                    }}
+                    className={`w-9 h-9 rounded-full flex items-center justify-center shadow cursor-pointer ${isFirst ? "opacity-30" : ""}`}
+                    style={{ backgroundColor: lightenColor(bgColor, 14) }}
                   >
                     <GoChevronLeft size={24} color={darkenColor(bgColor, 64)} />
                   </button>
@@ -394,17 +407,21 @@ const Flashcards = ({ taskId, initialQuestions, source, onClose }: Props) => {
                   <button
                     onClick={next}
                     disabled={isLast}
-                    className={`w-9 h-9 rounded-full flex items-center justify-center shadow cursor-pointer ${isLast ? "opacity-30" : ""
-                      }`}
-                    style={{
-                      backgroundColor: lightenColor(bgColor, 14),
-                    }}
+                    className={`w-9 h-9 rounded-full flex items-center justify-center shadow cursor-pointer ${isLast ? "opacity-30" : ""}`}
+                    style={{ backgroundColor: lightenColor(bgColor, 14) }}
                   >
-                    <GoChevronRight
-                      size={24}
-                      color={darkenColor(bgColor, 64)}
-                    />
+                    <GoChevronRight size={24} color={darkenColor(bgColor, 64)} />
                   </button>
+                </div>
+
+                {/* Tap to flip back — very bottom */}
+                <div className="w-full text-center pt-3 pb-1">
+                  <p
+                    onClick={() => setRevealed(false)}
+                    className="text-[14px] font-medium cursor-pointer"
+                  >
+                    {t('flashcards.tapToFlipBack')}
+                  </p>
                 </div>
               </div>
             </div>

@@ -88,7 +88,7 @@ useEffect(() => {
     const displayName = user?.name || user?.email?.split("@")[0] || "";
 
     return (
-        <div className="w-full h-full flex flex-col px-6">
+        <div className="w-full h-full flex flex-col px-6 overflow-y-auto">
            
 
             {/* TITLE */}

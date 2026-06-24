@@ -97,6 +97,8 @@ export const signOutUser = async (): Promise<void> => {
 
   // ✅ Always clear everything regardless of sessionId
   await signOut(auth);
+  localStorage.removeItem("aiTutor_messages");
+  localStorage.removeItem("aiTutor_conversationId");
   localStorage.clear();
   document.cookie = "idToken=; max-age=0";
   setCookie("idToken", "");

@@ -36,7 +36,13 @@ const AudioPlayer = dynamic(
 const AiTutor = () => {
   const { t } = useTranslation();
   const inputRef = useRef<HTMLInputElement>(null);
-  const [conversationId, setConversationId] = useState<string | null>(null);
+  const [conversationId, setConversationId] = useState<string | null>(() => {
+    try {
+      return localStorage.getItem("aiTutor_conversationId") || null;
+    } catch {
+      return null;
+    }
+  });
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
@@ -46,6 +52,8 @@ const AiTutor = () => {
   const recognitionRef = useRef<any>(null);
   const [isConverting, setIsConverting] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const isRecordingRef = useRef(false);
+  const accumulatedTranscriptRef = useRef("");
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -81,25 +89,55 @@ const AiTutor = () => {
 
     const recognition = new SpeechRecognition();
     recognition.lang = "en-US";
-    recognition.continuous = false;
+    recognition.continuous = true;
     recognition.interimResults = false;
 
     recognition.onstart = () => {
       setIsRecording(true);
+      isRecordingRef.current = true;
       setIsConverting(false);
     };
 
     recognition.onresult = (event: any) => {
-      const transcript = event.results[0][0].transcript;
-      setMessage(transcript);
+      const results = Array.from(event.results as SpeechRecognitionResultList);
+      const newTranscript = results
+        .map((result: SpeechRecognitionResult) => result[0].transcript)
+        .join(" ");
+
+      // Append new transcript to accumulated text
+      const fullTranscript = accumulatedTranscriptRef.current
+        ? `${accumulatedTranscriptRef.current} ${newTranscript}`
+        : newTranscript;
+
+      accumulatedTranscriptRef.current = fullTranscript;
+      setMessage(fullTranscript);
     };
 
     recognition.onend = () => {
+      // Auto-restart if user is still intending to record
+      if (isRecordingRef.current) {
+        try {
+          recognition.start();
+        } catch {
+          // ignore if already starting
+        }
+        return;
+      }
       setIsRecording(false);
       setIsConverting(false);
     };
 
-    recognition.onerror = () => {
+    recognition.onerror = (event: any) => {
+      // Restart on recoverable silence errors
+      if (event.error === "no-speech" && isRecordingRef.current) {
+        try {
+          recognition.start();
+        } catch {
+          // ignore
+        }
+        return;
+      }
+      isRecordingRef.current = false;
       setIsRecording(false);
       setIsConverting(false);
     };
@@ -134,13 +172,42 @@ const AiTutor = () => {
     resetRecording,
   } = useAudioRecorder();
 
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<any[]>(() => {
+    try {
+      const saved = localStorage.getItem("aiTutor_messages");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
   const [message, setMessage] = useState("");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   useEffect(() => {
     scrollToBottom();
   }, [messages, loading]);
+
+  // Persist messages to localStorage
+  useEffect(() => {
+    try {
+      const serializableMessages = messages.filter((m) => !m.audio);
+      localStorage.setItem("aiTutor_messages", JSON.stringify(serializableMessages));
+    } catch {
+      // ignore storage errors
+    }
+  }, [messages]);
+
+  // Clear conversation only on tab close, not on refresh
+  useEffect(() => {
+    // If sessionStorage flag missing → tab was closed and reopened → clear old chat
+    const isRefresh = sessionStorage.getItem("aiTutor_session");
+    if (!isRefresh) {
+      localStorage.removeItem("aiTutor_messages");
+      localStorage.removeItem("aiTutor_conversationId");
+    }
+    // Set flag — survives refresh but clears on tab close
+    sessionStorage.setItem("aiTutor_session", "true");
+  }, []);
 
   useEffect(() => {
     adjustTextareaHeight();
@@ -149,6 +216,22 @@ const AiTutor = () => {
   const handleImage = async (e: any) => {
     const file = (e.target as HTMLInputElement).files?.[0];
     if (!file) return;
+
+    // Check if file is a video — not supported
+    if (file.type.startsWith("video/")) {
+      antMessage.error("Video uploads are not supported. Please upload an image instead.");
+      if (inputRef.current) inputRef.current.value = "";
+      if (cameraInputRef.current) cameraInputRef.current.value = "";
+      return;
+    }
+
+    // Check if file is an image
+    if (!file.type.startsWith("image/")) {
+      antMessage.error("Only image files are supported. Please upload a JPG, PNG, or similar image.");
+      if (inputRef.current) inputRef.current.value = "";
+      if (cameraInputRef.current) cameraInputRef.current.value = "";
+      return;
+    }
 
     try {
       setIsUploading(true);
@@ -163,6 +246,7 @@ const AiTutor = () => {
 
     } catch (err) {
       console.error("Upload failed", err);
+      antMessage.error("Failed to upload image. Please try again.");
     } finally {
       setIsUploading(false);
     }
@@ -213,6 +297,7 @@ const AiTutor = () => {
       // Save conversationId if first message
       if (!conversationId) {
         setConversationId(res.conversationId);
+        localStorage.setItem("aiTutor_conversationId", res.conversationId);
       }
 
       setMessages((prev) => [
@@ -237,15 +322,41 @@ const AiTutor = () => {
     }
   };
 
-  const handleSendAudio = useCallback(() => {
+  const handleSendAudio = useCallback(async () => {
     if (recordingState === "stopped" && audioUrl) {
       setMessages((prev) => [
         ...prev,
         { role: "user", message: null, audio: audioUrl },
       ]);
-      resetRecording();
+
+      try {
+        setLoading(true);
+        const res = await sendAiMessage({
+          message: "I sent a voice message.",
+          imageUrl: "",
+          conversationId,
+        });
+
+        if (!conversationId) {
+          setConversationId(res.conversationId);
+          localStorage.setItem("aiTutor_conversationId", res.conversationId);
+        }
+
+        setMessages((prev) => [
+          ...prev,
+          { role: "tutor", message: res.reply },
+        ]);
+      } catch {
+        setMessages((prev) => [
+          ...prev,
+          { role: "tutor", message: t('errors.somethingWentWrong') },
+        ]);
+      } finally {
+        setLoading(false);
+        resetRecording();
+      }
     }
-  }, [recordingState, audioUrl, resetRecording]);
+  }, [recordingState, audioUrl, conversationId, resetRecording, t]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -274,7 +385,7 @@ const AiTutor = () => {
       console.error("Failed to save note", err);
     } finally {
       setIsSavingNote(false);
-      antMessage.success(t('success.saved'));
+      antMessage.success(t('aiTutor.notesSaved'));
     }
   };
 
@@ -316,7 +427,7 @@ const AiTutor = () => {
     try {
       setIsGeneratingFlashcard(true);
       const res = await generateFlashcards(conversationId);
-      antMessage.success(t('success.saved'));
+      antMessage.success(t('aiTutor.flashcardsGenerated'));
 
       // ✅ Refresh user profile so counts update in localStorage
       const updatedUser = await getUserProfile();
@@ -452,7 +563,7 @@ const AiTutor = () => {
                 </p>
 
                 {isSavingNote ? (
-                  <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" style={{backgroundColor: '#ffffff'}} />
+                  <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" style={{ backgroundColor: '#ffffff' }} />
                 ) : (
                   <NotesIcon />
                 )}
@@ -521,7 +632,7 @@ const AiTutor = () => {
                     }}
                     onClick={() => {
                       if (!uploadedImageUrl) {
-                        inputRef.current?.click();
+                        setShowUploadImageModal(true);
                       }
                     }}
                   >
@@ -538,14 +649,16 @@ const AiTutor = () => {
                       accept="image/*"
                       disabled={!!uploadedImageUrl}
                       className="hidden"
+                      onClick={(e) => e.stopPropagation()}
                     />
                     <input
                       ref={cameraInputRef}
                       onChange={handleImage}
                       type="file"
                       accept="image/*"
-                      capture="environment"
+                      capture
                       className="hidden"
+                      onClick={(e) => e.stopPropagation()}
                     />
                   </div>
                   {isRecording && (
@@ -563,6 +676,14 @@ const AiTutor = () => {
                     value={message}
                     rows={1}
                     onChange={(e) => setMessage(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        if (!loading && !isConverting && !isRecording && !isUploading) {
+                          handleSendMessage();
+                        }
+                      }
+                    }}
                   />
                 </>
               )}
@@ -573,14 +694,21 @@ const AiTutor = () => {
                   style={{
                     boxShadow: "0px 0px 4px 0px #00000040",
                   }}
-                  onClick={() => {
+                  onClick={async () => {
                     if (!recognitionRef.current) return;
 
                     if (!isRecording) {
+                      accumulatedTranscriptRef.current = ""; // reset on new recording
+                      setMessage("");
+                      isRecordingRef.current = true;
                       recognitionRef.current.start();
                     } else {
+                      isRecordingRef.current = false; // stop auto-restart
                       setIsConverting(true);
                       recognitionRef.current.stop();
+                      // Wait briefly for onresult to fire and set the message
+                      await new Promise((resolve) => setTimeout(resolve, 500));
+                      handleSendMessage();
                     }
                   }}
                 >
@@ -596,7 +724,7 @@ const AiTutor = () => {
                   <div className="flex-1 flex justify-center items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
                     <span className="text-sm text-gray-600">
-                       {t('common.listening')}...
+                      {t('common.listening')}...
                     </span>
                   </div>
                 </div>

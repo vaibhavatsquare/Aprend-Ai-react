@@ -317,6 +317,71 @@ interface SignUpFormData {
   password: string;
 }
 
+// Helper function to get user-friendly OTP error messages
+const getOtpErrorMessage = (error: any): string => {
+  const errorCode = error?.response?.data?.code || error?.code || "";
+  const message = error?.response?.data?.message || error?.message || "";
+  const messageLower = message.toLowerCase();
+
+  if (messageLower.includes("invalid") || messageLower.includes("incorrect")) {
+    return "The verification code you entered is incorrect. Please try again.";
+  }
+
+  if (messageLower.includes("expired")) {
+    return "The verification code has expired. Please request a new one.";
+  }
+
+  if (messageLower.includes("too many")) {
+    return "Too many failed attempts. Please try again later.";
+  }
+
+  return "Invalid OTP. Please try again.";
+};
+
+// Helper function to get user-friendly Firebase signup error messages
+const getFirebaseSignupErrorMessage = (error: any): string => {
+  const errorCode = error?.code || error?.message || "";
+  const errorMessage = error?.message || "";
+
+  // Weak password
+  if (errorCode.includes("weak-password")) {
+    return "Password must be at least 6 characters with uppercase, lowercase, and numbers.";
+  }
+
+  // Email already in use
+  if (errorCode.includes("email-already-in-use")) {
+    return "This email is already registered. Please sign in or use a different email.";
+  }
+
+  // Invalid email format
+  if (errorCode.includes("invalid-email")) {
+    return "Please enter a valid email address.";
+  }
+
+  // Operation not allowed
+  if (errorCode.includes("operation-not-allowed")) {
+    return "Signup is currently unavailable. Please try again later.";
+  }
+
+  // Too many requests
+  if (errorCode.includes("too-many-requests")) {
+    return "Too many signup attempts. Please try again later.";
+  }
+
+  // Network error
+  if (errorCode.includes("network-request-failed")) {
+    return "Network error. Please check your connection and try again.";
+  }
+
+  // User disabled
+  if (errorCode.includes("user-disabled")) {
+    return "This account has been disabled. Contact support for help.";
+  }
+
+  // Default error message
+  return "Signup failed. Please try again.";
+};
+
 const SignUp = () => {
   const {
     control,
@@ -399,7 +464,8 @@ const SignUp = () => {
         await signOut(auth);
         document.cookie = "idToken=; max-age=0";
       }
-      message.error(error?.message || "Signup failed");
+      const errorMessage = getFirebaseSignupErrorMessage(error);
+      message.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -420,7 +486,8 @@ const SignUp = () => {
       message.success("Account created successfully!");
       handlePostLoginRedirect(res.user);
     } catch (error: any) {
-      message.error(error?.message || "Invalid OTP. Please try again.");
+      const errorMessage = getOtpErrorMessage(error);
+      message.error(errorMessage);
       // Clear OTP inputs on error
       setOtpValues(["", "", "", "",]);
       otpRefs.current[0]?.focus();
@@ -439,7 +506,8 @@ const SignUp = () => {
       otpRefs.current[0]?.focus();
       message.success("OTP resent!");
     } catch (error: any) {
-      message.error(error?.message || "Failed to resend OTP");
+      const errorMessage = getOtpErrorMessage(error);
+      message.error(errorMessage);
     }
   };
 
@@ -491,7 +559,8 @@ const SignUp = () => {
       message.success("Account created successfully.");
       handlePostLoginRedirect(res.user);
     } catch (error: any) {
-      message.error(error.message || "Google sign-in failed");
+      const errorMessage = getFirebaseSignupErrorMessage(error);
+      message.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -508,7 +577,8 @@ const SignUp = () => {
       message.success("Signed in with Apple.");
       handlePostLoginRedirect(res.user);
     } catch (error: any) {
-      message.error(error.message || "Apple sign-in failed");
+      const errorMessage = getFirebaseSignupErrorMessage(error);
+      message.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -579,19 +649,19 @@ const SignUp = () => {
             </Button>
 
             {/* Resend */}
-            <p className="text-center text-sm text-gray-500">
-              Didn't receive it?{" "}
+            <div className="text-center">
+              <p className="text-sm text-gray-500">Didn't you receive any code?</p>
               {resendTimer > 0 ? (
-                <span className="text-gray-400">Resend in {resendTimer}s</span>
+                <p className="text-sm text-gray-400 mt-2">Resend in {resendTimer}s</p>
               ) : (
-                <span
+                <p
                   onClick={handleResendOtp}
-                  className="text-primary font-medium cursor-pointer hover:underline"
+                  className="text-primary font-medium cursor-pointer hover:underline mt-2 text-sm"
                 >
                   Resend OTP
-                </span>
+                </p>
               )}
-            </p>
+            </div>
           </div>
         </div>
       </div>

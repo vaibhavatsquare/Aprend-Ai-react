@@ -21,6 +21,57 @@ interface LoginFormData {
   password: string;
 }
 
+// Helper function to get user-friendly Firebase error messages
+const getFirebaseErrorMessage = (error: any): string => {
+  const errorCode = error?.code || error?.message || "";
+  const errorMessage = error?.message || "";
+
+  // Invalid credentials (wrong email or password)
+  if (errorCode.includes("invalid-credential") || 
+      errorCode.includes("invalid-password") ||
+      errorMessage.includes("Invalid password")) {
+    return "Invalid email or password. Please try again.";
+  }
+
+  // User not found
+  if (errorCode.includes("user-not-found")) {
+    return "No account exists with this email. Please sign up first.";
+  }
+
+  // Wrong password
+  if (errorCode.includes("wrong-password")) {
+    return "Invalid email or password. Please try again.";
+  }
+
+  // Too many login attempts
+  if (errorCode.includes("too-many-requests")) {
+    return "Too many login attempts. Please try again later.";
+  }
+
+  // User account disabled
+  if (errorCode.includes("user-disabled")) {
+    return "This account has been disabled. Contact support for help.";
+  }
+
+  // Invalid email format
+  if (errorCode.includes("invalid-email")) {
+    return "Please enter a valid email address.";
+  }
+
+  // Network error
+  if (errorCode.includes("network-request-failed")) {
+    return "Network error. Please check your connection and try again.";
+  }
+
+  // Operation not allowed
+  if (errorCode.includes("operation-not-allowed")) {
+    return "Login is not available at the moment. Please try again later.";
+  }
+
+  // Default error message (if not recognized)
+  return "Login failed. Please try again.";
+};
+
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [fcmToken, setFcmToken] = useState("");
@@ -90,7 +141,8 @@ const handleGoogleSignIn = async () => {
     message.success("Signed in with Google");
     handlePostLoginRedirect(res.user);
   } catch (error: any) {
-    message.error(error.message || "Google sign-in failed");
+    const errorMessage = getFirebaseErrorMessage(error);
+    message.error(errorMessage);
   } finally {
     setIsLoading(false);
   }
@@ -111,7 +163,8 @@ const handleAppleSignIn = async () => {
     message.success("Signed in with Apple.");
     handlePostLoginRedirect(res.user);
   } catch (error: any) {
-    message.error(error.message || "Apple sign-in failed");
+    const errorMessage = getFirebaseErrorMessage(error);
+    message.error(errorMessage);
   } finally {
     setIsLoading(false);
   }
@@ -126,7 +179,8 @@ const handleAppleSignIn = async () => {
       message.success("Login successful");
       handlePostLoginRedirect(res.user);
     } catch (error: any) {
-      message.error(error?.message || "Login failed");
+      const errorMessage = getFirebaseErrorMessage(error);
+      message.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -228,7 +282,7 @@ const handleAppleSignIn = async () => {
                 // className="mt-6 w-[90%] h-[40px]! bg-primary! text-white! border-none! py-2 px-4 rounded-xl! hover:bg-primary/90! transition-all"
                 className="btn-primary mt-6 w-[90%] h-[40px]!"
               >
-                Login
+                Sign In
               </Button>
             </div>
 

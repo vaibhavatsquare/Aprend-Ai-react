@@ -56,7 +56,12 @@ export const logoutUser = async (): Promise<void> => {
     localStorage.removeItem("user");
 };
 
-/* SEND OTP */
+/**
+ * SEND OTP - Sends verification code to email
+ * @param email - User email address
+ * @param isForgetPassword - Whether this is for password reset flow
+ * @throws Error with meaningful message if user not found or other issues
+ */
 export const sendOtp = async (
     email: string,
     isForgetPassword: boolean
@@ -72,7 +77,11 @@ export const sendOtp = async (
 };
 
 
-/* RESEND OTP */
+/**
+ * RESEND OTP - Resends verification code to email
+ * @param email - User email address
+ * @throws Error if email not found or too many attempts
+ */
 export const resendOtp = async (email: string) => {
     return await fetch({
         url: "/auth/otp/resend",
@@ -83,7 +92,13 @@ export const resendOtp = async (email: string) => {
     });
 };
 
-/* VERIFY OTP */
+/**
+ * VERIFY OTP - Verifies the OTP code entered by user
+ * @param email - User email address
+ * @param otp - The verification code (usually 4-6 digits)
+ * @returns Response with verification ID needed for password reset
+ * @throws Error if OTP is invalid or expired
+ */
 export const verifyOtp = async (email: string, otp: string) => {
     return await fetch<{
         data: {
@@ -96,7 +111,11 @@ export const verifyOtp = async (email: string, otp: string) => {
     });
 };
 
-/* CHANGE PASSWORD */
+/**
+ * CHANGE PASSWORD - Updates user password after OTP verification
+ * @param payload - Object containing email, password, confirmPassword, and verificationId
+ * @throws Error if password reset fails
+ */
 export const changePassword = async (payload: {
   email: string;
   password: string;

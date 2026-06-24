@@ -102,11 +102,13 @@ export const submitTaskAnswer = async (
   });
 };
 
+type QuestionBankResponse = SimuladoResponse | SimuladoResponse['questions'];
+
 export const questionBankSimuladoQuestions = async (
   payload: GenerateSimuladoRequest
 ): Promise<{ id: string; questions: Question[] }> => {
 
-  const res = await fetch<SimuladoResponse>({
+  const res = await fetch<QuestionBankResponse>({
     url: "/question-simulados/question-bank",
     method: "GET",
     params: {
@@ -129,9 +131,16 @@ export const questionBankSimuladoQuestions = async (
     },
   });
 
+  // The question-bank GET endpoint may return a direct array of questions
+  // or a wrapped object like { questions: [...] } — handle both.
+  const raw = res as any;
+  const questionList: SimuladoResponse['questions'] = Array.isArray(raw)
+    ? raw
+    : (raw.questions ?? raw.data ?? raw.items ?? []);
+
   return {
-    id: res.id,
-    questions: res.questions.map((q) => ({
+    id: Array.isArray(raw) ? "" : (raw.id ?? ""),
+    questions: questionList.map((q) => ({
       id: q.id,
       taskId: q.id,
       questionText: q.question,
