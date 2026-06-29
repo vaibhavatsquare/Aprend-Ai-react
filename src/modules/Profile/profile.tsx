@@ -219,15 +219,15 @@ const [educationLevelName, setEducationLevelName] = useState(
     }
 
     return (
-        <div className="px-6 py-6 pt-1 h-[calc(100vh-80px)]">
-            <div className="flex gap-6 h-full overflow-hidden">
+        <div className="px-3 sm:px-4 py-3 pt-1 sm:pt-2 min-h-[calc(100vh-5rem)]">
+            <div className="flex gap-4 h-full overflow-hidden">
 
                 {/* LEFT PANEL */}
                 <div className={`transition-all duration-300 ${isSplit ? "w-1/2" : "w-full"} h-full overflow-hidden`}>
                     <div className="bg-white h-full flex flex-col">
                         <div className="p-2 sm:p-4">
                             <div className="flex flex-col items-center text-center">
-                                <div className="relative w-[70px] h-[70px] sm:w-[90px] sm:h-[90px] md:w-[110px] md:h-[110px]">
+                                <div className="relative w-[22%] max-w-[6.875rem] min-w-[4.375rem] aspect-square">
                                     {user?.image ? (
                                         <AntImage
                                             src={user.image}
@@ -238,29 +238,29 @@ const [educationLevelName, setEducationLevelName] = useState(
                                             className="rounded-full object-fill shadow-[0_-3px_8px_rgba(0,0,0,0.15)]"
                                         />
                                     ) : (
-                                        <div className="w-full h-full rounded-full bg-[#0F3057] flex items-center justify-center text-white text-[32px] font-semibold">
+                                        <div className="w-full h-full rounded-full bg-[#0F3057] flex items-center justify-center text-white text-[2rem] font-semibold">
                                             {getInitials(displayName)}
                                         </div>
                                     )}
                                     <div
                                         onClick={() => handleSelect("editProfile")}
-                                        className="absolute bottom-1 right-1 w-[32px] h-[32px] bg-white rounded-full flex items-center justify-center shadow"
+                                        className="absolute bottom-[2%] right-[2%] w-[28%] max-w-[2rem] aspect-square bg-white rounded-full flex items-center justify-center shadow"
                                     >
-                                        <FiEdit2 size={16} />
+                                        <FiEdit2 size="1rem" />
                                     </div>
                                 </div>
 
-                                <h2 className="text-[20px] sm:text-[26px] md:text-[32px] font-semibold text-primaryText mt-2 sm:mt-4">
+                                <h2 className="text-[1.25rem] sm:text-[1.625rem] md:text-[2rem] font-semibold text-primaryText mt-2 sm:mt-4">
                                     {displayName}
                                 </h2>
-                                <p className="text-[12px] sm:text-[14px] md:text-[16px] underline text-primaryText mt-1">
+                                <p className="text-[0.75rem] sm:text-[0.875rem] md:text-[1rem] underline text-primaryText mt-1">
                                     {user?.email}
                                 </p>
                                 <div className="mt-1 sm:mt-2">
-                    <span className="text-[12px] sm:text-[14px] md:text-[16px] font-semibold text-primaryText">
+                    <span className="text-[0.75rem] sm:text-[0.875rem] md:text-[1rem] font-semibold text-primaryText">
                         {t('profile.educationLevel')}
                     </span>{" "}
-                    <span className="text-[12px] sm:text-[14px] md:text-[16px] font-medium text-secondary">
+                    <span className="text-[0.75rem] sm:text-[0.875rem] md:text-[1rem] font-medium text-secondary">
                                         {/* {educationLabel} */}
                                         {educationLevelName || ""}
                                     </span>
@@ -268,14 +268,14 @@ const [educationLevelName, setEducationLevelName] = useState(
                             </div>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto scrollbar px-3">
-                            <div className="mt-2 sm:mt-4 md:mt-6 space-y-1 sm:space-y-2 md:space-y-3">
+                        <div className="flex-1 overflow-y-auto scrollbar px-3 sm:px-4">
+                            <div className="mt-[2%] sm:mt-[3%] md:mt-[4%] space-y-1 sm:space-y-2 md:space-y-3">
 
                                 <ProfileItem
                                     title={t('profile.preferredLanguage')}
                                     onClick={() => handleSelect("language")}
                                     rightContent={
-                                        <span className="text-[14px] text-secondary">
+                                        <span className="text-[0.875rem] text-secondary">
                                             {languages.find((l: any) => l.value === selectedLanguage)?.label ?? "English (UK)"}
                                         </span>
                                     }
@@ -389,9 +389,9 @@ const [educationLevelName, setEducationLevelName] = useState(
                                     rightContent={
                                         <div className="flex items-center gap-1">
                                             {isPremium && (
-                                                <span className="text-[12px] text-secondary">Premium</span>
+                                                <span className="text-[0.75rem] text-secondary">Premium</span>
                                             )}
-                                            <IoChevronForward size={18} />
+                                            <IoChevronForward size="1.125rem" />
                                         </div>
                                     }
                                 />
@@ -426,7 +426,7 @@ const [educationLevelName, setEducationLevelName] = useState(
                 {/* RIGHT PANEL */}
                 {isSplit && (
                     <div
-                        className="w-1/2 bg-white m-4 p-4 rounded-[12px] h-[calc(96vh-100px)] col-span-2 flex flex-col gap-4"
+                        className="w-1/2 bg-white m-[2%] p-[3%] rounded-[0.75rem] min-h-[calc(96vh-6.25rem)] col-span-2 flex flex-col gap-[3%]"
                         style={{ boxShadow: "0px 0px 4px 0px #00000040" }}
                     >
                         {selected === "editProfile" && (
@@ -1081,7 +1081,7 @@ const ProfileItem = ({
 }) => (
     <div
         onClick={onClick}
-        className="h-[40px] sm:h-[46px] md:h-[50px] bg-[#F7F7F8] rounded-[8px] px-3 sm:px-4 flex items-center justify-between cursor-pointer"
+        className="h-[40px] sm:h-[46px] md:h-[50px] bg-[#F7F7F8] rounded-[0.5rem] px-3 sm:px-4 flex items-center justify-between cursor-pointer"
     >
         <p className={`text-[13px] sm:text-[14px] md:text-[16px] ${titleClass || "text-primaryText"}`}>
             {title}

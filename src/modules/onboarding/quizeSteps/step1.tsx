@@ -147,7 +147,20 @@ const handleCustomSubjectChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             style={quiz.subjects.includes(level.id) ? { boxShadow: '0px 4px 16px 0px #2563EB40' } : undefined}
           >
             {/* <p className="text-sm">{level.label}</p> */}
-            <p className={`text-sm ${quiz.subjects.includes(level.id) ? "text-white" : "text-[#121212]"}`}>{level.name}</p>
+            <div className="flex items-center gap-2">
+              {level.imageUrl ? (
+                <img
+                  src={level.imageUrl}
+                  alt={level.name}
+                  width={20}
+                  height={20}
+                  style={{ objectFit: 'contain', flexShrink: 0 }}
+                />
+              ) : (
+                <span style={{ fontSize: '18px', lineHeight: 1 }}>📚</span>
+              )}
+              <p className={`text-sm ${quiz.subjects.includes(level.id) ? "text-white" : "text-[#121212]"}`}>{level.name}</p>
+            </div>
             <div
               className={`w-4 h-4 flex justify-center items-center border-2 rounded-[4px] transition-all ${quiz.subjects.includes(level.id)
                 ? "border-white bg-white"

@@ -1,15 +1,16 @@
 import { fetch } from "@/src/libs/helpers";
 import { UserDetail, UserSession } from "@/src/libs/types";
 
-export const backendLogin = async (notificationToken?: string) => {
-    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+export const backendLogin = async (notificationToken?: string, authType?: string) => {
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  
   return await fetch<{
     user: UserDetail;
     userSessions: UserSession;
   }>({
     url: "/auth",
     method: "POST",
-    data: { notificationToken,timezone },
+    data: { notificationToken, timezone, authType },  // ← add authType
   });
 };
 
@@ -31,14 +32,12 @@ export const backendDeleteUser = async () => {
     });
 };
 
-export const authenticateWithAPI = async (fcmToken: any) => {
-    const res = await backendLogin(fcmToken);
-
-    localStorage.setItem("sessionId", res.userSessions.id);
-    localStorage.setItem("userId", res.user.id);
-
-    localStorage.setItem("user", JSON.stringify(res.user));
-    return res;
+export const authenticateWithAPI = async (fcmToken: any, authType?: string) => {
+  const res = await backendLogin(fcmToken, authType);
+  localStorage.setItem("sessionId", res.userSessions.id);
+  localStorage.setItem("userId", res.user.id);
+  localStorage.setItem("user", JSON.stringify(res.user));
+  return res;
 };
 
 export const logoutUser = async (): Promise<void> => {

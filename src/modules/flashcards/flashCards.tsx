@@ -20,7 +20,6 @@ type Props = {
 
 const Flashcards = ({ taskId, initialQuestions, source, onClose }: Props) => {
   const [questions, setQuestions] = useState<Question[]>(() => {
-    // Restore cached questions with attempt data if available
     if (taskId) {
       try {
         const cached = sessionStorage.getItem(`flashcard_questions_${taskId}`);
@@ -38,11 +37,8 @@ const Flashcards = ({ taskId, initialQuestions, source, onClose }: Props) => {
   const [showResult, setShowResult] = useState(false);
   const [direction, setDirection] = useState<"next" | "prev" | null>(null);
 
-  useEffect(() => {
-    setLoading(false);
-  }, []);
+  useEffect(() => { setLoading(false); }, []);
 
-  // Cache questions with attempt data so they persist on re-open
   useEffect(() => {
     if (taskId && questions.length) {
       try {
@@ -69,12 +65,9 @@ const Flashcards = ({ taskId, initialQuestions, source, onClose }: Props) => {
 
   const handleSelect = async (i: number) => {
     if (checking || showResult) return;
-
     const option = current.options[i];
-
     setSelected(i);
     setChecking(true);
-
     try {
       let res;
       if (source === QuestionSource.HOME_PRACTICE_QUESTION) {
@@ -89,8 +82,6 @@ const Flashcards = ({ taskId, initialQuestions, source, onClose }: Props) => {
           selectedOptionId: option.id,
         });
       }
-      // update explanation from API
-
       setQuestions((prev) =>
         prev.map((q) =>
           q.id === current.id
@@ -123,20 +114,16 @@ const Flashcards = ({ taskId, initialQuestions, source, onClose }: Props) => {
 
   useEffect(() => {
     if (!current) return;
-
     const attempt = current.userQuestionAttempts?.[0];
-    console.log("attempt: ", attempt);
     if (!attempt) {
       setSelected(null);
       setShowResult(false);
       setChecking(false);
       return;
     }
-
     const selectedIndex = current.options.findIndex(
       (o) => o.id === attempt.selectedOptionId,
     );
-    console.log("selectedIndex: ", selectedIndex);
     if (selectedIndex !== -1) {
       setSelected(selectedIndex);
       setShowResult(true);
@@ -144,286 +131,336 @@ const Flashcards = ({ taskId, initialQuestions, source, onClose }: Props) => {
   }, [current]);
 
   const next = () => {
-    if (isLast) {
-      onClose?.();
-      return;
-    }
-
+    if (isLast) { onClose?.(); return; }
     setDirection("next");
-
-    setTimeout(() => {
-      setIndex((prev) => prev + 1);
-      resetState();
-    }, 200);
-
+    setTimeout(() => { setIndex((prev) => prev + 1); resetState(); }, 200);
     setTimeout(() => setDirection(null), 400);
   };
 
   const prev = () => {
     if (isFirst) return;
-
     setDirection("prev");
-
-    setTimeout(() => {
-      setIndex((prev) => prev - 1);
-      resetState();
-    }, 200);
-
+    setTimeout(() => { setIndex((prev) => prev - 1); resetState(); }, 200);
     setTimeout(() => setDirection(null), 400);
   };
 
-  const getQuestionFontSize = (text: string) => {
-    if (text.length > 220) return "text-[11px] sm:text-[13px] md:text-[14px]";
-    if (text.length > 150) return "text-[12px] sm:text-[14px] md:text-[16px]";
-    if (text.length > 80) return "text-[13px] sm:text-[15px] md:text-[18px]";
-    return "text-[14px] sm:text-[17px] md:text-[20px]";
+  // ONE base font-size on card scales with viewport (1vw ≈ 16px at 1600px)
+  // All text inside uses % relative to this base — so everything scales together
+  // Base: clamp(10px, 1vw, 16px)
+  // % mapping (base=16px):
+  //   87.5%  = 14px  (tap to reveal, counter)
+  //   100%   = 16px  (options)
+  //   112.5% = 18px  (back answer, explanation heading)
+  //   125%   = 20px  (question short)
+  //   137.5% = 22px  (back heading)
+
+  const getQuestionFontPercent = (text: string) => {
+    if (text.length > 220) return '87.5%';   // 14px at base 16px
+    if (text.length > 150) return '100%';    // 16px
+    if (text.length > 80)  return '112.5%';  // 18px
+    return '125%';                           // 20px
+  };
+
+  const arrowStyle: React.CSSProperties = {
+    width: 'clamp(24px, 3vw, 36px)',
+    height: 'clamp(24px, 3vw, 36px)',
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    border: 'none',
+    flexShrink: 0,
+    cursor: 'pointer',
   };
 
   return (
-    <div className="px-4">
+    <div style={{ padding: '0 2%' }}>
       <div
-        // className="h-[calc(100vh-100px)] mt-1 mb-4 py-6 rounded-[32px] flex flex-col"
-        className="h-[calc(100vh-100px)] mt-1 mb-4 py-6 rounded-[32px] flex flex-col overflow-hidden"
-        style={{ boxShadow: "0px 0px 4px 0px #00000040", backgroundColor: '#F7F9FC' }}
+        style={{
+          height: 'calc(100vh - 100px)',
+          marginTop: '0.5vh',
+          marginBottom: '1vh',
+          paddingTop: '2vh',
+          paddingBottom: '2vh',
+          borderRadius: 'clamp(16px, 2.5vw, 32px)',
+          boxShadow: '0px 0px 4px 0px #00000040',
+          backgroundColor: '#F7F9FC',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+        }}
       >
-        {/* HEADER */}
-        <div className="relative flex justify-center items-center">
-          <h1
-            // className="text-[26px] font-semibold"
-            className="text-xl sm:text-[26px] font-semibold"
-          >{t("flashcards.title")}</h1>
 
+        {/* ── HEADER ── */}
+        <div style={{
+          position: 'relative',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: '0 3%',
+          flexShrink: 0,
+          // Header base: slightly bigger than card base
+          fontSize: 'clamp(14px, 1.2vw, 16px)',
+        }}>
+          <h1 style={{ fontSize: '162.5%', fontWeight: 600 }}> {/* 26px at base 16px */}
+            {t("flashcards.title")}
+          </h1>
           {streak > 0 && (
-            <div className="absolute right-8 text-[22px]">{streak} 🔥</div>
+            <div style={{ position: 'absolute', right: '3%', fontSize: '137.5%' }}> {/* 22px */}
+              {streak} 🔥
+            </div>
           )}
-
           {onClose && (
             <GoX
               onClick={onClose}
-              className="absolute left-8 text-[24px] cursor-pointer"
+              style={{ position: 'absolute', left: '3%', fontSize: '150%', cursor: 'pointer' }} // 24px
             />
           )}
         </div>
 
-        {/* CARD AREA */}
-        <div className="flex-1 flex flex-col items-center justify-center mb-2 sm:mb-6 md:mb-10 px-2 sm:px-0">
+        {/* ── CARD AREA ── */}
+        <div style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '1vh 2%',
+          minHeight: 0,
+        }}>
 
-         <div className="w-full sm:w-[380px] md:w-[440px] lg:w-[480px] mb-1 text-right text-[14px] sm:text-[16px] font-medium text-gray-600">
+          {/* Counter */}
+          <div style={{
+            width: 'clamp(280px, 30vw, 520px)',
+            textAlign: 'right',
+            fontSize: 'clamp(11px, 1vw, 16px)',
+            fontWeight: 500,
+            color: '#4B5563',
+            marginBottom: '0.5vh',
+            flexShrink: 0,
+          }}>
             {index + 1}/{total}
           </div>
+
+          {/* Card —
+              Single clamp on fontSize = the ONE scaling unit
+              All text inside uses % of this base
+              base 16px at 1600px, 10px at 1000px, min 10px
+          */}
           <div
-            className="relative w-full sm:w-[380px] md:w-[440px] lg:w-[480px] h-[380px] sm:h-[440px] md:h-[500px] lg:h-[550px] rounded-[20px] p-3 sm:p-4 md:p-6"
             style={{
+              position: 'relative',
+              width: 'clamp(280px, 30vw, 520px)',
+              height: 'clamp(320px, 56vh, 580px)',
+              borderRadius: 'clamp(14px, 1.8vw, 24px)',
+              padding: 'clamp(10px, 2vw, 28px)',
               background: bgColor,
-              perspective: "1000px",
-              transform:
-                direction === "next"
-                  ? "translateX(-40px)"
-                  : direction === "prev"
-                    ? "translateX(40px)"
-                    : "translateX(0)",
+              // ★ ONE base font-size — all % inside scale with this
+              fontSize: 'clamp(10px, 1vw, 16px)',
+              perspective: '1000px',
+              transform: direction === "next"
+                ? "translateX(-40px)"
+                : direction === "prev"
+                  ? "translateX(40px)"
+                  : "translateX(0)",
               opacity: direction ? 0 : 1,
               transition: "transform 0.2s ease, opacity 0.2s ease",
             }}
           >
-            {/* Shared arrows — inside yellow card, outside rotating div
-            <div className="absolute left-6 right-6 flex items-center justify-between z-10" style={{ bottom: '36px' }}>
-              <button
-                onClick={prev}
-                disabled={isFirst}
-                className={`w-9 h-9 rounded-full flex items-center justify-center shadow cursor-pointer ${isFirst ? "opacity-30" : ""}`}
-                style={{ backgroundColor: lightenColor(bgColor, 14) }}
-              >
-                <GoChevronLeft size={24} color={darkenColor(bgColor, 64)} />
-              </button>
-
-              <button
-                onClick={next}
-                className="w-9 h-9 rounded-full flex items-center justify-center shadow cursor-pointer"
-                style={{ backgroundColor: lightenColor(bgColor, 14) }}
-              >
-                <GoChevronRight size={24} color={darkenColor(bgColor, 64)} />
-              </button>
-            </div> */}
-
             <div
-              className="relative w-full h-full transition-transform duration-500"
               style={{
+                position: 'relative',
+                width: '100%',
+                height: '100%',
+                transition: 'transform 0.5s',
                 transform: revealed ? "rotateY(180deg)" : "rotateY(0deg)",
                 transformStyle: "preserve-3d",
               }}
             >
-              {/* FRONT SIDE */}
+
+              {/* ══ FRONT SIDE ══ */}
               <div
-                className="absolute inset-0 flex flex-col pb-6"
-                style={{ backfaceVisibility: "hidden" }}
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  overflow: 'hidden',
+                  backfaceVisibility: 'hidden',
+                } as React.CSSProperties}
               >
-                {/* Question */}
-                <div
-                  // className="text-center px-12"
-                  className="text-center px-4 sm:px-12"
-                >
-                  <h2
-                    className={`${getQuestionFontSize(
-                      current.questionText,
-                    )} font-semibold leading-relaxed break-words`}
-                  >
+                {/* Question — % of base font */}
+                <div style={{ textAlign: 'center', padding: '0 8%', flexShrink: 0 }}>
+                  <h2 style={{
+                    fontSize: getQuestionFontPercent(current.questionText),
+                    fontWeight: 600,
+                    lineHeight: 1.4,
+                    wordBreak: 'break-word',
+                  }}>
                     {current.questionText}
                   </h2>
                 </div>
 
-                {/* Options */}
-                <div
-                  // className="px-10 mt-14 flex flex-col gap-6"
-                  className="px-2 sm:px-6 md:px-10 mt-3 sm:mt-8 md:mt-14 flex flex-col gap-2 sm:gap-4 md:gap-6"
-                >
+                {/* Options — 100% of base = 16px on large screens */}
+                <div style={{
+                  padding: '0 6%',
+                  marginTop: '5%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '4%',
+                  flex: 1,
+                  minHeight: 0,
+                  justifyContent: 'center',
+                }}>
                   {current.options.map((option, i) => {
                     const isCorrect = option.id === current.correctOptionId;
                     const isSelected = i === selected;
-
                     return (
-                      <div
-                        key={i}
-                        onClick={() => handleSelect(i)}
-                        className="cursor-pointer"
-                      >
-                        <div className="flex justify-between items-center">
-                          <p
-                            className={`text-[12px] sm:text-[14px] md:text-[16px] ml-1 sm:ml-2 ${isSelected ? "font-semibold" : ""
-                              }`}
-                          >
+                      <div key={i} onClick={() => handleSelect(i)} style={{ cursor: 'pointer' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <p style={{
+                            fontSize: '100%', // 16px at base 16px
+                            marginLeft: '2%',
+                            fontWeight: isSelected ? 600 : 400,
+                            lineHeight: 1.3,
+                          }}>
                             {option.text}
                           </p>
-
                           {checking && isSelected && (
-                            <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                            <div style={{
+                              width: '1.2em',
+                              height: '1.2em',
+                              border: '2px solid black',
+                              borderTopColor: 'transparent',
+                              borderRadius: '50%',
+                              animation: 'spin 1s linear infinite',
+                              flexShrink: 0,
+                            }} />
                           )}
-
                           {showResult && isCorrect && (
-                            <IoCheckmark size={24} color="green" />
+                            <IoCheckmark style={{ flexShrink: 0, fontSize: '125%' }} color="green" />
                           )}
-
                           {showResult && isSelected && !isCorrect && (
-                            <IoClose size={24} color="red" />
+                            <IoClose style={{ flexShrink: 0, fontSize: '125%' }} color="red" />
                           )}
                         </div>
-
-                        <div className="mt-2 h-[1px] bg-gray-400 opacity-40" />
+                        <div style={{
+                          marginTop: '3%',
+                          height: 1,
+                          backgroundColor: '#9CA3AF',
+                          opacity: 0.4,
+                        }} />
                       </div>
                     );
                   })}
                 </div>
 
-                {/* Tap to flip */}
-                {/* {showResult && (
-                  <div className="absolute bottom-4 w-full text-center">
-                    <p
-                      onClick={() => setRevealed(true)}
-                      className="text-[16px] font-medium cursor-pointer"
-                    >
-                      Tap to view explanation
-                    </p>
-                  </div>
-                )} */}
-
-                {/* Spacer — pushes content to bottom */}
-                <div className="flex-1" />
-
                 {/* Arrows */}
-                <div className="w-full px-2 flex items-center justify-between mt-4">
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '0 2%',
+                  marginTop: '3%',
+                  marginBottom: '12%',
+                  flexShrink: 0,
+                }}>
                   <button
                     onClick={prev}
                     disabled={isFirst}
-                    className={`w-9 h-9 rounded-full flex items-center justify-center shadow cursor-pointer ${isFirst ? "opacity-30" : ""}`}
-                    style={{ backgroundColor: lightenColor(bgColor, 14) }}
+                    style={{ ...arrowStyle, opacity: isFirst ? 0.3 : 1, backgroundColor: lightenColor(bgColor, 14) }}
                   >
-                    <GoChevronLeft size={24} color={darkenColor(bgColor, 64)} />
+                    <GoChevronLeft style={{ fontSize: '120%' }} color={darkenColor(bgColor, 64)} />
                   </button>
-
                   <button
                     onClick={next}
                     disabled={isLast}
-                    className={`w-9 h-9 rounded-full flex items-center justify-center shadow cursor-pointer ${isLast ? "opacity-30" : ""}`}
-                    style={{ backgroundColor: lightenColor(bgColor, 14) }}
+                    style={{ ...arrowStyle, opacity: isLast ? 0.3 : 1, backgroundColor: lightenColor(bgColor, 14) }}
                   >
-                    <GoChevronRight size={24} color={darkenColor(bgColor, 64)} />
+                    <GoChevronRight style={{ fontSize: '120%' }} color={darkenColor(bgColor, 64)} />
                   </button>
                 </div>
 
-                {/* Tap to reveal — very bottom */}
-                <div className="w-full text-center pt-3 pb-1">
+                {/* Tap to reveal */}
+                <div style={{ position: 'absolute', bottom: '4%', left: 0, right: 0, textAlign: 'center' }}>
                   <p
                     onClick={() => setRevealed(true)}
-                    className="text-[14px] font-medium cursor-pointer"
+                    style={{ fontSize: '87.5%', fontWeight: 500, cursor: 'pointer' }}
                   >
                     {t('flashcards.tapToReveal')}
                   </p>
                 </div>
               </div>
 
-              {/* BACK SIDE */}
+              {/* ══ BACK SIDE ══ */}
               <div
-                className="absolute inset-0 flex flex-col px-4 sm:px-7 md:px-10 pt-3 sm:pt-4 pb-4 sm:pb-6"
                 style={{
-                  transform: "rotateY(180deg)",
-                  backfaceVisibility: "hidden",
-                }}
+                  position: 'absolute',
+                  inset: 0,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  overflow: 'hidden',
+                  padding: '4% 6%',
+                  transform: 'rotateY(180deg)',
+                  backfaceVisibility: 'hidden',
+                } as React.CSSProperties}
               >
-                <h2 className="text-[14px] sm:text-[18px] md:text-[22px] font-semibold text-center">
+                <h2 style={{ fontSize: '137.5%', fontWeight: 600, textAlign: 'center', flexShrink: 0 }}> {/* 22px */}
                   Correct Answer
                 </h2>
 
-                <p className="mt-2 sm:mt-3 text-[12px] sm:text-[15px] md:text-[18px] font-medium text-green-600 text-center">
-                  {
-                    current.options.find(
-                      (o) => o.id === current.correctOptionId,
-                    )?.text
-                  }
+                <p style={{ fontSize: '112.5%', fontWeight: 500, color: '#16a34a', textAlign: 'center', marginTop: '3%', flexShrink: 0 }}> {/* 18px */}
+                  {current.options.find((o) => o.id === current.correctOptionId)?.text}
                 </p>
 
-                <div className="mt-3 sm:mt-6 md:mt-4 text-center">
-                  <h3 className="text-[13px] sm:text-[15px] md:text-[18px] font-semibold mb-2 sm:mb-3">
+                {/* Explanation — no scroll */}
+                <div style={{ flex: 1, textAlign: 'center', marginTop: '4%', minHeight: 0, overflow: 'hidden' }}>
+                  <h3 style={{ fontSize: '112.5%', fontWeight: 600, marginBottom: '3%' }}> {/* 18px */}
                     Explanation
                   </h3>
-                  <p className="text-[11px] sm:text-[13px] md:text-[16px] text-gray-700 leading-relaxed">
+                  <p style={{ fontSize: '100%', color: '#374151', lineHeight: 1.4 }}> {/* 16px */}
                     {current.stepByStepExplanation}
                   </p>
                 </div>
 
-                {/* Spacer — pushes arrows to bottom (same as front side) */}
-                <div className="flex-1" />
-
                 {/* Arrows */}
-                <div className="w-full px-2 flex items-center justify-between mt-4">
+                <div style={{
+                  position: 'absolute',
+                  bottom: '12%',
+                  left: '2%',
+                  right: '2%',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}>
                   <button
                     onClick={prev}
                     disabled={isFirst}
-                    className={`w-9 h-9 rounded-full flex items-center justify-center shadow cursor-pointer ${isFirst ? "opacity-30" : ""}`}
-                    style={{ backgroundColor: lightenColor(bgColor, 14) }}
+                    style={{ ...arrowStyle, opacity: isFirst ? 0.3 : 1, backgroundColor: lightenColor(bgColor, 14) }}
                   >
-                    <GoChevronLeft size={24} color={darkenColor(bgColor, 64)} />
+                    <GoChevronLeft style={{ fontSize: '120%' }} color={darkenColor(bgColor, 64)} />
                   </button>
-
                   <button
                     onClick={next}
                     disabled={isLast}
-                    className={`w-9 h-9 rounded-full flex items-center justify-center shadow cursor-pointer ${isLast ? "opacity-30" : ""}`}
-                    style={{ backgroundColor: lightenColor(bgColor, 14) }}
+                    style={{ ...arrowStyle, opacity: isLast ? 0.3 : 1, backgroundColor: lightenColor(bgColor, 14) }}
                   >
-                    <GoChevronRight size={24} color={darkenColor(bgColor, 64)} />
+                    <GoChevronRight style={{ fontSize: '120%' }} color={darkenColor(bgColor, 64)} />
                   </button>
                 </div>
 
-                {/* Tap to flip back — very bottom */}
-                <div className="w-full text-center pt-3 pb-1">
+                {/* Tap to flip back */}
+                <div style={{ position: 'absolute', bottom: '4%', left: 0, right: 0, textAlign: 'center' }}>
                   <p
                     onClick={() => setRevealed(false)}
-                    className="text-[14px] font-medium cursor-pointer"
+                    style={{ fontSize: '87.5%', fontWeight: 500, cursor: 'pointer' }}
                   >
                     {t('flashcards.tapToFlipBack')}
                   </p>
                 </div>
               </div>
+
             </div>
           </div>
         </div>

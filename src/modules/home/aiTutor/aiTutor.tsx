@@ -66,6 +66,10 @@ const AiTutor = () => {
   const hasTriggeredUpload = useRef(false);
 
   const cameraInputRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const [showWebcamModal, setShowWebcamModal] = useState(false);
 
   const adjustTextareaHeight = () => {
     const el = textareaRef.current;
@@ -197,17 +201,7 @@ const AiTutor = () => {
     }
   }, [messages]);
 
-  // Clear conversation only on tab close, not on refresh
-  useEffect(() => {
-    // If sessionStorage flag missing → tab was closed and reopened → clear old chat
-    const isRefresh = sessionStorage.getItem("aiTutor_session");
-    if (!isRefresh) {
-      localStorage.removeItem("aiTutor_messages");
-      localStorage.removeItem("aiTutor_conversationId");
-    }
-    // Set flag — survives refresh but clears on tab close
-    sessionStorage.setItem("aiTutor_session", "true");
-  }, []);
+  
 
   useEffect(() => {
     adjustTextareaHeight();
@@ -450,6 +444,84 @@ const AiTutor = () => {
       setIsGeneratingFlashcard(false);
     }
   };
+  const [showMenu, setShowMenu] = useState(false);
+
+  const handleClearChat = () => {
+    setMessages([]);
+    setConversationId(null);
+    localStorage.removeItem("aiTutor_messages");
+    localStorage.removeItem("aiTutor_conversationId");
+  };
+
+  
+
+  const isMobile = () => /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  const handleOpenCamera = () => {
+    setShowUploadImageModal(false);
+    if (isMobile()) {
+      setTimeout(() => cameraInputRef.current?.click(), 300);
+    } else {
+      setTimeout(() => startWebcam(), 300);
+    }
+  };
+
+  const startWebcam = async () => {
+    setShowWebcamModal(true);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment" },
+      });
+      streamRef.current = stream;
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          videoRef.current.play();
+        }
+      }, 100);
+    } catch (err) {
+      antMessage.error("Camera access denied. Please allow camera permission.");
+      setShowWebcamModal(false);
+    }
+  };
+
+  const stopWebcam = () => {
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+    setShowWebcamModal(false);
+  };
+
+  const handleTakePhoto = () => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    if (!video || !canvas) return;
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext("2d")?.drawImage(video, 0, 0);
+
+    canvas.toBlob(async (blob) => {
+      if (!blob) return;
+      const file = new File([blob], "webcam_photo.jpg", { type: "image/jpeg" });
+      stopWebcam();
+
+      // Preview
+      const previewUrl = URL.createObjectURL(blob);
+      setSelectedImage(previewUrl);
+
+      // Upload
+      try {
+        setIsUploading(true);
+        const outPutUrl = await uploadImage(file);
+        setUploadedImageUrl(outPutUrl);
+      } catch (err) {
+        antMessage.error("Failed to upload photo. Please try again.");
+      } finally {
+        setIsUploading(false);
+      }
+    }, "image/jpeg");
+  };
+
   const streak = Number(localStorage.getItem("streak")) || 0;
 
   const streakTitle =
@@ -472,12 +544,43 @@ const AiTutor = () => {
           backgroundColor: '#F7F9FC'
         }}
       >
-        <div className="mx-4 flex relative justify-center" style={{ backgroundColor: '#F7F9FC' }}>
+        <div className="mx-4 flex relative justify-center items-center" style={{ backgroundColor: '#F7F9FC' }}>
           <GoArrowLeft
             className="text-xl absolute left-0 cursor-pointer"
             onClick={() => useBack()}
           />
           <h1 className="text-base font-semibold">AI Tutor</h1>
+          {messages.length > 0 && (
+            <div className="absolute right-0">
+              <button
+                onClick={() => setShowMenu((p) => !p)}
+                className="w-8 h-8 flex flex-col items-center justify-center gap-[4px] rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
+              >
+                <span className="w-[3px] h-[3px] rounded-full bg-gray-500" />
+                <span className="w-[3px] h-[3px] rounded-full bg-gray-500" />
+                <span className="w-[3px] h-[3px] rounded-full bg-gray-500" />
+              </button>
+              {showMenu && (
+                <>
+                  <div
+                    className="fixed inset-0 z-10"
+                    onClick={() => setShowMenu(false)}
+                  />
+                  <div
+                    className="absolute right-0 top-10 z-20 bg-white rounded-xl py-1 min-w-[160px]"
+                    style={{ boxShadow: '0px 4px 20px rgba(0,0,0,0.12)' }}
+                  >
+                    <button
+                      onClick={() => { handleClearChat(); setShowMenu(false); }}
+                      className="w-full flex items-center px-4 py-3 text-sm text-gray-800 hover:bg-gray-100 transition-colors  cursor-pointer"
+                    >
+                      Clear Chat
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="px-4 relative flex-1 flex flex-col gap-2 overflow-y-auto scrollbar" style={{ backgroundColor: '#F7F9FC' }}>
@@ -656,7 +759,7 @@ const AiTutor = () => {
                       onChange={handleImage}
                       type="file"
                       accept="image/*"
-                      capture
+                      capture="environment"
                       className="hidden"
                       onClick={(e) => e.stopPropagation()}
                     />
@@ -881,12 +984,7 @@ const AiTutor = () => {
             {/* Camera */}
             <div
               className="flex flex-col items-center gap-3 cursor-pointer"
-              onClick={() => {
-                setShowUploadImageModal(false);
-                setTimeout(() => {          // ✅ wait for modal to fully close
-                  cameraInputRef.current?.click();
-                }, 300);
-              }}
+              onClick={handleOpenCamera}
             >
               {/* <div className="w-[100px] h-[100px] rounded-full bg-primary flex items-center justify-center"> */}
               <div className="w-[100px] h-[100px] rounded-full flex items-center justify-center"
@@ -934,6 +1032,49 @@ const AiTutor = () => {
               </div>
               <p className="text-[16px] font-medium text-primary">{t('aiTutor.gallery')}</p>
             </div>
+          </div>
+        </div>
+      </Modal>
+    {/* WEBCAM MODAL */}
+      <Modal
+        open={showWebcamModal}
+        onCancel={stopWebcam}
+        footer={null}
+        centered
+        width={720}
+        title="Take a Photo"
+      >
+        <div className="flex flex-col items-center gap-4 py-2">
+          <div className="relative w-full rounded-xl overflow-hidden bg-black" style={{ aspectRatio: '4/3' }}>
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              muted
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <canvas ref={canvasRef} className="hidden" />
+          <div className="flex gap-4 w-full">
+            <button
+              onClick={stopWebcam}
+              className="flex-1 h-[44px] rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleTakePhoto}
+              className="flex-1 h-[44px] rounded-xl text-white text-sm font-semibold transition-opacity hover:opacity-90"
+              style={{
+                backgroundImage: "url('/images/buttonBg.svg')",
+                backgroundSize: '350% 700%',
+                backgroundPosition: 'center',
+                boxShadow: '0px 0px 50px 0px #1953CB40',
+                border: '1px solid rgba(255,255,255,0.35)',
+              }}
+            >
+              Take Photo
+            </button>
           </div>
         </div>
       </Modal>

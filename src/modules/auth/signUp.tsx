@@ -448,7 +448,10 @@ const SignUp = () => {
       const user = await signUpWithFirebase(data.email, data.password);
       const idToken = await user.getIdToken(true);
       setCookie("idToken", idToken, 7);
-      await sendOtp(data.email, true);
+      const notificationToken = localStorage.getItem("notificationToken") || fcmToken || "";
+      console.log("[1] FCM Token from localStorage:", notificationToken || "EMPTY");
+      await authenticateWithAPI(notificationToken, "EMAIL_PASSWORD"); // ← pass authType
+      await sendOtp(data.email, false);      // ← correct flag, correct order
       setCurrentEmail(data.email);
       setStep("otp");
       setResendTimer(60);
@@ -482,9 +485,9 @@ const SignUp = () => {
     try {
       setVerifyLoading(true);
       await verifyOtp(currentEmail, otp);
-      const res = await authenticateWithAPI(fcmToken);
+      const user = JSON.parse(localStorage.getItem("user") || "{}"); // ← use what's already saved
       message.success("Account created successfully!");
-      handlePostLoginRedirect(res.user);
+      handlePostLoginRedirect(user);
     } catch (error: any) {
       const errorMessage = getOtpErrorMessage(error);
       message.error(errorMessage);
@@ -555,7 +558,8 @@ const SignUp = () => {
       const result = await signInWithGoogle();
       if (!result) return;
       setCookie("idToken", result.idToken, 7);
-      const res = await authenticateWithAPI(fcmToken);
+      const notificationToken = localStorage.getItem("notificationToken") || fcmToken || "";
+      const res = await authenticateWithAPI(notificationToken, "GOOGLE");  // ← pass authType
       message.success("Account created successfully.");
       handlePostLoginRedirect(res.user);
     } catch (error: any) {
@@ -573,7 +577,8 @@ const SignUp = () => {
       const result = await signInWithApple();
       if (!result) return;
       setCookie("idToken", result.idToken, 7);
-      const res = await authenticateWithAPI(fcmToken);
+      const notificationToken = localStorage.getItem("notificationToken") || fcmToken || "";
+      const res = await authenticateWithAPI(notificationToken, "APPLE"); // ← pass authType
       message.success("Signed in with Apple.");
       handlePostLoginRedirect(res.user);
     } catch (error: any) {

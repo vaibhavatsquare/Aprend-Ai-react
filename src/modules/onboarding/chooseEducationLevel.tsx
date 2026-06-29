@@ -135,7 +135,7 @@ const levelIcons: Record<string, string> = {
             >
               {/* Icon */}
               <div className="w-10 h-10 rounded-2xl bg-gray-100 flex items-center justify-center flex-shrink-0 text-lg overflow-hidden">
-                {levelIcons[level.code] || "📖"}
+                {levelIcons[level.code] || "📚"}
               </div>
 
               {/* Title + subtitle */}
