@@ -87,8 +87,8 @@ const levelIcons: Record<string, string> = {
 
 
   return (
-    <div className="w-full h-full flex justify-center items-center">
-      <div className="flex flex-col gap-6 items-center">
+    <div className="w-full h-full flex justify-center overflow-y-auto">
+      <div className="flex flex-col gap-6 items-center my-auto py-8">
         <h1 className="text-xl font-semibold">
           {t('onboarding.chooseEducationLevel')}
         </h1>

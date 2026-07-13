@@ -223,7 +223,7 @@ const Questions = () => {
                             // ✅ Pass remainingQuestions — premium gets 40, free gets their remaining count
                             remainingQuestions={(() => {
                                 const { user, isPremium } = getUserData();
-                                return isPremium ? 40 : (user?.freePlan?.remainingQuestionsToday ?? 20);
+                                return isPremium ? 30 : (user?.freePlan?.remainingQuestionsToday ?? 20);
                             })()}
                         />
                     </div>

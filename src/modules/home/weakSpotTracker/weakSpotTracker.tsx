@@ -55,7 +55,7 @@ const fetchWeakSpotData = async (): Promise<WeakSpotTrackerData> => {
   const res = await getWeakSpotTracker("all");
   return {
     totalWeakAreas: res.summary.totalWeakAreas,
-    improvementTrend: `+${res.summary.improvementTrendPercent}% this week`,
+    improvementTrend: `${res.summary.improvementTrendPercent}% this week`,
     avgTimeOnWeakTopics: `${res.summary.estimatedAverageStudyMinutes} min`,
     weeklyChart: (res.trend.weekly ?? []).map((e) => ({
       day: e.label,
@@ -123,7 +123,7 @@ const Skeleton = ({ className }: { className?: string }) => (
 );
 
 const WeakSpotRow = ({ spot }: { spot: WeakSpot }) => {
-  const [expanded, setExpanded] = useState(!!spot.commonMistakes);
+  const [expanded, setExpanded] = useState(false);
   return (
     <div className="border border-gray-200 rounded-xl overflow-hidden mb-3 last:mb-0">
       <button
@@ -211,7 +211,8 @@ const WeakSpotTracker = () => {
         )}
 
         {/* Stat Cards — ratio 1:1:2 matching Figma 261:261:523 */}
-        <div className="flex gap-3">
+        {/* Bottom: Progress trend + All weak spots — 50/50 */}
+        <div className="flex gap-3 items-start">
           {loading ? (
             <>
               <Skeleton className="flex-1 h-[99px]" />
@@ -277,7 +278,7 @@ const WeakSpotTracker = () => {
           {/* Progress Trend */}
           <div
             className="flex-1 border border-gray-200 rounded-xl p-4 flex flex-col pointer-events-none"
-            style={{ boxShadow: "0px 0px 1px 0px #00000040", backgroundColor: '#ffffff' }}
+            style={{ boxShadow: "0px 0px 1px 0px #00000040", backgroundColor: '#ffffff', height: '500px' }}
           >
             <div className="flex items-center justify-between mb-3">
               <p className="font-semibold text-gray-900">Progress trend</p>
@@ -324,8 +325,8 @@ const WeakSpotTracker = () => {
 
           {/* All Weak Spots */}
           <div
-            className="flex-1 rounded-xl p-4 overflow-y-auto scrollbar"
-            style={{ boxShadow: "0px 0px 1px 0px #00000040", backgroundColor: '#ffffff' }}
+            className="flex-1 rounded-xl p-4"
+style={{ boxShadow: "0px 0px 1px 0px #00000040", backgroundColor: '#ffffff', minHeight: '300px' }}
           >
             <p className="font-semibold text-gray-900 mb-3">All weak spots</p>
             {loading ? (

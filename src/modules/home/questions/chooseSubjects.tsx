@@ -14,7 +14,7 @@ const ChooseSubjects = ({
   onBack,
   onStartQuestions,
   source,
-  remainingQuestions = 40, // ✅ default 40 for premium, passed from parent for free users
+  remainingQuestions = 30, // ✅ default 40 for premium, passed from parent for free users
 }: {
   onBack?: () => void;
   onStartQuestions?: (task: { id: string; questions: Question[] }) => void;
@@ -22,7 +22,7 @@ const ChooseSubjects = ({
   remainingQuestions?: number;
 }) => {
   // ✅ Initial slider value should not exceed remainingQuestions
-  const [value, setValue] = useState(Math.min(12, remainingQuestions));
+  const [value, setValue] = useState(Math.min(20, remainingQuestions));
   const { t } = useTranslation();
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null);
@@ -41,10 +41,10 @@ const [subjectIdMap, setSubjectIdMap] = useState<Record<string, string>>({});
         const userCode = user?.user_EducationLevel; // e.g. "HIGH_SCHOOL" — language independent
 
         // ALWAYS fetch education levels for current language
-        let educationLevelId = null;
+       let educationLevelId: string | null = null;
 
-        try {
-          const allLevels = await getEducationLevels(language);
+try {
+    const allLevels = await getEducationLevels(language);
 
           console.log("🌐 Language:", language);
           console.log("🎓 user_EducationLevel code:", userCode);
@@ -149,28 +149,7 @@ const [subjectIdMap, setSubjectIdMap] = useState<Record<string, string>>({});
 
   // TOGGLE SUBJECT
   const handleSubject = (value: string) => {
-
-    // 👉 Explore = single select
-    // if (isExplore) {
-    //   setSelectedSubjects([value]);
-    //   return;
-    // }
-
-    // 👉 Simulado = multi select (existing logic)
-    if (value === "ALL") {
-      setSelectedSubjects(["ALL"]);
-      return;
-    }
-
-    setSelectedSubjects((prev) => {
-      const filtered = prev.filter((s) => s !== "ALL");
-
-      if (filtered.includes(value)) {
-        return filtered.filter((s) => s !== value);
-      }
-
-      return [...filtered, value];
-    });
+    setSelectedSubjects([value]);
   };
 
   // SELECT DIFFICULTY

@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import { UserDetail, UserEducationLevel } from "@/src/libs/types";
 import { uploadImage } from "@/src/services/api/upload.api";
 import { Image as AntImage, Button, message, Spin } from "antd";
-import { updateUserProfile, getEducationLevels } from "@/src/services/api/user.api";
+import { updateUserProfile, getEducationLevels, getUserProfile } from "@/src/services/api/user.api";
 import { getInitials } from "@/src/libs/helpers";
 import { FiCamera } from "react-icons/fi";
 
@@ -64,19 +64,32 @@ useEffect(() => {
             }
 
             await updateUserProfile({
-                name,
-                educationLevelId: education,
-                image: imageUrl,
-            });
+    name,
+    educationLevelId: education,
+    image: imageUrl,
+});
 
-            onUpdated({
-                name,
-                educationLevelId: education,
-                image: imageUrl,
-            });
+// Refresh full user profile and update localStorage
+const { getUserProfile } = await import("@/src/services/api/user.api");
+const freshProfile = await getUserProfile();
+localStorage.setItem("user", JSON.stringify(freshProfile));
 
-            setImageFile(null);
-            message.success("Profile updated");
+// Re-fetch subjects for the updated educationLevelId + current language
+if (education) {
+    const { getSubjectsByLevel } = await import("@/src/services/api/user.api");
+    const language = freshProfile?.user_language || "ENGLISH";
+    const subjects = await getSubjectsByLevel(education, language);
+    localStorage.setItem("subjectsByLevel", JSON.stringify(subjects));
+}
+
+onUpdated({
+    name,
+    educationLevelId: education,
+    image: imageUrl,
+});
+
+setImageFile(null);
+message.success("Profile updated");
 
         } catch {
             message.error("Failed to update profile");

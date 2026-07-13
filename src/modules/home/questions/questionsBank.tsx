@@ -27,11 +27,32 @@ const QuestionsBank = ({ taskId, initialQuestions, source, onClose }: Props) => 
   const [status, setStatus] = useState<Status>("idle");
   const [submitting, setSubmitting] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
+  const [reviewMode, setReviewMode] = useState(false);
 
   useEffect(() => {
     if (!initialQuestions && taskId) fetchQuestions();
     else setLoading(false);
   }, []);
+
+  // On mount/reopen: skip correct and retry-exhausted questions
+  useEffect(() => {
+    if (loading || !questions.length) return;
+    const attemptsMap = JSON.parse(localStorage.getItem(`attempts_${taskId}`) || "{}");
+    const correctList = JSON.parse(localStorage.getItem(`correct_${taskId}`) || "[]");
+    const firstIncomplete = questions.findIndex((q) => {
+      if (correctList.includes(q.id)) return false;
+      const a = q.userQuestionAttempts?.[0];
+      if (a?.isCorrect) return false;
+      if ((attemptsMap[q.id] || 0) >= 2) return false;
+      return true;
+    });
+    if (firstIncomplete === -1) {
+      setReviewMode(true);
+      setCurrentIndex(0);
+      return;
+    }
+    setCurrentIndex(firstIncomplete);
+  }, [loading]);
 
   const fetchQuestions = async () => {
     try {
@@ -85,7 +106,7 @@ const QuestionsBank = ({ taskId, initialQuestions, source, onClose }: Props) => 
   const progress = (currentIndex / questions.length) * 100;
 
   const handleSelect = (id: string) => {
-    if (status !== "idle") return;
+    if (status !== "idle" || reviewMode) return;
     setSelectedOption(id);
   };
 
@@ -105,6 +126,35 @@ const QuestionsBank = ({ taskId, initialQuestions, source, onClose }: Props) => 
       setStatus(res.isCorrect ? "correct" : "wrong");
       currentQuestion.correctOptionId = res.correctOptionId;
       currentQuestion.stepByStepExplanation = res.explanation ?? "";
+
+      // Persist answered state for reopen
+      const reviewKey = `review_${taskId}`;
+      const reviewData = JSON.parse(localStorage.getItem(reviewKey) || "{}");
+      reviewData[currentQuestion.id] = {
+        selectedOptionId: selectedOption,
+        correctOptionId: res.correctOptionId,
+        explanation: res.explanation ?? "",
+        isCorrect: res.isCorrect,
+      };
+      localStorage.setItem(reviewKey, JSON.stringify(reviewData));
+
+      if (!res.isCorrect) {
+        const key = `attempts_${taskId}`;
+        const attemptsMap = JSON.parse(localStorage.getItem(key) || "{}");
+        const newCount = (attemptsMap[currentQuestion.id] || 0) + 1;
+        attemptsMap[currentQuestion.id] = newCount;
+        localStorage.setItem(key, JSON.stringify(attemptsMap));
+        setRetryCount(Math.max(0, newCount - 1));
+        const selMap = JSON.parse(localStorage.getItem(`selected_${taskId}`) || "{}");
+        selMap[currentQuestion.id] = selectedOption;
+        localStorage.setItem(`selected_${taskId}`, JSON.stringify(selMap));
+      } else {
+        const correctList = JSON.parse(localStorage.getItem(`correct_${taskId}`) || "[]");
+        if (!correctList.includes(currentQuestion.id)) {
+          correctList.push(currentQuestion.id);
+          localStorage.setItem(`correct_${taskId}`, JSON.stringify(correctList));
+        }
+      }
     } catch (err) {
       console.error("Validate error", err);
     } finally {
@@ -114,12 +164,68 @@ const QuestionsBank = ({ taskId, initialQuestions, source, onClose }: Props) => 
 
   useEffect(() => {
     if (!currentQuestion) return;
+
+    // Completed task reopened — restore finished state
+    if (reviewMode) {
+      const reviewData = JSON.parse(localStorage.getItem(`review_${taskId}`) || "{}");
+      const qReview = reviewData[currentQuestion.id];
+      const latestAttempt = (currentQuestion.userQuestionAttempts || [])[0];
+
+      if (qReview) {
+        currentQuestion.correctOptionId = qReview.correctOptionId;
+        currentQuestion.stepByStepExplanation = qReview.explanation || "";
+        setSelectedOption(qReview.selectedOptionId);
+        setStatus(qReview.isCorrect ? "correct" : "wrong");
+        setRetryCount(qReview.isCorrect ? 0 : 1);
+      } else if (latestAttempt) {
+        setSelectedOption(latestAttempt.selectedOptionId);
+        setStatus(latestAttempt.isCorrect ? "correct" : "wrong");
+        setRetryCount(latestAttempt.isCorrect ? 0 : 1);
+      } else {
+        setSelectedOption(null);
+        setStatus("wrong");
+        setRetryCount(1);
+      }
+      return;
+    }
+
+    const attemptsMap = JSON.parse(localStorage.getItem(`attempts_${taskId}`) || "{}");
+    const correctList = JSON.parse(localStorage.getItem(`correct_${taskId}`) || "[]");
+    const selMap = JSON.parse(localStorage.getItem(`selected_${taskId}`) || "{}");
+    const usedAttempts = attemptsMap[currentQuestion.id] || 0;
+    const isCorrectInStorage = correctList.includes(currentQuestion.id);
+    const attempts = currentQuestion.userQuestionAttempts || [];
+    const latestAttempt = attempts[0];
+
+    // Correct from localStorage or API
+    if (isCorrectInStorage || latestAttempt?.isCorrect) {
+      setSelectedOption(latestAttempt?.selectedOptionId || null);
+      setStatus("correct");
+      setRetryCount(0);
+      return;
+    }
+
+    // Has wrong attempts in localStorage (even if API has no data)
+    if (usedAttempts > 0) {
+      setSelectedOption(selMap[currentQuestion.id] || latestAttempt?.selectedOptionId || null);
+      setStatus("wrong");
+      setRetryCount(Math.max(0, usedAttempts - 1));
+      return;
+    }
+
+    // Has API attempt but no localStorage (fallback)
+    if (latestAttempt) {
+      setSelectedOption(latestAttempt.selectedOptionId);
+      setStatus("wrong");
+      setRetryCount(1);
+      return;
+    }
+
+    // Fresh question
+    setSelectedOption(null);
+    setStatus("idle");
     setRetryCount(0);
-    const attempt = currentQuestion.userQuestionAttempts?.[0];
-    if (!attempt) { setSelectedOption(null); setStatus("idle"); return; }
-    setSelectedOption(attempt.selectedOptionId);
-    setStatus(attempt.isCorrect ? "correct" : "wrong");
-  }, [currentQuestion]);
+  }, [currentQuestion, reviewMode]);
 
   const resetState = (isNextQuestion = false) => {
     setSelectedOption(null);
@@ -132,14 +238,33 @@ const QuestionsBank = ({ taskId, initialQuestions, source, onClose }: Props) => 
   const handleWhy = () => setStatus("explanation");
   const handleNext = () => {
     if (isLast) { onClose?.(); return; }
-    resetState(true);
-    setCurrentIndex((p) => p + 1);
+
+    // Review mode: just go next sequentially
+    if (reviewMode) {
+      setCurrentIndex((p) => p + 1);
+      return;
+    }
+
+    // Active mode: skip correct and exhausted questions
+    const attemptsMap = JSON.parse(localStorage.getItem(`attempts_${taskId}`) || "{}");
+    const correctList = JSON.parse(localStorage.getItem(`correct_${taskId}`) || "[]");
+    let next = currentIndex + 1;
+    while (next < questions.length) {
+      if (correctList.includes(questions[next].id)) { next++; continue; }
+      const a = questions[next].userQuestionAttempts?.[0];
+      if (a?.isCorrect) { next++; continue; }
+      if ((attemptsMap[questions[next].id] || 0) >= 2) { next++; continue; }
+      break;
+    }
+    if (next >= questions.length) { onClose?.(); return; }
+    setCurrentIndex(next);
   };
 
   const getBorderColor = (optionId: string, isCorrectOption: boolean) => {
     if (status === "correct" && isCorrectOption) return "#22C55E";
     if (status === "wrong" && selectedOption === optionId) return "#EF4444";
     if (status === "showAnswer" && isCorrectOption) return "#2563EB";
+    if (status === "showAnswer" && selectedOption === optionId && !isCorrectOption) return "#EF4444";
     if (status === "explanation") {
       if (isCorrectOption) return "#22C55E";
       if (selectedOption === optionId) return "#EF4444";
@@ -152,11 +277,13 @@ const QuestionsBank = ({ taskId, initialQuestions, source, onClose }: Props) => 
     (status === "idle" && selectedOption === optionId) ||
     (status === "wrong" && selectedOption === optionId) ||
     (status === "correct" && isCorrectOption) ||
-    (status === "showAnswer" && isCorrectOption) ||
+    (status === "showAnswer" && (isCorrectOption || selectedOption === optionId)) ||
     (status === "explanation" && selectedOption === optionId);
 
   const getOptionBg = (optionId: string, isCorrectOption: boolean) => {
-    if ((status === "correct" || status === "showAnswer" || status === "explanation") && isCorrectOption) return "#22C55E";
+    if ((status === "correct" || status === "explanation") && isCorrectOption) return "#22C55E";
+    if (status === "showAnswer" && isCorrectOption) return "#2563EB";
+    if (status === "showAnswer" && selectedOption === optionId && !isCorrectOption) return "#EF4444";
     if ((status === "wrong" || (status === "explanation" && !isCorrectOption)) && selectedOption === optionId) return "#EF4444";
     if (status === "idle" && selectedOption === optionId) return "#2563EB";
     return "white";
@@ -165,7 +292,7 @@ const QuestionsBank = ({ taskId, initialQuestions, source, onClose }: Props) => 
   const isHighlighted = (optionId: string, isCorrectOption: boolean) =>
     (status === "idle" && selectedOption === optionId) ||
     (status === "correct" && isCorrectOption) ||
-    (status === "showAnswer" && isCorrectOption) ||
+    (status === "showAnswer" && (isCorrectOption || (selectedOption === optionId && !isCorrectOption))) ||
     (status === "explanation" && isCorrectOption) ||
     (status === "wrong" && selectedOption === optionId) ||
     (status === "explanation" && selectedOption === optionId && !isCorrectOption);
@@ -174,7 +301,7 @@ const QuestionsBank = ({ taskId, initialQuestions, source, onClose }: Props) => 
   const getQuestionFontPercent = (text: string) => {
     if (text.length > 220) return '87.5%';
     if (text.length > 150) return '100%';
-    if (text.length > 80)  return '112.5%';
+    if (text.length > 80) return '112.5%';
     return '125%';
   };
 
@@ -298,9 +425,9 @@ const QuestionsBank = ({ taskId, initialQuestions, source, onClose }: Props) => 
                   background: getOptionBg(option.id, isCorrectOption),
                   boxShadow:
                     status === "idle" && selectedOption === option.id ? "0px 4px 16px 0px #2563EB40"
-                    : (status === "correct" && isCorrectOption) ? "0px 4px 16px 0px #22C55E40"
-                    : (status === "wrong" && selectedOption === option.id) ? "0px 4px 16px 0px #EF444440"
-                    : "none",
+                      : (status === "correct" && isCorrectOption) ? "0px 4px 16px 0px #22C55E40"
+                        : (status === "wrong" && selectedOption === option.id) ? "0px 4px 16px 0px #EF444440"
+                          : "none",
                 }}
               >
                 {/* Option text — 100% of base */}

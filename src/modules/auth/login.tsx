@@ -187,6 +187,7 @@ const handleAppleSignIn = async () => {
   };
 
   return (
+    // <div className="w-full h-screen overflow-hidden bg-primary flex">
     <div className="w-full h-screen overflow-hidden bg-primary flex">
       {/* {isLoading && <MiniLoader />} */}
 
@@ -202,7 +203,8 @@ const handleAppleSignIn = async () => {
           className="object-contain w-auto h-full"
         />
       </div> */}
-      <div className="h-full w-[37%] -mr-6 flex-shrink-0 flex items-center justify-center overflow-hidden relative z-0">
+      {/* <div className="h-full w-[37%] -mr-6 flex-shrink-0 flex items-center justify-center overflow-hidden relative z-0"> */}
+      <div className="hidden md:flex h-full w-[37%] -mr-6 flex-shrink-0 items-center justify-center overflow-hidden relative z-0">
               <Image
                 src="/images/auth/loginImg.svg"
                 alt="Login background"
