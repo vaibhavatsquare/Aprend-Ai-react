@@ -271,7 +271,7 @@ const Home = () => {
                     cursor: 'pointer',
                     border: isSelected ? '1px solid rgba(255,255,255,0.35)' : '1px solid #E5E5E5',
                     backgroundImage: isSelected ? "url('/images/buttonBg.svg')" : undefined,
-                    backgroundSize: isSelected ? '2000% 1600%' : undefined,
+                    backgroundSize: isSelected ? '2400% 1600%' : undefined,
                     backgroundPosition: isSelected ? 'center' : undefined,
                     backgroundColor: isSelected ? undefined : 'white',
                     boxShadow: isSelected ? '0px 0px 50px 0px #1953CB40' : '0px 2px 6px rgba(0,0,0,0.06)',
@@ -507,7 +507,7 @@ const Home = () => {
         onCancel={() => setShowUpgradeModal(false)}
         footer={null}
         centered
-        width={400}
+        width="clamp(280px,25vw,400px)"
         className="premium-modal"
       >
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'clamp(10px, 1.5vh, 16px)', width: '100%' }}>

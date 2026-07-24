@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 import { Button, message } from "antd";
 import { useRedirect } from "@/src/hooks/router.hooks";
 import { useLanguageStore } from "@/src/store/language.store";
-import { saveLanguage, getEducationLevels } from "@/src/services/api/user.api";
+// import { saveLanguage, getEducationLevels } from "@/src/services/api/user.api";
+import { saveLanguage } from "@/src/services/api/user.api";
 import { UserLanguage } from "@/src/libs/types";
 import { useTranslation } from "@/src/libs/i18n";
 import { useRouter } from "next/navigation";
@@ -40,9 +41,11 @@ const handleContinue = async () => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     user.user_language = selectedLanguage;
     localStorage.setItem("user", JSON.stringify(user));
-    const levels = await getEducationLevels(selectedLanguage);
-    localStorage.setItem("educationLevels", JSON.stringify(levels));
-    useRedirect("/onboarding/choose-education-level");
+    // const levels = await getEducationLevels(selectedLanguage);
+    // localStorage.setItem("educationLevels", JSON.stringify(levels));
+    // useRedirect("/onboarding/choose-education-level");
+    localStorage.removeItem("educationLevels");
+    router.push("/onboarding/choose-education-level");
   } catch {
     message.error("Failed to save language");
   } finally {

@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { getInitials, getStoredUser } from "@/src/libs/helpers";
 import { UserDetail, UserLanguage } from "@/src/libs/types";
 import { useRouter } from "next/navigation";
@@ -219,15 +219,15 @@ const [educationLevelName, setEducationLevelName] = useState(
     }
 
     return (
-        <div className="px-3 sm:px-4 py-3 pt-1 sm:pt-2 min-h-[calc(100vh-5rem)]">
-            <div className="flex gap-4 h-full overflow-hidden">
+        <div className="px-[clamp(8px,1vw,16px)] py-[clamp(6px,0.8vw,12px)] min-h-[calc(100vh-5rem)]">
+            <div className="flex gap-[clamp(10px,1vw,16px)] h-full overflow-hidden">
 
                 {/* LEFT PANEL */}
-                <div className={`transition-all duration-300 ${isSplit ? "w-1/2" : "w-full"} h-full overflow-hidden`}>
+                <div className={`transition-all duration-300 ${isSplit ? "hidden lg:block lg:w-1/2" : "w-full"} h-full overflow-hidden`}>
                     <div className="bg-white h-full flex flex-col">
-                        <div className="p-2 sm:p-4">
+                        <div className="p-[clamp(6px,0.8vw,16px)]">
                             <div className="flex flex-col items-center text-center">
-                                <div className="relative w-[22%] max-w-[6.875rem] min-w-[4.375rem] aspect-square">
+                                <div className="relative w-[clamp(60px,8vw,110px)] aspect-square">
                                     {user?.image ? (
                                         <AntImage
                                             src={user.image}
@@ -238,29 +238,29 @@ const [educationLevelName, setEducationLevelName] = useState(
                                             className="rounded-full object-fill shadow-[0_-3px_8px_rgba(0,0,0,0.15)]"
                                         />
                                     ) : (
-                                        <div className="w-full h-full rounded-full bg-[#0F3057] flex items-center justify-center text-white text-[2rem] font-semibold">
+                                        <div className="w-full h-full rounded-full bg-[#0F3057] flex items-center justify-center text-white text-[clamp(18px,2vw,32px)] font-semibold">
                                             {getInitials(displayName)}
                                         </div>
                                     )}
                                     <div
                                         onClick={() => handleSelect("editProfile")}
-                                        className="absolute bottom-[2%] right-[2%] w-[28%] max-w-[2rem] aspect-square bg-white rounded-full flex items-center justify-center shadow"
+                                        className="absolute bottom-[2%] right-[2%] w-[clamp(20px,2vw,32px)] aspect-square bg-white rounded-full flex items-center justify-center shadow"
                                     >
                                         <FiEdit2 size="1rem" />
                                     </div>
                                 </div>
 
-                                <h2 className="text-[1.25rem] sm:text-[1.625rem] md:text-[2rem] font-semibold text-primaryText mt-2 sm:mt-4">
+                                <h2 className="text-[clamp(14px,1.4vw,28px)] font-semibold text-primaryText mt-[clamp(6px,0.8vw,14px)]">
                                     {displayName}
                                 </h2>
-                                <p className="text-[0.75rem] sm:text-[0.875rem] md:text-[1rem] underline text-primaryText mt-1">
+                                <p className="text-[clamp(11px,0.9vw,15px)] underline text-primaryText mt-[clamp(2px,0.3vw,5px)]">
                                     {user?.email}
                                 </p>
                                 <div className="mt-1 sm:mt-2">
-                    <span className="text-[0.75rem] sm:text-[0.875rem] md:text-[1rem] font-semibold text-primaryText">
+                    <span className="text-[clamp(11px,0.9vw,15px)] font-semibold text-primaryText">
                         {t('profile.educationLevel')}
                     </span>{" "}
-                    <span className="text-[0.75rem] sm:text-[0.875rem] md:text-[1rem] font-medium text-secondary">
+                    <span className="text-[clamp(11px,0.9vw,15px)] font-medium text-secondary">
                                         {/* {educationLabel} */}
                                         {educationLevelName || ""}
                                     </span>
@@ -268,14 +268,14 @@ const [educationLevelName, setEducationLevelName] = useState(
                             </div>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto scrollbar px-3 sm:px-4">
-                            <div className="mt-[2%] sm:mt-[3%] md:mt-[4%] space-y-1 sm:space-y-2 md:space-y-3">
+                        <div className="flex-1 overflow-y-auto scrollbar px-[clamp(8px,1vw,16px)]">
+                            <div className="mt-[clamp(6px,1vw,16px)] space-y-[clamp(4px,0.5vw,10px)]">
 
                                 <ProfileItem
                                     title={t('profile.preferredLanguage')}
                                     onClick={() => handleSelect("language")}
                                     rightContent={
-                                        <span className="text-[0.875rem] text-secondary">
+                                        <span className="text-[clamp(11px,0.85vw,14px)] text-secondary">
                                             {languages.find((l: any) => l.value === selectedLanguage)?.label ?? "English (UK)"}
                                         </span>
                                     }
@@ -426,7 +426,7 @@ const [educationLevelName, setEducationLevelName] = useState(
                 {/* RIGHT PANEL */}
                 {isSplit && (
                     <div
-                        className="w-1/2 bg-white m-[2%] p-[3%] rounded-[0.75rem] min-h-[calc(96vh-6.25rem)] col-span-2 flex flex-col gap-[3%]"
+                        className="w-full lg:w-1/2 bg-white m-[2%] p-[clamp(12px,2vw,24px)] rounded-[clamp(8px,0.75vw,14px)] min-h-[calc(96vh-6.25rem)] col-span-2 flex flex-col gap-[clamp(8px,1vw,16px)]"
                         style={{ boxShadow: "0px 0px 4px 0px #00000040" }}
                     >
                         {selected === "editProfile" && (
@@ -516,7 +516,10 @@ const SubscriptionSection = ({ onBack }: { onBack?: () => void }) => {
     const { t } = useTranslation();
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [immediateCancel, setImmediateCancel] = useState(false);
-    const [cancelClickCount, setCancelClickCount] = useState(0);
+    const isAlreadyCancelled = useMemo(() => {
+    return subscription?.cancelledAt !== null &&
+           subscription?.cancelledAt !== undefined;
+}, [subscription?.cancelledAt]);
 
     const handleRestore = async () => {
         if (restoring) return;
@@ -714,18 +717,18 @@ const SubscriptionSection = ({ onBack }: { onBack?: () => void }) => {
     if (isActive) {
         return (
             <div className="flex flex-col h-full">
-                <div className="flex items-center mb-4">
+                <div className="flex items-center mb-[clamp(10px,1vw,16px)]">
                     <GoArrowLeft className="text-xl cursor-pointer" onClick={onBack} />
                 </div>
-                <div className="flex-1 flex flex-col gap-6 justify-center">
-                    <div className="bg-white rounded-[20px] p-6 mx-6 flex flex-col gap-6 border border-gray-200" style={{ minHeight: 300 }}>
-                        <p className="text-[14px] text-secondary">{t('subscription.checkPlanOverview')}</p>
-                        <h2 className="text-[22px] font-bold text-[#2563EB]">
+                <div className="flex-1 flex flex-col gap-[clamp(12px,1.5vw,24px)] justify-center">
+                    <div className="bg-white rounded-[clamp(12px,1.5vw,20px)] p-[clamp(12px,1.5vw,24px)] mx-[clamp(10px,1.5vw,24px)] flex flex-col gap-[clamp(12px,1.5vw,24px)] border border-gray-200" style={{ minHeight: 300 }}>
+                        <p className="text-[clamp(11px,0.9vw,14px)] text-secondary">{t('subscription.checkPlanOverview')}</p>
+                        <h2 className="text-[clamp(15px,1.4vw,22px)] font-bold text-[#2563EB]">
                             {/* Your {subscription.price >= 100 ? "Yearly" : "Monthly"} Plan */}
                             {t('subscription.your') as any} {subscription.price >= 100 ? t('subscription.yearly') : t('subscription.monthly')} Plan
 
                             {isTrial && (
-                                <span className="ml-2 text-[12px] bg-blue-600 text-white px-2 py-0.5 rounded-full align-middle">
+                                <span className="ml-2 text-[clamp(9px,0.75vw,12px)] bg-blue-600 text-white px-[clamp(4px,0.4vw,8px)] py-[clamp(1px,0.15vw,3px)] rounded-full align-middle">
                                     Free Trial
                                 </span>
                             )}
@@ -740,7 +743,7 @@ const SubscriptionSection = ({ onBack }: { onBack?: () => void }) => {
                                     </div>
                                     <div className="w-px h-8 border-l-2 border-dashed border-gray-300 mt-1" />
                                 </div>
-                                <p className="text-[14px] text-gray-700 mt-0.5">
+                                <p className="text-[clamp(11px,0.9vw,14px)] text-gray-700 mt-[clamp(1px,0.15vw,3px)]">
                                     {/* Active From <span className="font-bold">{formatDate(subscription.purchasedAt)}</span> */}
                                     {isTrial ? "Trial Started" : t('subscription.activeFrom')} <span className="font-bold">{formatDate(subscription.purchasedAt)}</span>
                                 </p>
@@ -751,13 +754,13 @@ const SubscriptionSection = ({ onBack }: { onBack?: () => void }) => {
                                         <path d="M2.5 7L5.5 10L11.5 4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                     </svg>
                                 </div>
-                                <p className="text-[14px] text-gray-700 mt-0.5">
+                                <p className="text-[clamp(11px,0.9vw,14px)] text-gray-700 mt-[clamp(1px,0.15vw,3px)]">
                                     {/* Expire on <span className="font-bold">{formatDate(subscription.endsAt)}</span> */}
                                     {isTrial ? "Trial Ends" : t('subscription.expireOn')} <span className="font-bold">{formatDate(subscription.endsAt)}</span>
                                 </p>
                             </div>
                         </div>
-                        <p className="text-[13px] text-gray-600">
+                        <p className="text-[clamp(10px,0.85vw,13px)] text-gray-600">
                             <span className="font-semibold underline">{t('subscription.status')}:</span>{" "}
                             {/* You can explore all features and content without limits. */}
                             {isTrial
@@ -770,7 +773,7 @@ const SubscriptionSection = ({ onBack }: { onBack?: () => void }) => {
                         <button
                             onClick={() => window.location.href = "/home"}
                             // className="w-full h-[52px] bg-gray-900 text-white rounded-[14px] text-[16px] font-semibold hover:opacity-90 transition-opacity"
-                            className="w-full h-[52px] text-white rounded-[14px] text-[16px] font-semibold hover:opacity-90 transition-opacity"
+                            className="w-full h-[clamp(38px,3.2vw,52px)] text-white rounded-[clamp(8px,0.9vw,14px)] text-[clamp(12px,1vw,16px)] font-semibold hover:opacity-90 transition-opacity"
                             style={{
                                 backgroundImage: "url('/images/buttonBg.svg')",
                                 backgroundSize: '350% 700%', backgroundPosition: 'center',
@@ -784,21 +787,19 @@ const SubscriptionSection = ({ onBack }: { onBack?: () => void }) => {
 
                     <button
                         onClick={() => {
-                            const isImmediate = cancelClickCount >= 1;
-                            setImmediateCancel(isImmediate);
-                            setShowConfirmModal(true);
-                            setCancelClickCount((prev) => prev + 1);
-                        }}
-                        className="w-full text-center text-[14px] text-secondary hover:text-red-500 transition-colors underline"
+                        setImmediateCancel(isAlreadyCancelled);
+                        setShowConfirmModal(true);
+                    }}
+                        className="w-full text-center text-[clamp(11px,0.9vw,14px)] text-secondary hover:text-red-500 transition-colors underline"
                     >
                         {t('subscription.cancel')}
                     </button>
                 </div>
                 {showConfirmModal && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-6">
-                        <div className="bg-white rounded-[20px] p-6 w-full max-w-sm flex flex-col items-center gap-4">
+                        <div className="bg-white rounded-[clamp(12px,1.5vw,20px)] p-[clamp(12px,1.5vw,24px)] w-full max-w-sm flex flex-col items-center gap-[clamp(10px,1vw,16px)]">
                             {/* <button onClick={() => setShowConfirmModal(false)} className="self-end text-gray-400 hover:text-gray-600">✕</button> */}
-                            <button onClick={() => { setShowConfirmModal(false); setCancelClickCount(0); }} className="self-end text-gray-400 hover:text-gray-600">✕</button>
+                            <button onClick={() => setShowConfirmModal(false)} className="self-end text-gray-400 hover:text-gray-600">✕</button>
                             <div className="text-red-500">
                                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                                     <polyline points="3 6 5 6 21 6" />
@@ -807,15 +808,15 @@ const SubscriptionSection = ({ onBack }: { onBack?: () => void }) => {
                                     <path d="M9 6V4h6v2" />
                                 </svg>
                             </div>
-                            <p className="text-[16px] font-bold text-gray-900 text-center">
+                            <p className="text-[clamp(12px,1vw,16px)] font-bold text-gray-900 text-center">
                                 {immediateCancel
                                     ? "Are you sure you want to cancel your subscription immediately?"
                                     : "Are you sure you want to cancel your subscription?"}
                             </p>
                             <div className="flex gap-3 w-full mt-2">
                                 <button
-                                    onClick={() => { setShowConfirmModal(false); setCancelClickCount(0); }}
-                                    className="flex-1 h-[52px] border border-gray-200 rounded-[14px] text-[15px] font-medium text-gray-900"
+                                    onClick={() => setShowConfirmModal(false)}
+                                    className="flex-1 h-[clamp(38px,3.2vw,52px)] border border-gray-200 rounded-[clamp(8px,0.9vw,14px)] text-[clamp(11px,0.95vw,15px)] font-medium text-gray-900"
                                 >
                                     Cancel
                                 </button>
@@ -824,11 +825,11 @@ const SubscriptionSection = ({ onBack }: { onBack?: () => void }) => {
                                     disabled={cancelling}
                                     onClick={() => handleCancel(immediateCancel)}
                                     style={{
-                                        height: '52px',
+                                        height: 'clamp(38px,3.2vw,52px)',
                                         backgroundColor: '#ef4444',
                                         color: 'white',
-                                        borderRadius: '14px',
-                                        fontSize: '15px',
+                                        borderRadius: 'clamp(8px,0.9vw,14px)',
+                                        fontSize: 'clamp(11px,0.95vw,15px)',
                                         fontWeight: '600',
                                         border: 'none',
                                         flex: 1,
@@ -852,22 +853,22 @@ const SubscriptionSection = ({ onBack }: { onBack?: () => void }) => {
                 <button
                     onClick={handleRestore}
                     disabled={restoring}
-                    className="text-[14px] text-primary underline disabled:opacity-50"
+                    className="text-[clamp(11px,0.9vw,14px)] text-primary underline disabled:opacity-50"
                 >
                     {restoring ? t('common.loading') : t('subscription.restore')}
                 </button>
             </div>
 
-            <div className="text-center mb-6">
-                <h3 className="text-[22px] font-bold text-gray-900">
+            <div className="text-center mb-[clamp(12px,1.5vw,24px)]">
+                <h3 className="text-[clamp(15px,1.4vw,22px)] font-bold text-gray-900">
                     Unlock premium learning access
                 </h3>
-                <p className="text-[14px] text-secondary mt-1">
+                <p className="text-[clamp(11px,0.9vw,14px)] text-secondary mt-[clamp(2px,0.3vw,5px)]">
                     Unlock your full learning potential!
                 </p>
             </div>
 
-            <div className="flex flex-col gap-3 flex-1">
+            <div className="flex flex-col gap-[clamp(8px,0.8vw,12px)] flex-1">
                 {/* FREE */}
                 <div
                     className={`border rounded-[12px] overflow-hidden cursor-pointer transition-all ${selectedPlan === "free" ? "border-[#2563EB] bg-[#EFF6FF]" : "border-gray-200"}`}
@@ -875,17 +876,17 @@ const SubscriptionSection = ({ onBack }: { onBack?: () => void }) => {
                     // onClick={() => { setSelectedPlan("free"); setExpandedFree((p) => !p); }}
                     onClick={() => { setSelectedPlan("free"); setExpandedFree((p) => !p); setExpandedMonthly(false); setExpandedYearly(false); }}
                 >
-                    <div className="w-full flex items-center justify-between px-4 py-3">
-                        <span className="text-[15px] font-semibold text-gray-900">{t('subscription.free').toUpperCase()}</span>
+                    <div className="w-full flex items-center justify-between px-[clamp(10px,1vw,16px)] py-[clamp(8px,0.8vw,12px)]">
+                        <span className="text-[clamp(11px,0.95vw,15px)] font-semibold text-gray-900">{t('subscription.free').toUpperCase()}</span>
                         {expandedFree
                             ? <LuChevronUp size={18} className="text-secondary" />
                             : <LuChevronDown size={18} className="text-secondary" />
                         }
                     </div>
                     {expandedFree && (
-                        <div className="px-4 pb-4 space-y-2 border-t border-gray-100 pt-3">
+                        <div className="px-[clamp(10px,1vw,16px)] pb-[clamp(10px,1vw,16px)] space-y-[clamp(4px,0.5vw,8px)] border-t border-gray-100 pt-[clamp(8px,0.8vw,12px)]">
                             {FREE_FEATURES.map((f, i) => (
-                                <div key={i} className="flex items-center gap-2 text-[13px] text-secondary">
+                                <div key={i} className="flex items-center gap-[clamp(4px,0.5vw,8px)] text-[clamp(10px,0.85vw,13px)] text-secondary">
                                     <span className="text-[#2563EB]">{f.icon}</span>
                                     {f.label}
                                 </div>
@@ -901,12 +902,12 @@ const SubscriptionSection = ({ onBack }: { onBack?: () => void }) => {
                     // onClick={() => { setSelectedPlan("monthly"); setExpandedMonthly((p) => !p); }}
                     onClick={() => { setSelectedPlan("monthly"); setExpandedMonthly((p) => !p); setExpandedFree(false); setExpandedYearly(false); }}
                 >
-                    <div className="flex items-center justify-between px-4 py-3">
+                    <div className="flex items-center justify-between px-[clamp(10px,1vw,16px)] py-[clamp(8px,0.8vw,12px)]">
                         <div>
-                            <p className="text-[13px] text-secondary font-medium">{t('subscription.monthly').toUpperCase()}</p>
-                            <p className="text-[18px] font-bold text-gray-900">
+                            <p className="text-[clamp(10px,0.85vw,13px)] text-secondary font-medium">{t('subscription.monthly').toUpperCase()}</p>
+                            <p className="text-[clamp(13px,1.1vw,18px)] font-bold text-gray-900">
                                 {plans?.monthly?.currency === "BRL" ? "R$" : "$"}{plans?.monthly?.amount ?? 29.90}
-                                <span className="text-[13px] font-normal text-secondary"> /month</span>
+                                <span className="text-[clamp(10px,0.85vw,13px)] font-normal text-secondary"> /month</span>
                             </p>
                         </div>
                         {expandedMonthly
@@ -915,9 +916,9 @@ const SubscriptionSection = ({ onBack }: { onBack?: () => void }) => {
                         }
                     </div>
                     {expandedMonthly && (
-                        <div className="px-4 pb-4 space-y-2 border-t border-gray-100 pt-3">
+                        <div className="px-[clamp(10px,1vw,16px)] pb-[clamp(10px,1vw,16px)] space-y-[clamp(4px,0.5vw,8px)] border-t border-gray-100 pt-[clamp(8px,0.8vw,12px)]">
                             {PAID_FEATURES.map((f, i) => (
-                                <div key={i} className="flex items-center gap-2 text-[13px] text-secondary">
+                                <div key={i} className="flex items-center gap-[clamp(4px,0.5vw,8px)] text-[clamp(10px,0.85vw,13px)] text-secondary">
                                     <span className="text-[#2563EB]">{f.icon}</span>
                                     {f.label}
                                 </div>
@@ -938,13 +939,13 @@ const SubscriptionSection = ({ onBack }: { onBack?: () => void }) => {
                     <span className="absolute -top-2 right-4 bg-[#2563EB] text-white text-[10px] font-semibold px-3 py-1 rounded-full italic">
                         7-{t('time.days')} free trial
                     </span>
-                    <div className="flex items-center justify-between px-4 py-3">
+                    <div className="flex items-center justify-between px-[clamp(10px,1vw,16px)] py-[clamp(8px,0.8vw,12px)]">
 
                         <div>
-                            <p className="text-[13px] text-secondary font-medium">{t('subscription.yearly').toUpperCase()}</p>
-                            <p className="text-[18px] font-bold text-gray-900">
+                            <p className="text-[clamp(10px,0.85vw,13px)] text-secondary font-medium">{t('subscription.yearly').toUpperCase()}</p>
+                            <p className="text-[clamp(13px,1.1vw,18px)] font-bold text-gray-900">
                                 {plans?.yearly?.currency === "BRL" ? "R$" : "$"}{plans?.yearly?.amount ?? 239.90}
-                                <span className="text-[13px] font-normal text-secondary"> /year</span>
+                                <span className="text-[clamp(10px,0.85vw,13px)] font-normal text-secondary"> /year</span>
                             </p>
                         </div>
                         <div className="flex items-center gap-2">
@@ -957,9 +958,9 @@ const SubscriptionSection = ({ onBack }: { onBack?: () => void }) => {
                         </div>
                     </div>
                     {expandedYearly && (
-                        <div className="px-4 pb-4 space-y-2 border-t border-gray-100 pt-3">
+                        <div className="px-[clamp(10px,1vw,16px)] pb-[clamp(10px,1vw,16px)] space-y-[clamp(4px,0.5vw,8px)] border-t border-gray-100 pt-[clamp(8px,0.8vw,12px)]">
                             {PAID_FEATURES.map((f, i) => (
-                                <div key={i} className="flex items-center gap-2 text-[13px] text-secondary">
+                                <div key={i} className="flex items-center gap-[clamp(4px,0.5vw,8px)] text-[clamp(10px,0.85vw,13px)] text-secondary">
                                     <span className="text-[#2563EB]">{f.icon}</span>
                                     {f.label}
                                 </div>
@@ -974,16 +975,16 @@ const SubscriptionSection = ({ onBack }: { onBack?: () => void }) => {
                 disabled={upgrading}
                 onClick={handleUpgrade}
                 style={{
-                    marginTop: '24px',
-                    marginLeft: '16px',
-                    marginRight: '16px',
-                    width: 'calc(100% - 32px)',
-                    height: '48px',
-                    minHeight: '48px',
+                    marginTop: 'clamp(14px,1.5vw,24px)',
+                    marginLeft: 'clamp(8px,1vw,16px)',
+                    marginRight: 'clamp(8px,1vw,16px)',
+                    width: 'calc(100% - clamp(16px,2vw,32px))',
+                    height: 'clamp(36px,3vw,48px)',
+                    minHeight: 'clamp(36px,3vw,48px)',
                     flexShrink: 0,
                     color: 'white',
-                    borderRadius: '12px',
-                    fontSize: '15px',
+                    borderRadius: 'clamp(8px,0.8vw,12px)',
+                    fontSize: 'clamp(11px,0.95vw,15px)',
                     fontWeight: '600',
                     backgroundImage: "url('/images/buttonBg.svg')",
                     backgroundSize: '350% 700%',
@@ -1010,12 +1011,12 @@ const TERMS_PARAGRAPHS = [
 
 const TermsSection = () => (
     <div className="flex flex-col h-full overflow-y-auto scrollbar">
-        <h3 className="text-[22px] font-bold text-gray-900 text-center mb-6">
+        <h3 className="text-[clamp(15px,1.4vw,22px)] font-bold text-gray-900 text-center mb-[clamp(12px,1.5vw,24px)]">
             Terms &amp; Conditions
         </h3>
-        <div className="space-y-4">
+        <div className="space-y-[clamp(8px,1vw,16px)]">
             {TERMS_PARAGRAPHS.map((para, i) => (
-                <p key={i} className="text-[14px] text-secondary leading-relaxed">
+                <p key={i} className="text-[clamp(11px,0.9vw,14px)] text-secondary leading-relaxed">
                     {para}
                 </p>
             ))}
@@ -1029,17 +1030,17 @@ const PrivacySection = () => {
     const { t } = useTranslation();
     return (
         <div className="flex flex-col h-full overflow-y-auto scrollbar">
-            <h3 className="text-[22px] font-bold text-gray-900 text-center mb-6">
+            <h3 className="text-[clamp(15px,1.4vw,22px)] font-bold text-gray-900 text-center mb-[clamp(12px,1.5vw,24px)]">
                 {t('profile.privacyPolicy')}
             </h3>
-            <div className="space-y-4">
-                <p className="text-[14px] text-secondary leading-relaxed">
+            <div className="space-y-[clamp(8px,1vw,16px)]">
+                <p className="text-[clamp(11px,0.9vw,14px)] text-secondary leading-relaxed">
                     Your data is handled securely and in accordance with applicable data protection laws. We collect only the information necessary to provide our services.
                 </p>
-                <p className="text-[14px] text-secondary leading-relaxed">
+                <p className="text-[clamp(11px,0.9vw,14px)] text-secondary leading-relaxed">
                     We do not share personal data with third parties except where required by law or necessary to provide the service. You may request deletion of your data at any time by contacting support.
                 </p>
-                <p className="text-[14px] text-secondary leading-relaxed">
+                <p className="text-[clamp(11px,0.9vw,14px)] text-secondary leading-relaxed">
                     We use industry-standard encryption to protect your data both in transit and at rest. Our security practices are regularly reviewed and updated.
                 </p>
             </div>
@@ -1081,9 +1082,9 @@ const ProfileItem = ({
 }) => (
     <div
         onClick={onClick}
-        className="h-[40px] sm:h-[46px] md:h-[50px] bg-[#F7F7F8] rounded-[0.5rem] px-3 sm:px-4 flex items-center justify-between cursor-pointer"
+        className="h-[clamp(36px,3.2vw,50px)] bg-[#F7F7F8] rounded-[clamp(6px,0.5vw,9px)] px-[clamp(8px,1vw,16px)] flex items-center justify-between cursor-pointer"
     >
-        <p className={`text-[13px] sm:text-[14px] md:text-[16px] ${titleClass || "text-primaryText"}`}>
+        <p className={`text-[clamp(11px,1vw,16px)] ${titleClass || "text-primaryText"}`}>
             {title}
         </p>
         {rightContent ? rightContent : <IoChevronForward size={18} />}

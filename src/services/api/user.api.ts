@@ -76,7 +76,7 @@ export const updateUserProfile = async (data: {
 };
 
 export const getEducationLevels = async (language?: string) => {
-  return fetch<{ id: string; code: string; name: string; description: string; sortOrder: number }[]>({
+  return fetch<{ id: string; code: string; name: string; description: string; sortOrder: number; imageUrl: string }[]>({
     url: "/onboarding/education-levels",
     method: "GET",
     params: { language },

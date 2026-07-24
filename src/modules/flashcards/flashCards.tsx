@@ -157,7 +157,7 @@ const Flashcards = ({ taskId, initialQuestions, source, onClose }: Props) => {
   const getQuestionFontPercent = (text: string) => {
     if (text.length > 220) return '87.5%';   // 14px at base 16px
     if (text.length > 150) return '100%';    // 16px
-    if (text.length > 80)  return '112.5%';  // 18px
+    if (text.length > 80) return '112.5%';  // 18px
     return '125%';                           // 20px
   };
 
@@ -232,7 +232,7 @@ const Flashcards = ({ taskId, initialQuestions, source, onClose }: Props) => {
 
           {/* Counter */}
           <div style={{
-            width: 'clamp(280px, 30vw, 520px)',
+            width: 'min(90vw, 520px)',
             textAlign: 'right',
             fontSize: 'clamp(11px, 1vw, 16px)',
             fontWeight: 500,
@@ -414,12 +414,23 @@ const Flashcards = ({ taskId, initialQuestions, source, onClose }: Props) => {
                   {current.options.find((o) => o.id === current.correctOptionId)?.text}
                 </p>
 
-                {/* Explanation — no scroll */}
-                <div style={{ flex: 1, textAlign: 'center', marginTop: '4%', minHeight: 0, overflow: 'hidden' }}>
-                  <h3 style={{ fontSize: '112.5%', fontWeight: 600, marginBottom: '3%' }}> {/* 18px */}
+                {/* Explanation — scrollable when content overflows */}
+                <div style={{
+                  flex: 1,
+                  textAlign: 'center',
+                  marginTop: '4%',
+                  minHeight: 0,
+                  overflowY: 'auto',
+                  // Pad bottom so text never slides under the absolute-positioned arrows + tap text
+                  paddingBottom: 'clamp(60px, 18%, 90px)',
+                  // Thin scrollbar so it doesn't look ugly on desktop
+                  scrollbarWidth: 'thin',
+                  scrollbarColor: 'rgba(0,0,0,0.2) transparent',
+                }}>
+                  <h3 style={{ fontSize: '112.5%', fontWeight: 600, marginBottom: '3%' }}>
                     Explanation
                   </h3>
-                  <p style={{ fontSize: '100%', color: '#374151', lineHeight: 1.4 }}> {/* 16px */}
+                  <p style={{ fontSize: '100%', color: '#374151', lineHeight: 1.4 }}>
                     {current.stepByStepExplanation}
                   </p>
                 </div>
@@ -450,14 +461,29 @@ const Flashcards = ({ taskId, initialQuestions, source, onClose }: Props) => {
                   </button>
                 </div>
 
-                {/* Tap to flip back */}
-                <div style={{ position: 'absolute', bottom: '4%', left: 0, right: 0, textAlign: 'center' }}>
-                  <p
-                    onClick={() => setRevealed(false)}
-                    style={{ fontSize: '87.5%', fontWeight: 500, cursor: 'pointer' }}
-                  >
-                    {t('flashcards.tapToFlipBack')}
-                  </p>
+                {/* Tap to flip back — with gradient fade above it */}
+                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
+                  {/* Fade gradient — blends scrolled content into the bottom */}
+                  <div style={{
+                    height: 'clamp(40px, 8%, 60px)',
+                    background: `linear-gradient(to bottom, transparent, ${bgColor})`,
+                    pointerEvents: 'none',
+                  }} />
+
+                  {/* Tap text sits on solid background so it's always legible */}
+                  <div style={{
+                    backgroundColor: bgColor,
+                    textAlign: 'center',
+                    paddingBottom: '4%',
+                    paddingTop: '1%',
+                  }}>
+                    <p
+                      onClick={() => setRevealed(false)}
+                      style={{ fontSize: '87.5%', fontWeight: 500, cursor: 'pointer' }}
+                    >
+                      {t('flashcards.tapToFlipBack')}
+                    </p>
+                  </div>
                 </div>
               </div>
 

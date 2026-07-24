@@ -21,19 +21,30 @@ const ChooseEducationLevel = () => {
 
 
 
+// useEffect(() => {
+//   const cached = localStorage.getItem("educationLevels");
+//   if (cached) {
+//     setEducationLevels(JSON.parse(cached));
+//     setLoadingLevels(false);
+//     return;
+//   }
+//   const user = JSON.parse(localStorage.getItem("user") || "{}");
+//   const language = user?.user_language || "ENGLISH";
+//   getEducationLevels(language)
+//     .then((data) => {
+//       setEducationLevels(data);
+//       localStorage.setItem("educationLevels", JSON.stringify(data));
+//     })
+//     .catch(() => {})
+//     .finally(() => setLoadingLevels(false));
+// }, []);
+
 useEffect(() => {
-  const cached = localStorage.getItem("educationLevels");
-  if (cached) {
-    setEducationLevels(JSON.parse(cached));
-    setLoadingLevels(false);
-    return;
-  }
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const language = user?.user_language || "ENGLISH";
   getEducationLevels(language)
     .then((data) => {
       setEducationLevels(data);
-      localStorage.setItem("educationLevels", JSON.stringify(data));
     })
     .catch(() => {})
     .finally(() => setLoadingLevels(false));
@@ -134,8 +145,11 @@ const levelIcons: Record<string, string> = {
               style={selectedEducationLevel === level.id ? { boxShadow: '0px 4px 16px 0px #2563EB40' } : undefined}
             >
               {/* Icon */}
-              <div className="w-10 h-10 rounded-2xl bg-gray-100 flex items-center justify-center flex-shrink-0 text-lg overflow-hidden">
+              {/* <div className="w-10 h-10 rounded-2xl bg-gray-100 flex items-center justify-center flex-shrink-0 text-lg overflow-hidden">
                 {levelIcons[level.code] || "📚"}
+              </div> */}
+              <div className="w-10 h-10 rounded-2xl bg-gray-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                <Image src={level.imageUrl} alt={level.name} width={35} height={35} className="object-contain" unoptimized />
               </div>
 
               {/* Title + subtitle */}

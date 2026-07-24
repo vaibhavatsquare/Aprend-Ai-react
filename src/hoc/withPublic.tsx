@@ -17,10 +17,11 @@ function withPublic<P extends object>(
     const checkAuthState = () => {
       const idToken = getCookie("idToken");
       waitForAuthState().then((user) => {
-        if (user && idToken) {
-          router.replace("/home"); // Replace with your protected home route
+        const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+        if (user && idToken && storedUser?.isEmailVerified === true) {
+          router.replace("/home");
         } else {
-         if (!user) clearData();
+          if (!user) clearData();
           setLoading(false);
         }
       });

@@ -11,7 +11,8 @@ import {
   signInWithGoogle
 } from "@/src/services/auth/auth.firebase.service";
 import { setCookie } from "@/src/services/coockies/coockie.service";
-import { authenticateWithAPI } from "@/src/services/api/auth.api";
+import { authenticateWithAPI, sendOtp, verifyOtp, resendOtp } from "@/src/services/api/auth.api";
+import { GoArrowLeft } from "react-icons/go";
 import { getFCMToken } from "@/src/configs/firebase.config";
 import { handlePostLoginRedirect } from "@/src/utils/redirect";
 import MiniLoader from "@/src/components/loaders/MiniLoader";
@@ -74,7 +75,14 @@ const getFirebaseErrorMessage = (error: any): string => {
 
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [verifyLoading, setVerifyLoading] = useState(false);
   const [fcmToken, setFcmToken] = useState("");
+  const [step, setStep] = useState<"form" | "otp">("form");
+  const [currentEmail, setCurrentEmail] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [otpValues, setOtpValues] = useState(["", "", "", ""]);
+  const [resendTimer, setResendTimer] = useState(0);
+  const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
   const isInitialized = useRef(false);
 
   useEffect(() => {
@@ -121,6 +129,14 @@ const Login = () => {
       registerServiceWorkerAndGetToken();
     }
   }, []);
+
+  useEffect(() => {
+    if (resendTimer <= 0) return;
+    const interval = setInterval(() => {
+      setResendTimer((prev) => prev - 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [resendTimer]);
 
   const {
     control,
@@ -176,6 +192,16 @@ const handleAppleSignIn = async () => {
       const { idToken } = await signInWithFirebase(data.email, data.password);
       setCookie("idToken", idToken, 7);
       const res = await authenticateWithAPI(fcmToken);
+      if (!res.user.isEmailVerified) {
+        document.cookie = "idToken=; max-age=0; path=/";
+        await sendOtp(data.email, false);
+        setCurrentEmail(data.email);
+        setCurrentPassword(data.password);
+        setStep("otp");
+        setResendTimer(60);
+        message.warning("Please verify your email to continue.");
+        return;
+      }
       message.success("Login successful");
       handlePostLoginRedirect(res.user);
     } catch (error: any) {
@@ -185,6 +211,143 @@ const handleAppleSignIn = async () => {
       setIsLoading(false);
     }
   };
+
+  const handleVerifyOtp = async () => {
+    const otp = otpValues.join("");
+    if (otp.length < 4) {
+      message.error("Please enter the complete 4-digit OTP");
+      return;
+    }
+    try {
+      setVerifyLoading(true);
+      await verifyOtp(currentEmail, otp);
+      const { idToken } = await signInWithFirebase(currentEmail, currentPassword);
+      setCookie("idToken", idToken, 7);
+      const res = await authenticateWithAPI(fcmToken);
+      message.success("Email verified! Login successful.");
+      handlePostLoginRedirect(res.user);
+    } catch (error: any) {
+      message.error("Invalid OTP. Please try again.");
+      setOtpValues(["", "", "", ""]);
+      otpRefs.current[0]?.focus();
+    } finally {
+      setVerifyLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (resendTimer > 0) return;
+    try {
+      await resendOtp(currentEmail);
+      setResendTimer(60);
+      setOtpValues(["", "", "", ""]);
+      otpRefs.current[0]?.focus();
+      message.success("OTP resent!");
+    } catch (error: any) {
+      message.error("Failed to resend OTP. Please try again.");
+    }
+  };
+
+  const handleOtpChange = (index: number, value: string) => {
+    if (!/^\d*$/.test(value)) return;
+    const newValues = [...otpValues];
+    newValues[index] = value.slice(-1);
+    setOtpValues(newValues);
+    if (value && index < 3) {
+      otpRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace" && !otpValues[index] && index > 0) {
+      otpRefs.current[index - 1]?.focus();
+    }
+    if (e.key === "Enter") handleVerifyOtp();
+  };
+
+  const handleOtpPaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 4);
+    const newValues = [...otpValues];
+    pasted.split("").forEach((char, i) => { newValues[i] = char; });
+    setOtpValues(newValues);
+    otpRefs.current[Math.min(pasted.length, 3)]?.focus();
+  };
+
+  if (step === "otp") {
+    return (
+      <div className="w-full h-screen overflow-hidden bg-primary flex">
+        <div className="hidden md:flex h-full w-[35%] flex-shrink-0 items-center justify-center overflow-hidden">
+          <Image
+            src="/images/auth/loginImg.svg"
+            alt="Login background"
+            width={390}
+            height={844}
+            className="object-cover w-full h-full"
+          />
+        </div>
+        <div className="relative flex-1 h-full bg-white rounded-tl-4xl rounded-bl-4xl flex items-center justify-center">
+          <GoArrowLeft
+            className="absolute top-5 left-5 cursor-pointer text-xl"
+            onClick={() => {
+              setStep("form");
+              setOtpValues(["", "", "", ""]);
+            }}
+          />
+          <div className="w-[90%] sm:w-[80%] md:w-[60%] xl:w-[50%] flex flex-col gap-8">
+            <div className="flex flex-col gap-2 text-primary">
+              <h1 className="text-2xl font-bold">Verify your email</h1>
+              <p className="text-sm text-gray-500">
+                We sent a 4-digit OTP to{" "}
+                <span className="font-medium text-primary">{currentEmail}</span>
+              </p>
+            </div>
+            <div className="flex gap-3 justify-center">
+              {otpValues.map((val, index) => (
+                <input
+                  key={index}
+                  ref={(el) => { otpRefs.current[index] = el; }}
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={1}
+                  value={val}
+                  onChange={(e) => handleOtpChange(index, e.target.value)}
+                  onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                  onPaste={handleOtpPaste}
+                  className="w-[52px] h-[56px] text-center text-[22px] font-semibold border-2 rounded-xl outline-none transition-all"
+                  style={{
+                    borderColor: val ? "#2563EB" : "#E5E7EB",
+                    backgroundColor: val ? "#EFF6FF" : "#F9FAFB",
+                  }}
+                />
+              ))}
+            </div>
+            <Button
+              loading={verifyLoading}
+              disabled={verifyLoading || otpValues.join("").length < 4}
+              onClick={handleVerifyOtp}
+              className="btn-primary w-full h-[40px]!"
+            >
+              Verify OTP
+            </Button>
+            <div className="text-center">
+              <p className="text-sm text-gray-500">Didn't receive any code?</p>
+              {resendTimer > 0 ? (
+                <p className="text-sm text-gray-400 mt-2">Resend in {resendTimer}s</p>
+              ) : (
+                <p
+                  onClick={handleResendOtp}
+                  className="text-primary font-medium cursor-pointer hover:underline mt-2 text-sm"
+                >
+                  Resend OTP
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     // <div className="w-full h-screen overflow-hidden bg-primary flex">

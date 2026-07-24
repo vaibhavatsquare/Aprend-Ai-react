@@ -535,26 +535,26 @@ const AiTutor = () => {
       : t('home.streak.keepItUp');
 
   return (
-    <div className="px-4 grid grid-cols-3 gap-2">
+    <div className="px-[clamp(8px,1vw,16px)] grid grid-cols-1 lg:grid-cols-3 gap-[clamp(6px,0.8vw,12px)]">
       {/* Header  */}
       <div
-        className="h-[calc(100vh-100px)] mt-1 mb-4 py-4 rounded-xl col-span-2 flex flex-col gap-4"
+        className="h-[calc(100vh-6vw)] mt-[0.2vw] mb-[0.8vw] py-[clamp(8px,1vw,16px)] rounded-[clamp(10px,1.2vw,16px)] col-span-2 flex flex-col gap-[clamp(8px,1vw,16px)]"
         style={{
           // boxShadow: "0px 0px 4px 0px #00000040",
           backgroundColor: '#F7F9FC'
         }}
       >
-        <div className="mx-4 flex relative justify-center items-center" style={{ backgroundColor: '#F7F9FC' }}>
+        <div className="mx-[clamp(8px,1vw,16px)] flex relative justify-center items-center" style={{ backgroundColor: '#F7F9FC' }}>
           <GoArrowLeft
-            className="text-xl absolute left-0 cursor-pointer"
+            className="text-[clamp(14px,1.2vw,20px)] absolute left-0 cursor-pointer"
             onClick={() => useBack()}
           />
-          <h1 className="text-base font-semibold">AI Tutor</h1>
+          <h1 className="text-[clamp(13px,1vw,16px)] font-semibold">AI Tutor</h1>
           {messages.length > 0 && (
             <div className="absolute right-0">
               <button
                 onClick={() => setShowMenu((p) => !p)}
-                className="w-8 h-8 flex flex-col items-center justify-center gap-[4px] rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
+                className="w-[clamp(28px,2vw,36px)] h-[clamp(28px,2vw,36px)] flex flex-col items-center justify-center gap-[4px] rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
               >
                 <span className="w-[3px] h-[3px] rounded-full bg-gray-500" />
                 <span className="w-[3px] h-[3px] rounded-full bg-gray-500" />
@@ -567,12 +567,12 @@ const AiTutor = () => {
                     onClick={() => setShowMenu(false)}
                   />
                   <div
-                    className="absolute right-0 top-10 z-20 bg-white rounded-xl py-1 min-w-[160px]"
+                    className="absolute right-0 top-[clamp(28px,2.5vw,40px)] z-20 bg-white rounded-[clamp(8px,0.8vw,14px)] py-[clamp(2px,0.3vw,5px)] min-w-[clamp(120px,10vw,160px)]"
                     style={{ boxShadow: '0px 4px 20px rgba(0,0,0,0.12)' }}
                   >
                     <button
                       onClick={() => { handleClearChat(); setShowMenu(false); }}
-                      className="w-full flex items-center px-4 py-3 text-sm text-gray-800 hover:bg-gray-100 transition-colors  cursor-pointer"
+                      className="w-full flex items-center px-[clamp(10px,1vw,16px)] py-[clamp(8px,0.8vw,12px)] text-[clamp(11px,0.85vw,14px)] text-gray-800 hover:bg-gray-100 transition-colors cursor-pointer"
                     >
                       Clear Chat
                     </button>
@@ -583,24 +583,24 @@ const AiTutor = () => {
           )}
         </div>
 
-        <div className="px-4 relative flex-1 flex flex-col gap-2 overflow-y-auto scrollbar" style={{ backgroundColor: '#F7F9FC' }}>
+        <div className="px-[clamp(8px,1vw,16px)] relative flex-1 flex flex-col gap-[clamp(6px,0.5vw,10px)] overflow-y-auto scrollbar" style={{ backgroundColor: '#F7F9FC' }}>
           {messages.length === 0 && (
-            <h1 className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-4xl font-semibold bg-linear-to-r from-primary via-[#6D8199] to-primary bg-clip-text text-transparent">
+            <h1 className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[clamp(20px,2.5vw,36px)] font-semibold bg-linear-to-r from-primary via-[#6D8199] to-primary bg-clip-text text-transparent">
               Hello{userName ? `, ${userName}!` : ""}
             </h1>
           )}
 
-          <div className="mt-auto flex flex-col gap-2">
+          <div className="mt-auto flex flex-col gap-[clamp(6px,0.5vw,10px)]">
             {messages &&
               messages.map((msg, index) =>
                 msg.role === "user" ? (
                   <div key={index} className="flex justify-end">
                     {msg.audio ? (
-                      <div className="w-[50%] p-3 bg-[#5555550D] rounded-xl rounded-br-none">
+                      <div className="w-[50%] p-[clamp(8px,0.8vw,12px)] bg-[#5555550D] rounded-[clamp(8px,0.8vw,14px)] rounded-br-none">
                         <AudioPlayer audioUrl={msg.audio} />
                       </div>
                     ) : (
-                      <div className="max-w-[80%] p-3 bg-[#5555550D] rounded-xl rounded-br-none flex flex-col gap-2">
+                      <div className="max-w-[80%] p-[clamp(8px,0.8vw,12px)] bg-[#5555550D] rounded-[clamp(8px,0.8vw,14px)] rounded-br-none flex flex-col gap-[clamp(4px,0.5vw,8px)]">
                         {msg.image && (
                           <AntImage
                             src={msg.image}
@@ -619,11 +619,11 @@ const AiTutor = () => {
                   </div>
                 ) : (
                   <div key={index} className="flex justify-start">
-                    <div className="max-w-[80%] p-3 flex gap-2">
-                      <div className="w-12 h-12 p-2 rounded-full bg-primary flex justify-center items-center">
+                    <div className="max-w-[80%] p-[clamp(8px,0.8vw,12px)] flex gap-[clamp(6px,0.5vw,10px)]">
+                      <div className="w-[clamp(32px,2.5vw,48px)] h-[clamp(32px,2.5vw,48px)] p-[clamp(4px,0.4vw,8px)] rounded-full bg-primary flex justify-center items-center">
                         <IconSparkel color="#ffffff" />
                       </div>
-                      <div className="prose prose-sm max-w-none text-secondary">
+                      <div className="prose prose-sm max-w-none text-secondary text-[clamp(11px,0.85vw,14px)]">
                         <ReactMarkdown>{msg.message}</ReactMarkdown>
                       </div>
                     </div>
@@ -633,12 +633,12 @@ const AiTutor = () => {
 
             {loading && (
               <div className="flex justify-start">
-                <div className="max-w-[80%] p-3 flex gap-2">
-                  <div className="w-12 h-12 p-2 rounded-full bg-primary flex justify-center items-center">
+                <div className="max-w-[80%] p-[clamp(8px,0.8vw,12px)] flex gap-[clamp(6px,0.5vw,10px)]">
+                  <div className="w-[clamp(32px,2.5vw,48px)] h-[clamp(32px,2.5vw,48px)] p-[clamp(4px,0.4vw,8px)] rounded-full bg-primary flex justify-center items-center">
                     <IconSparkel color="#ffffff" />
                   </div>
                   <div className="flex items-center h-12">
-                    <p className="text-secondary leading-none">
+                    <p className="text-[clamp(11px,0.85vw,14px)] text-secondary leading-none">
                       {t('common.loading')}...
                     </p>
                   </div>
@@ -653,14 +653,14 @@ const AiTutor = () => {
         {/* Inputs */}
         <div className="flex flex-col gap-4">
           {messages.length > 0 && (
-            <div className="px-4 grid grid-cols-2 gap-3  ">
+            <div className="px-[clamp(8px,1vw,16px)] grid grid-cols-2 gap-[clamp(6px,0.6vw,10px)]">
               <div
-                className={`w-full flex gap-2 items-center justify-between rounded-full px-4 py-2.5 border border-[#DADADA] transition-all bg-white
+                className={`w-full flex gap-[clamp(4px,0.5vw,8px)] items-center justify-between rounded-full px-[clamp(8px,1vw,16px)] py-[clamp(6px,0.6vw,10px)] border border-[#DADADA] transition-all bg-white
     ${!conversationId || isSavingNote ? "opacity-50 pointer-events-none" : "cursor-pointer"}
   `}
                 onClick={handleGenerateNote}
               >
-                <p className="text-sm text-secondary">
+                <p className="text-[clamp(11px,0.85vw,14px)] text-secondary">
                   {/* {isSavingNote ? t('common.saving') : t('notes.title')} */}
                   {isSavingNote ? t('common.saving') : t('aiTutor.saveNotes')}
                 </p>
@@ -672,7 +672,7 @@ const AiTutor = () => {
                 )}
               </div>
               <div
-                className={`w-full flex gap-2 items-center justify-between rounded-full px-4 py-2.5 border border-[#DADADA] transition-all bg-white
+                className={`w-full flex gap-[clamp(4px,0.5vw,8px)] items-center justify-between rounded-full px-[clamp(8px,1vw,16px)] py-[clamp(6px,0.6vw,10px)] border border-[#DADADA] transition-all bg-white
     ${!conversationId || isGeneratingFlashcard
                     ? "opacity-50 pointer-events-none"
                     : "cursor-pointer"
@@ -680,7 +680,7 @@ const AiTutor = () => {
   `}
                 onClick={handleGenerateFlashcard}
               >
-                <p className="text-sm text-secondary">
+                <p className="text-[clamp(11px,0.85vw,14px)] text-secondary">
                   {/* {isGeneratingFlashcard ? t('common.generating') : t('flashcards.title')} */}
                   {isGeneratingFlashcard ? t('common.generating') : t('aiTutor.generateFlashcards')}
                 </p>
@@ -695,7 +695,7 @@ const AiTutor = () => {
             </div>
           )}
           <div
-            className="mx-4 flex flex-col gap-2 rounded-xl p-3"
+            className="mx-[clamp(8px,1vw,16px)] flex flex-col gap-[clamp(6px,0.5vw,10px)] rounded-[clamp(8px,0.8vw,14px)] p-[clamp(8px,0.8vw,12px)]"
             style={{
               boxShadow: "0px 0px 4px 0px #00000040",
               backgroundColor: '#ffffff',
@@ -728,7 +728,7 @@ const AiTutor = () => {
               {recordingState === "idle" && (
                 <>
                   <div
-                    className={`w-8 h-8 rounded-full flex justify-center items-center transition-all ${uploadedImageUrl ? "opacity-50 pointer-events-none" : "cursor-pointer"
+                    className={`w-[clamp(28px,2vw,36px)] h-[clamp(28px,2vw,36px)] rounded-full flex justify-center items-center transition-all ${uploadedImageUrl ? "opacity-50 pointer-events-none" : "cursor-pointer"
                       }`}
                     style={{
                       boxShadow: "0px 0px 4px 0px #00000040",
@@ -765,7 +765,7 @@ const AiTutor = () => {
                     />
                   </div>
                   {isRecording && (
-                    <div className="flex items-center gap-2 text-sm text-red-500 px-1">
+                    <div className="flex items-center gap-[clamp(4px,0.5vw,8px)] text-[clamp(11px,0.85vw,14px)] text-red-500 px-[clamp(2px,0.3vw,5px)]">
                       <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                       {/* Listening... */}
                       {t('common.listening')}...
@@ -792,7 +792,7 @@ const AiTutor = () => {
               )}
               {recordingState === "idle" ? (
                 <div
-                  className={`w-8 h-8 rounded-full flex justify-center items-center cursor-pointer transition-all duration-200 ${isRecording ? "bg-red-500 scale-110 animate-pulse" : ""
+                  className={`w-[clamp(28px,2vw,36px)] h-[clamp(28px,2vw,36px)] rounded-full flex justify-center items-center cursor-pointer transition-all duration-200 ${isRecording ? "bg-red-500 scale-110 animate-pulse" : ""
                     }`}
                   style={{
                     boxShadow: "0px 0px 4px 0px #00000040",
@@ -826,7 +826,7 @@ const AiTutor = () => {
                 <div className="flex-1 flex items-center gap-2">
                   <div className="flex-1 flex justify-center items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                    <span className="text-sm text-gray-600">
+                    <span className="text-[clamp(11px,0.85vw,14px)] text-gray-600">
                       {t('common.listening')}...
                     </span>
                   </div>
@@ -834,7 +834,7 @@ const AiTutor = () => {
               ) : (
                 <div className="flex items-center gap-2 flex-1">
                   <div
-                    className="w-8 h-8 rounded-full flex justify-center items-center cursor-pointer hover:bg-gray-100 transition-colors"
+                    className="w-[clamp(28px,2vw,36px)] h-[clamp(28px,2vw,36px)] rounded-full flex justify-center items-center cursor-pointer hover:bg-gray-100 transition-colors"
                     onClick={cancelRecording}
                   >
                     <IoClose className="text-lg text-gray-600" />
@@ -843,7 +843,7 @@ const AiTutor = () => {
                 </div>
               )}
               <div
-                className={`w-8 h-8 rounded-full flex justify-center items-center transition-all ${loading || isConverting || isRecording || isUploading
+                className={`w-[clamp(28px,2vw,36px)] h-[clamp(28px,2vw,36px)] rounded-full flex justify-center items-center transition-all ${loading || isConverting || isRecording || isUploading
                   ? "opacity-50 pointer-events-none"
                   : "cursor-pointer"
                   }`}
@@ -869,30 +869,30 @@ const AiTutor = () => {
       </div>
 
       {/* Right part */}
-      <div className="flex flex-col gap-4 h-[calc(100vh-84px)] mt-1 px-2 overflow-y-auto scrollbar">
-        <div className="relative w-full flex items-start justify-between gap-4 rounded-lg px-4 py-6 bg-linear-to-r from-[#F97316] via-[#ED482F] to-[#EF4444]">
-          <h1 className="text-base text-white">
+      <div className="flex flex-col gap-[clamp(8px,1vw,16px)] h-auto lg:h-[calc(100vh-5vw)] mt-[0.2vw] px-[clamp(4px,0.5vw,8px)] overflow-y-auto scrollbar">
+        <div className="relative w-full flex items-start justify-between gap-[clamp(8px,1vw,16px)] rounded-[clamp(8px,1vw,14px)] px-[clamp(10px,1.2vw,18px)] py-[clamp(12px,1.5vw,22px)] bg-linear-to-r from-[#F97316] via-[#ED482F] to-[#EF4444]">
+          <h1 className="text-[clamp(12px,1vw,16px)] text-white">
             {streakTitle}
             <br />
             {streakSub}
           </h1>
-          <AiOutlineFire className="text-white text-4xl" />
+          <AiOutlineFire className="text-white text-[clamp(20px,2.5vw,36px)]" />
           {streak > 0 && (
-            <div className="absolute -bottom-3 right-5 flex gap-2 items-center text-[#FFFFFF80] font-medium">
-              <h2 className="text-5xl">{streak}</h2>
+            <div className="absolute -bottom-3 right-[clamp(10px,1.5vw,20px)] flex gap-[clamp(4px,0.5vw,8px)] items-center text-[#FFFFFF80] font-medium">
+              <h2 className="text-[clamp(28px,3.5vw,48px)]">{streak}</h2>
               {/* <p className="text-xl">{streak > 1 ? "days" : "day"}</p> */}
-              <p className="text-xl">{t('home.streak.days')}</p>
+              <p className="text-[clamp(12px,1.2vw,20px)]">{t('home.streak.days')}</p>
 
             </div>
           )}
         </div>
 
         <div
-          className="flex gap-2 items-center justify-between p-4 rounded-xl border border-[#DADADA] cursor-pointer hover:bg-gray-50 transition-colors"
+          className="flex gap-[clamp(6px,0.6vw,10px)] items-center justify-between p-[clamp(10px,1vw,16px)] rounded-[clamp(8px,0.8vw,14px)] border border-[#DADADA] cursor-pointer hover:bg-gray-50 transition-colors"
           onClick={() => useRedirect("/home/questions")}
         >
-          <p className="text-sm font-medium">{t('home.questionBank.title')}</p>
-          <IoArrowForwardSharp className="text-lg -rotate-45 cursor-pointer" />
+          <p className="text-[clamp(11px,0.85vw,14px)] font-medium">{t('home.questionBank.title')}</p>
+          <IoArrowForwardSharp className="text-[clamp(14px,1.2vw,18px)] -rotate-45 cursor-pointer" />
         </div>
 
         <div
@@ -906,7 +906,7 @@ const AiTutor = () => {
             }
             useRedirect("/home/weak-spot-tracker");
           }}
-          className={`flex gap-2 items-center justify-between p-4 rounded-xl border border-[#DADADA] cursor-pointer transition-colors ${JSON.parse(localStorage.getItem("user") || "{}").isPremium
+          className={`flex gap-[clamp(6px,0.6vw,10px)] items-center justify-between p-[clamp(10px,1vw,16px)] rounded-[clamp(8px,0.8vw,14px)] border border-[#DADADA] cursor-pointer transition-colors ${JSON.parse(localStorage.getItem("user") || "{}").isPremium
             ? "hover:bg-gray-50"
             : "opacity-40"
             }`}
@@ -917,9 +917,9 @@ const AiTutor = () => {
                 <path d="M4.93797 44.4392L0.0332797 12.56C-0.329533 10.2058 2.35259 8.59866 4.25803 10.0284L19.5392 21.4879C19.9364 21.7855 20.39 21.9989 20.8725 22.1153C21.355 22.2317 21.8561 22.2485 22.3452 22.1648C22.8344 22.081 23.3014 21.8984 23.7177 21.6282C24.1339 21.358 24.4908 21.0057 24.7663 20.593L37.489 1.51172C38.8327 -0.503906 41.7943 -0.503906 43.1381 1.51172L55.8607 20.593C56.1363 21.0057 56.4931 21.358 56.9094 21.6282C57.3257 21.8984 57.7926 22.081 58.2818 22.1648C58.771 22.2485 59.2721 22.2317 59.7546 22.1153C60.237 21.9989 60.6907 21.7855 61.0879 21.4879L76.369 10.0284C78.2772 8.59866 80.9566 10.2058 80.5938 12.56L75.6891 44.4392H4.93797ZM71.9992 62.1283H8.6279C8.14334 62.1283 7.66351 62.0328 7.21583 61.8474C6.76814 61.662 6.36137 61.3902 6.01872 61.0475C5.32673 60.3555 4.93797 59.417 4.93797 58.4383V50.3355H75.6891V58.4383C75.6891 60.4755 74.0363 62.1283 71.9992 62.1283Z" fill="#9CA3AF" />
               </svg>
             )}
-            <p className="text-sm font-medium">{t('home.weakSpotTracker.title')}</p>
+            <p className="text-[clamp(11px,0.85vw,14px)] font-medium">{t('home.weakSpotTracker.title')}</p>
           </div>
-          <IoArrowForwardSharp className="text-lg -rotate-45 cursor-pointer" />
+          <IoArrowForwardSharp className="text-[clamp(14px,1.2vw,18px)] -rotate-45 cursor-pointer" />
         </div>
       </div>
       <Modal
@@ -927,19 +927,19 @@ const AiTutor = () => {
         onCancel={() => setShowUpgradeModal(false)}
         footer={null}
         centered
-        width={400}
+        width="clamp(280px,25vw,400px)"
       >
-        <div className="flex flex-col items-center gap-4 py-4">
-          <div className="w-16 h-16 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-[clamp(10px,0.8vw,16px)] py-[clamp(8px,0.8vw,16px)]">
+          <div className="w-[clamp(40px,3.2vw,64px)] h-[clamp(40px,3.2vw,64px)] flex items-center justify-center">
             <svg width="81" height="63" viewBox="0 0 81 63" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M4.93797 44.4392L0.0332797 12.56C-0.329533 10.2058 2.35259 8.59866 4.25803 10.0284L19.5392 21.4879C19.9364 21.7855 20.39 21.9989 20.8725 22.1153C21.355 22.2317 21.8561 22.2485 22.3452 22.1648C22.8344 22.081 23.3014 21.8984 23.7177 21.6282C24.1339 21.358 24.4908 21.0057 24.7663 20.593L37.489 1.51172C38.8327 -0.503906 41.7943 -0.503906 43.1381 1.51172L55.8607 20.593C56.1363 21.0057 56.4931 21.358 56.9094 21.6282C57.3257 21.8984 57.7926 22.081 58.2818 22.1648C58.771 22.2485 59.2721 22.2317 59.7546 22.1153C60.237 21.9989 60.6907 21.7855 61.0879 21.4879L76.369 10.0284C78.2772 8.59866 80.9566 10.2058 80.5938 12.56L75.6891 44.4392H4.93797ZM71.9992 62.1283H8.6279C8.14334 62.1283 7.66351 62.0328 7.21583 61.8474C6.76814 61.662 6.36137 61.3902 6.01872 61.0475C5.32673 60.3555 4.93797 59.417 4.93797 58.4383V50.3355H75.6891V58.4383C75.6891 60.4755 74.0363 62.1283 71.9992 62.1283Z" fill="#1B2A4A" />
             </svg>
           </div>
-          <h3 className="text-[20px] font-bold text-gray-900 text-center">
+          <h3 className="text-[clamp(14px,1.1vw,20px)] font-bold text-gray-900 text-center">
             {/* Premium Feature */}
             {t('common.premiumFeature')}
           </h3>
-          <p className="text-[14px] text-secondary text-center">
+          <p className="text-[clamp(11px,0.875vw,14px)] text-secondary text-center">
             {modalMessage}
           </p>
           <button
@@ -948,7 +948,7 @@ const AiTutor = () => {
               useRedirect("/profile?open=subscription");
             }}
             // className="w-full h-[48px] bg-primary text-white rounded-[12px] text-[15px] font-semibold hover:opacity-90 transition-opacity"
-            className="w-full h-[48px] text-white rounded-[12px] text-[15px] font-semibold hover:opacity-90 transition-opacity"
+            className="w-full h-[clamp(36px,2.5vw,48px)] text-white rounded-[clamp(8px,0.6vw,12px)] text-[clamp(12px,0.85vw,15px)] font-semibold hover:opacity-90 transition-opacity"
             style={{
               backgroundImage: "url('/images/buttonBg.svg')",
               backgroundSize: '175% 700%',
@@ -962,7 +962,7 @@ const AiTutor = () => {
           </button>
           <button
             onClick={() => setShowUpgradeModal(false)}
-            className="text-[14px] text-secondary hover:text-gray-700 transition-colors"
+            className="text-[clamp(11px,0.875vw,14px)] text-secondary hover:text-gray-700 transition-colors"
           >
             {/* Maybe later */}
             {t('common.cancel')}
@@ -975,19 +975,19 @@ const AiTutor = () => {
         onCancel={() => setShowUploadImageModal(false)}
         footer={null}
         centered
-        width={380}
+        width="clamp(280px,24vw,380px)"
       >
-        <div className="flex flex-col items-center gap-8 py-4">
-          <h3 className="text-[20px] font-bold text-gray-900">{t('aiTutor.uploadImage')}</h3>
+        <div className="flex flex-col items-center gap-[clamp(16px,2vw,32px)] py-[clamp(8px,0.8vw,16px)]">
+          <h3 className="text-[clamp(14px,1.1vw,20px)] font-bold text-gray-900">{t('aiTutor.uploadImage')}</h3>
 
-          <div className="flex gap-10 justify-center">
+          <div className="flex gap-[clamp(20px,3vw,40px)] justify-center">
             {/* Camera */}
             <div
               className="flex flex-col items-center gap-3 cursor-pointer"
               onClick={handleOpenCamera}
             >
               {/* <div className="w-[100px] h-[100px] rounded-full bg-primary flex items-center justify-center"> */}
-              <div className="w-[100px] h-[100px] rounded-full flex items-center justify-center"
+              <div className="w-[clamp(70px,6vw,100px)] h-[clamp(70px,6vw,100px)] rounded-full flex items-center justify-center"
                 style={{
                   backgroundImage: "url('/images/buttonBg.svg')",
                   backgroundSize: '1400% 900%',
@@ -1000,7 +1000,7 @@ const AiTutor = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
                 </svg>
               </div>
-              <p className="text-[16px] font-medium text-primary">{t('aiTutor.camera')}</p>
+              <p className="text-[clamp(12px,1vw,16px)] font-medium text-primary">{t('aiTutor.camera')}</p>
             </div>
 
             {/* Gallery */}
@@ -1018,7 +1018,7 @@ const AiTutor = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 18h16.5M3.75 6h16.5A1.5 1.5 0 0121.75 7.5v9a1.5 1.5 0 01-1.5 1.5H3.75a1.5 1.5 0 01-1.5-1.5v-9A1.5 1.5 0 013.75 6z" />
                 </svg>
               </div> */}
-              <div className="w-[100px] h-[100px] rounded-full flex items-center justify-center"
+              <div className="w-[clamp(70px,6vw,100px)] h-[clamp(70px,6vw,100px)] rounded-full flex items-center justify-center"
                 style={{
                   backgroundImage: "url('/images/buttonBg.svg')",
                   backgroundSize: '1400% 900%',
@@ -1030,7 +1030,7 @@ const AiTutor = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 18h16.5M3.75 6h16.5A1.5 1.5 0 0121.75 7.5v9a1.5 1.5 0 01-1.5 1.5H3.75a1.5 1.5 0 01-1.5-1.5v-9A1.5 1.5 0 013.75 6z" />
                 </svg>
               </div>
-              <p className="text-[16px] font-medium text-primary">{t('aiTutor.gallery')}</p>
+              <p className="text-[clamp(12px,1vw,16px)] font-medium text-primary">{t('aiTutor.gallery')}</p>
             </div>
           </div>
         </div>
@@ -1041,7 +1041,7 @@ const AiTutor = () => {
         onCancel={stopWebcam}
         footer={null}
         centered
-        width={720}
+        width="clamp(300px,45vw,720px)"
         title="Take a Photo"
       >
         <div className="flex flex-col items-center gap-4 py-2">
@@ -1055,16 +1055,16 @@ const AiTutor = () => {
             />
           </div>
           <canvas ref={canvasRef} className="hidden" />
-          <div className="flex gap-4 w-full">
+          <div className="flex gap-[clamp(8px,1vw,16px)] w-full">
             <button
               onClick={stopWebcam}
-              className="flex-1 h-[44px] rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              className="flex-1 h-[clamp(36px,2.8vw,44px)] rounded-[clamp(8px,0.8vw,14px)] border border-gray-200 text-[clamp(11px,0.85vw,14px)] font-medium text-gray-700 hover:bg-gray-50 transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleTakePhoto}
-              className="flex-1 h-[44px] rounded-xl text-white text-sm font-semibold transition-opacity hover:opacity-90"
+              className="flex-1 h-[clamp(36px,2.8vw,44px)] rounded-[clamp(8px,0.8vw,14px)] text-white text-[clamp(11px,0.85vw,14px)] font-semibold transition-opacity hover:opacity-90"
               style={{
                 backgroundImage: "url('/images/buttonBg.svg')",
                 backgroundSize: '350% 700%',

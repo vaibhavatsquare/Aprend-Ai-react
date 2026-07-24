@@ -50,10 +50,10 @@ const Sidebar = () => {
   const { isCollapsed, setIsCollapsed, setIsTabChangeLoading } = useSidebarContext();
 
   const menuItems = [
-    { key: "home",      label: t('nav.home'),       icon: GoHome,    href: "/home" },
-    { key: "flashcards",label: t('nav.flashcards'),  icon: TbCards,   href: "/flashcards" },
-    { key: "notes",     label: t('nav.notes'),       icon: NotesIcon, href: "/notes" },
-    { key: "profile",   label: t('nav.profile'),     icon: UserIcon,  href: "/profile" },
+    { key: "home", label: t('nav.home'), icon: GoHome, href: "/home" },
+    { key: "flashcards", label: t('nav.flashcards'), icon: TbCards, href: "/flashcards" },
+    { key: "notes", label: t('nav.notes'), icon: NotesIcon, href: "/notes" },
+    { key: "profile", label: t('nav.profile'), icon: UserIcon, href: "/profile" },
   ];
 
   useEffect(() => {
@@ -100,9 +100,7 @@ const Sidebar = () => {
         transition: 'width 0.5s',
         boxShadow: '0px 0px 10px 0px #0000001A inset',
         // Width scales with viewport — collapsed: ~5vw, expanded: ~16vw
-        width: isCollapsed
-          ? 'clamp(50px, 5vw, 70px)'
-          : 'clamp(160px, 16vw, 230px)',
+        width: isCollapsed ? 'clamp(50px,4vw,70px)' : 'clamp(160px,13vw,220px)',
       }}
     >
       {/* ── LOGO ── */}
@@ -111,17 +109,17 @@ const Sidebar = () => {
           src="/images/appLogo.svg"
           alt="Loading"
           style={{
-            // Logo scales with sidebar width
-            width: isCollapsed ? 'clamp(36px, 4vw, 52px)' : 'clamp(60px, 7vw, 90px)',
-            height: isCollapsed ? 'clamp(36px, 4vw, 52px)' : 'clamp(60px, 7vw, 90px)',
-            transition: 'all 0.5s',
+            width: isCollapsed ? 'clamp(28px,3vw,48px)' : 'clamp(50px,6vw,90px)',
+            height: isCollapsed ? 'clamp(28px,3vw,48px)' : 'clamp(50px,6vw,90px)',
+            transition: 'width 0.5s, height 0.5s',
           }}
         />
         {!isCollapsed && (
           <p style={{
             color: '#1953CB',
             fontWeight: 700,
-            fontSize: 'clamp(10px, 1.1vw, 14px)',
+            fontSize: 'clamp(8px,0.7vw,12px)',
+            letterSpacing: '0.04em',
           }}>
             MESTRE.IA
           </p>
@@ -130,7 +128,7 @@ const Sidebar = () => {
 
       {/* Pro chip */}
       {isPremium && !isCollapsed && (
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 'clamp(4px, 0.5vh, 8px)' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 'clamp(3px,0.4vw,7px)' }}>
           <ProChip />
         </div>
       )}
@@ -139,18 +137,18 @@ const Sidebar = () => {
       <div style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: 'clamp(2px, 0.3vh, 6px)',
-        marginTop: 'clamp(12px, 2vh, 24px)',
+        gap: 'clamp(1px,0.15vw,3px)',
+        marginTop: 'clamp(10px,1.4vw,22px)',
         overflowY: 'auto',
         flex: 1,
         minHeight: 0,
-        paddingBottom: 'clamp(8px, 1vh, 16px)',
+        paddingBottom: 'clamp(6px,0.8vw,14px)',
       }}>
         {menuItems.map((item) => {
           const isActive = selectedItem === item.key;
           const Icon = item.icon;
           return (
-            <Tooltip key={item.key} title="" placement="right">
+            <Tooltip key={item.key} title={isCollapsed ? item.label : ""} placement="right">
               <img src="/images/buttonBg.svg" alt="" className="hidden" aria-hidden="true" />
               <Link
                 href={item.href}
@@ -162,13 +160,12 @@ const Sidebar = () => {
                   display: 'flex',
                   alignItems: 'center',
                   cursor: 'pointer',
-                  gap: 'clamp(4px, 0.5vw, 8px)',
-                  // Height scales with viewport
-                  height: 'clamp(38px, 5vh, 54px)',
+                  gap: 'clamp(4px,0.5vw,9px)',
+                  height: 'clamp(32px,2.6vw,44px)',
                   position: 'relative',
                   outline: 'none',
                   justifyContent: isCollapsed ? 'center' : undefined,
-                  paddingLeft: isCollapsed ? 'clamp(4px, 1vw, 10px)' : 'clamp(16px, 2.5vw, 32px)',
+                  paddingLeft: isCollapsed ? 'clamp(4px,0.5vw,9px)' : 'clamp(12px,1.4vw,22px)',
                   ...(!isCollapsed && isActive ? {
                     backgroundImage: "url('/images/buttonBg.svg')",
                     backgroundSize: '1200% 800%',
@@ -184,9 +181,10 @@ const Sidebar = () => {
                   <img
                     src="/images/sidebar/curv.svg"
                     alt=""
+                    aria-hidden="true"
                     style={{
-                      width: 'clamp(8px, 1vw, 12px)',
-                      height: 'clamp(38px, 5vh, 54px)',
+                      width: 'clamp(6px,0.7vw,11px)',
+                      height: 'clamp(32px,2.6vw,44px)',
                       position: 'absolute',
                       left: 0,
                     }}
@@ -200,9 +198,9 @@ const Sidebar = () => {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      borderRadius: 'clamp(10px, 1.2vw, 16px)',
-                      width: 'clamp(32px, 3.5vw, 44px)',
-                      height: 'clamp(32px, 3.5vw, 44px)',
+                      borderRadius: 'clamp(6px,0.8vw,13px)',
+                      width: 'clamp(26px,2.2vw,38px)',
+                      height: 'clamp(26px,2.2vw,38px)',
                       flexShrink: 0,
                       overflow: 'hidden',
                       backgroundColor: '#ffffff',
@@ -213,24 +211,22 @@ const Sidebar = () => {
                         item.key === "home"
                           ? isActive ? "/images/sidebar/homeIcon.svg" : "/images/sidebar/homeIconEmpty.svg"
                           : item.key === "flashcards"
-                          ? isActive ? "/images/sidebar/flashcardsIcon.svg" : "/images/sidebar/flashcardsIconEmpty.svg"
-                          : item.key === "notes"
-                          ? isActive ? "/images/sidebar/notesIcon.svg" : "/images/sidebar/notesIconEmpty.svg"
-                          : item.key === "profile"
-                          ? isActive ? "/images/sidebar/profileIcon.svg" : "/images/sidebar/profileIconEmpty.svg"
-                          : undefined
+                            ? isActive ? "/images/sidebar/flashcardsIcon.svg" : "/images/sidebar/flashcardsIconEmpty.svg"
+                            : item.key === "notes"
+                              ? isActive ? "/images/sidebar/notesIcon.svg" : "/images/sidebar/notesIconEmpty.svg"
+                              : "/images/sidebar/" + (isActive ? "profileIcon" : "profileIconEmpty") + ".svg"
                       }
                       alt={item.label}
-                      style={{ width: 'clamp(18px, 2vw, 24px)', height: 'clamp(18px, 2vw, 24px)' }}
+                      aria-label={item.label}
+                      style={{ width: 'clamp(14px,1.2vw,20px)', height: 'clamp(14px,1.2vw,20px)' }}
                     />
                   </div>
                 ) : (
                   // Expanded icon + label
                   <>
                     <div style={{
-                      fontSize: 'clamp(14px, 1.5vw, 20px)',
+                      fontSize: 'clamp(14px,1.2vw,20px)',
                       color: isActive ? 'white' : '#6B7280',
-                      // Force white for custom SVG icon components that ignore color prop
                       filter: isActive ? 'brightness(0) invert(1)' : 'none',
                       display: 'flex',
                       alignItems: 'center',
@@ -240,7 +236,7 @@ const Sidebar = () => {
                     </div>
                     <span style={{
                       color: isActive ? 'white' : '#6B7280',
-                      fontSize: 'clamp(10px, 1vw, 13px)',
+                      fontSize: 'clamp(10px,0.8vw,14px)',
                       fontWeight: 500,
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
