@@ -15,11 +15,12 @@ type Props = {
   initialQuestions?: Question[];
   source?: QuestionSource;
   onClose?: () => void;
+  isCompleted?: boolean;
 };
 
 type Status = "idle" | "correct" | "wrong" | "showAnswer" | "explanation";
 
-const QuestionsBank = ({ taskId, initialQuestions, source, onClose }: Props) => {
+const QuestionsBank = ({ taskId, initialQuestions, source, onClose, isCompleted }: Props) => {
   const [questions, setQuestions] = useState<Question[]>(initialQuestions || []);
   const [loading, setLoading] = useState(!initialQuestions);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -37,6 +38,11 @@ const QuestionsBank = ({ taskId, initialQuestions, source, onClose }: Props) => 
   // On mount/reopen: skip correct and retry-exhausted questions
   useEffect(() => {
     if (loading || !questions.length) return;
+    if (isCompleted) {
+      setReviewMode(true);
+      setCurrentIndex(0);
+      return;
+    }
     const attemptsMap = JSON.parse(localStorage.getItem(`attempts_${taskId}`) || "{}");
     const correctList = JSON.parse(localStorage.getItem(`correct_${taskId}`) || "[]");
     const firstIncomplete = questions.findIndex((q) => {

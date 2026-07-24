@@ -22,7 +22,7 @@ const ConfirmModal = ({
   const { t } = useTranslation();
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-[2px]">
-      <div className="bg-white w-[400px] rounded-[12px] p-4 relative">
+      <div className="bg-white w-[clamp(280px,25vw,400px)] rounded-[clamp(8px,0.8vw,12px)] p-[clamp(10px,1vw,16px)] relative">
         {/* Close */}
         <button
           onClick={onClose}
@@ -34,9 +34,9 @@ const ConfirmModal = ({
         {/* Achievement Layout */}
         {isAchievement && achievement ? (
           <div className="text-center pt-2">
-            <h2 className="text-[26px] font-semibold">New Achievement</h2>
+            <h2 className="text-[clamp(16px,1.6vw,26px)] font-semibold">New Achievement</h2>
 
-            <div className="flex justify-center mb-4">
+            <div className="flex justify-center mb-[clamp(10px,1vw,16px)]">
               <img
                 src={achievement.image}
                 alt="achievement"
@@ -44,16 +44,16 @@ const ConfirmModal = ({
               />
             </div>
 
-            <h3 className="text-[18px] font-medium">{achievement.title}</h3>
+            <h3 className="text-[clamp(13px,1.1vw,18px)] font-medium">{achievement.title}</h3>
 
-            <p className="text-[14px] text-secondary mt-2 px-4">
+            <p className="text-[clamp(11px,0.9vw,14px)] text-secondary mt-[clamp(4px,0.5vw,8px)] px-[clamp(8px,1vw,16px)]">
               {achievement.description}
             </p>
 
             <button
               onClick={onClose}
               style={{ backgroundColor: achievement.code }}
-              className="h-[40px] rounded-[20px] mt-6 px-6 py-2 rounded-[8px] text-white font-semibold mb-4"
+              className="h-[clamp(32px,2.5vw,40px)] rounded-[clamp(16px,1.2vw,20px)] mt-[clamp(10px,1.2vw,20px)] px-[clamp(12px,1.5vw,24px)] py-[clamp(4px,0.5vw,8px)] rounded-[8px] text-white font-semibold mb-[clamp(8px,1vw,16px)]"
             >
               {achievement.buttonName}
             </button>
@@ -61,7 +61,7 @@ const ConfirmModal = ({
         ) : (
           <>
             {/* Icon */}
-            <div className="flex justify-center mb-4 mt-6">
+            <div className="flex justify-center mb-[clamp(10px,1vw,16px)] mt-[clamp(12px,1.5vw,24px)]">
               {isDelete ? (
                 <FiTrash2 size={50} className="text-red-500" />
               ) : (
@@ -71,17 +71,17 @@ const ConfirmModal = ({
             </div>
 
             {/* Text */}
-            <p className="text-center text-[16px] text-primaryText mb-6 px-10">
+            <p className="text-center text-[clamp(12px,1vw,16px)] text-primaryText mb-[clamp(10px,1.2vw,20px)] px-[clamp(12px,2vw,40px)]">
               {isDelete
                 ? t("profile.confirmDelete")
                 : t("profile.confirmLogout")}
             </p>
 
             {/* Buttons */}
-            <div className="flex justify-between gap-3">
+            <div className="flex justify-between gap-[clamp(8px,0.8vw,12px)]">
               <button
                 onClick={onClose}
-                className="flex-1 h-[40px] bg-gray-100 rounded-[8px]"
+                className="flex-1 h-[clamp(32px,2.5vw,40px)] bg-gray-100 rounded-[clamp(6px,0.5vw,8px)] text-[clamp(11px,0.9vw,14px)]"
               >
                 {t("common.cancel")}
               </button>
@@ -102,7 +102,7 @@ const ConfirmModal = ({
                 onClick={onConfirm}
                 loading={loading}
                 disabled={loading}
-                className={`flex-1 h-[40px]! rounded-[8px]! text-white! ${isDelete ? "bg-red-500!" : ""}`}
+                className={`flex-1 h-[clamp(32px,2.5vw,40px)]! rounded-[clamp(6px,0.5vw,8px)]! text-[clamp(11px,0.9vw,14px)]! text-white! ${isDelete ? "bg-red-500!" : ""}`}
                 style={!isDelete ? {
                   backgroundImage: "url('/images/buttonBg.svg')",
                   backgroundSize: '350% 700%', backgroundPosition: 'center',

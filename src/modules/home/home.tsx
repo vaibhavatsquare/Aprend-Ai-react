@@ -182,6 +182,7 @@ const Home = () => {
           initialQuestions={activeTask.task.questions}
           source={type === "PRACTICE_QUESTION" ? QuestionSource.HOME_PRACTICE_QUESTION : QuestionSource.HOME_CONCEPT_EXPLANATION}
           onClose={handleTaskClose}
+          isCompleted={activeTask.status === "COMPLETED"}
         />
       );
     }
@@ -200,8 +201,8 @@ const Home = () => {
 
   return (
     <div
-      style={{ padding: '0 2%', display: 'grid', gap: '1%' }}
-      className="grid-cols-1 lg:grid-cols-3"
+      style={{ padding: '0 2%', gap: '1%' }}
+      className="grid grid-cols-1 lg:grid-cols-3"
     >
       {/* ── LEFT PANEL ── */}
       <div
@@ -370,7 +371,7 @@ const Home = () => {
       {/* ── RIGHT PANEL ── */}
       <div
         style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(10px, 1.5vh, 20px)', padding: '1%', overflowY: 'auto' }}
-        className="scrollbar"
+        className="scrollbar pb-[2vh] lg:max-h-[calc(100vh-4vw)]"
       >
         {/* AI Tutor card */}
         <div
