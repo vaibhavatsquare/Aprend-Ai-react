@@ -91,15 +91,15 @@ const Navbar = () => {
   const displayName = user?.name || user?.email?.split("@")[0] || "";
 
   return (
-    <div className="relative w-full h-[clamp(50px,5vw,80px)] px-[clamp(12px,1.2vw,24px)] flex justify-between items-center">
+    <div className="relative w-full min-h-[clamp(60px,5vw,80px)] px-[clamp(12px,1.2vw,24px)] py-[clamp(8px,0.6vw,12px)] flex justify-between items-center">
       {/* LEFT SIDE */}
-      <div className="flex flex-col gap-[clamp(2px,0.2vw,5px)]">
-        <h1 className="text-[clamp(13px,0.85vw,18px)] font-medium">
+      <div className="flex flex-col gap-[clamp(3px,0.3vw,6px)] flex-1 min-w-0 pr-2">
+        <h1 className="text-[clamp(16px,1.1vw,22px)] font-medium truncate">
           {/* {greeting} */}
           {t(getGreetingKey() as any)}
           {displayName === "" ? "" : ", " + displayName + "!"} 👋
         </h1>
-        <p className="text-[clamp(10px,0.7vw,13px)] text-secondary">
+        <p className="text-[clamp(13px,0.9vw,16px)] text-secondary">
           {t("home.readyToStart")}
         </p>
       </div>
@@ -218,7 +218,7 @@ const Navbar = () => {
   </span> */}
 
   <span
-    className="font-bold text-[clamp(8px,0.6vw,11px)] tracking-wider absolute z-10 overflow-hidden whitespace-nowrap"
+    className="font-bold text-[clamp(10px,0.75vw,13px)] tracking-wider absolute z-10 overflow-hidden whitespace-nowrap"
     style={{
       color: focusMode ? 'white' : '#374151',
       left: focusMode ? 'clamp(6px,0.5vw,10px)' : 'auto',
@@ -269,11 +269,11 @@ const Navbar = () => {
         <path d="M4.93797 44.4392L0.0332797 12.56C-0.329533 10.2058 2.35259 8.59866 4.25803 10.0284L19.5392 21.4879C19.9364 21.7855 20.39 21.9989 20.8725 22.1153C21.355 22.2317 21.8561 22.2485 22.3452 22.1648C22.8344 22.081 23.3014 21.8984 23.7177 21.6282C24.1339 21.358 24.4908 21.0057 24.7663 20.593L37.489 1.51172C38.8327 -0.503906 41.7943 -0.503906 43.1381 1.51172L55.8607 20.593C56.1363 21.0057 56.4931 21.358 56.9094 21.6282C57.3257 21.8984 57.7926 22.081 58.2818 22.1648C58.771 22.2485 59.2721 22.2317 59.7546 22.1153C60.237 21.9989 60.6907 21.7855 61.0879 21.4879L76.369 10.0284C78.2772 8.59866 80.9566 10.2058 80.5938 12.56L75.6891 44.4392H4.93797ZM71.9992 62.1283H8.6279C8.14334 62.1283 7.66351 62.0328 7.21583 61.8474C6.76814 61.662 6.36137 61.3902 6.01872 61.0475C5.32673 60.3555 4.93797 59.417 4.93797 58.4383V50.3355H75.6891V58.4383C75.6891 60.4755 74.0363 62.1283 71.9992 62.1283Z" fill="#1B2A4A"/>
     </svg>
 </div>
-          <h3 className="text-[clamp(14px,1.1vw,20px)] font-bold text-gray-900 text-center">
+          <h3 className="text-[clamp(17px,1.3vw,22px)] font-bold text-gray-900 text-center">
             {/* Premium Feature */}
             {t('common.premiumFeature')}
           </h3>
-          <p className="text-[clamp(11px,0.875vw,14px)] text-secondary text-center">
+          <p className="text-[clamp(13px,1vw,16px)] text-secondary text-center">
            {t('limits.focusModePremium')}
           </p>
           <button
@@ -282,7 +282,7 @@ const Navbar = () => {
                useRedirect("/profile?open=subscription");
             }}
             // className="w-full h-[48px] bg-primary text-white rounded-[12px] text-[15px] font-semibold hover:opacity-90 transition-opacity"
-            className="w-full h-[clamp(36px,2.5vw,48px)] text-white rounded-[clamp(8px,0.6vw,12px)] text-[clamp(12px,0.85vw,15px)] font-semibold hover:opacity-90 transition-opacity"
+            className="w-full h-[clamp(36px,2.5vw,48px)] text-white rounded-[clamp(8px,0.6vw,12px)] text-[clamp(14px,1vw,17px)] font-semibold hover:opacity-90 transition-opacity"
             style={{
               backgroundImage: "url('/images/buttonBg.svg')",
               backgroundSize: '175% 700%',
@@ -296,7 +296,7 @@ const Navbar = () => {
           </button>
           <button
             onClick={() => setShowUpgradeModal(false)}
-            className="text-[clamp(11px,0.875vw,14px)] text-secondary hover:text-gray-700 transition-colors"
+            className="text-[clamp(13px,1vw,16px)] text-secondary hover:text-gray-700 transition-colors"
           >
             {/* Maybe later */}
             {t('common.cancel')}

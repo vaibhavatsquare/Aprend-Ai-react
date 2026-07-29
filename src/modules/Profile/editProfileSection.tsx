@@ -32,6 +32,7 @@ useEffect(() => {
     const [image, setImage] = useState<string | null>(user?.image || null);
     const [loading, setLoading] = useState(false);
     const [imageFile, setImageFile] = useState<File | null>(null);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
 
@@ -190,24 +191,77 @@ message.success("Profile updated");
 
                     <div className="relative mt-1">
 
-                        {/* <select
-                            value={education}
-                            onChange={(e) =>
-                                setEducation(e.target.value as UserEducationLevel)
-                            }
-                            className="w-full h-[48px] px-4 bg-[#F5F5F6] rounded-[12px] outline-none appearance-none"
-                        > */}
-                        <select
-                            value={education}
-                             onChange={(e) => setEducation(e.target.value)}
-                            className="w-full h-[48px] px-4 bg-[#F5F5F6] rounded-[12px] outline-none appearance-none border border-transparent focus:border-2 focus:border-[#2563EB] transition-all"
+                        {/* Trigger button */}
+                        <button
+                            type="button"
+                            onClick={() => setDropdownOpen((p) => !p)}
+                            className={`w-full h-[48px] px-4 bg-[#F5F5F6] rounded-[12px] flex items-center justify-between transition-all border-2 ${
+                                dropdownOpen ? "border-[#2563EB]" : "border-transparent"
+                            }`}
                         >
-                            {educationLevels.map((level) => (
-                                <option key={level.id} value={level.id}>
-                                    {level.name}
-                                </option>
-                            ))}
-                        </select>
+                            <span className={`text-[15px] ${education ? "text-primaryText" : "text-gray-400"}`}>
+                                {educationLevels.find((l) => l.id === education)?.name || "Select education level"}
+                            </span>
+                            <svg
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke={dropdownOpen ? "#2563EB" : "#9CA3AF"}
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                style={{
+                                    transform: dropdownOpen ? "rotate(180deg)" : "rotate(0deg)",
+                                    transition: "transform 0.2s ease",
+                                    flexShrink: 0,
+                                }}
+                            >
+                                <polyline points="6 9 12 15 18 9" />
+                            </svg>
+                        </button>
+
+                        {/* Dropdown list */}
+                        {dropdownOpen && (
+                            <div
+                                className="absolute z-50 w-full mt-2 bg-white rounded-[12px] overflow-hidden"
+                                style={{ boxShadow: "0px 4px 24px rgba(37,99,235,0.13), 0px 1.5px 6px rgba(0,0,0,0.08)" }}
+                            >
+                                <div className="max-h-[220px] overflow-y-auto scrollbar">
+                                    {educationLevels.map((level, idx) => {
+                                        const isSelected = education === level.id;
+                                        return (
+                                            <button
+                                                key={level.id}
+                                                type="button"
+                                                onClick={() => {
+                                                    setEducation(level.id);
+                                                    setDropdownOpen(false);
+                                                }}
+                                                className={`w-full flex items-center justify-between px-4 py-3 text-left transition-colors ${
+                                                    isSelected
+                                                        ? "bg-[#EFF6FF] text-[#2563EB]"
+                                                        : "text-primaryText hover:bg-[#F5F7FF]"
+                                                } ${idx !== 0 ? "border-t border-gray-100" : ""}`}
+                                            >
+                                                <span className="text-[14px] font-medium">{level.name}</span>
+                                                {isSelected && (
+                                                    <svg width="16" height="16" viewBox="0 0 14 14" fill="none">
+                                                        <path
+                                                            d="M2.5 7L5.5 10L11.5 4"
+                                                            stroke="#2563EB"
+                                                            strokeWidth="2"
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                        />
+                                                    </svg>
+                                                )}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
 
                     </div>
 
